@@ -222,3 +222,6 @@ while running:
                 print("loseCase")
             if event.type == pygame.QUIT:
                 running = False
+                
+        # Update the display
+        pygame.display.update()
