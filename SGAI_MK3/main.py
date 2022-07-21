@@ -10,11 +10,12 @@ BORDER = 150                    # Number of pixels to offset grid to the top-lef
 CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
 ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite"]
 SELF_PLAY = False
+AI_PLAY_WAITTIME_MS = 300
 
 # Player role variables
 player_role = "Government"      # Valid options are "Government" and "Zombie"
 roleToRoleNum = {"Government": 1, "Zombie": -1}
-roleToRoleBoolean = {"Government": False, "Zombie": True}
+roleToRoleBoolean = {"Government": False, "Zombie": True}       # False means Human, True means Zombie. Switching this would turn Humans to Zombies, and vice versa. 
 
 #Create the game board
 GameBoard = Board((ROWS,COLUMNS), BORDER, CELL_DIMENSIONS, roleToRoleNum[player_role])
@@ -46,14 +47,14 @@ while running:
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = pygame.mouse.get_pos()
-                action = PF.get_action(GameBoard, x, y)
+                action = PF.get_action(GameBoard, x, y)                     # Can only return "heal", coordinate of grid clicked, or None. 
                 if action == "heal":                                        # Process a "heal" intention if take_action is currently empty
                     if take_action == []:
                         take_action.append("heal")
                 elif action != None:                                        # Otherwise, get the coordinate of a valid grid cell that was clicked
                     idx = GameBoard.toIndex(action)                         # Get the corresponding 1D index from the 2D grid location that was clicked
-                    if "move" not in take_action and take_action == []:     # Check that the click corresponds to an intention to move a player
-                        # Make sure that the space is not an empty space or a space of the opposite team
+                    if take_action == []:                                   # Check that the click corresponds to an intention to move a player
+                        # Returns true if the space is not empty and it is a piece belonging to the player.
                         if ( (GameBoard.States[idx].person is not None) and (GameBoard.States[idx].person.isZombie == roleToRoleBoolean[player_role]) ):
                             take_action.append("move")
                     if take_action != []:                                   # Only append a coordinate if there is a pending "heal" or "move" intention
@@ -71,7 +72,7 @@ while running:
         # Action handling
         if len(take_action) > 1:
             if take_action[0] == "move":
-                if len(take_action) > 2:
+                if len(take_action) > 2:        #Makes sure the second coordinate is clicked
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     result = [False, None]
                     if directionToMove == "moveUp":
@@ -140,88 +141,92 @@ while running:
     else:
         if epochs_ran % 100 == 0:
             print("Board Reset!")
-            GameBoard = Original_Board  # reset environment
-        for event in P:
-            i = 0
-            r = rd.uniform(0.0, 1.0)
-            st = rd.randint(0, len(GameBoard.States) - 1)
-            state = GameBoard.QTable[st]
+            GameBoard = Original_Board  # reset environment        
+        pygame.time.wait(AI_PLAY_WAITTIME_MS)        
+        i = 0
+        r = rd.uniform(0.0, 1.0)
+        st = rd.randint(0, len(GameBoard.States) - 1)
+        state = GameBoard.QTable[st]
 
-            if r < gamma:
-                while GameBoard.States[st].person is None:
-                    st = rd.randint(0, len(GameBoard.States) - 1)
-            else:
-                biggest = None
-                for x in range(len(GameBoard.States)):
-                    arr = GameBoard.QTable[x]
-                    exp = sum(arr) / len(arr)
-                    if biggest is None:
-                        biggest = exp
-                        i = x
-                    elif biggest < exp and player_role == "Government":
-                        biggest = exp
-                        i = x
-                    elif biggest > exp and player_role != "Government":
-                        biggest = exp
-                        i = x
-                state = GameBoard.QTable[i]
-            b = 0
-            j = 0
-            ind = 0
-            for v in state:
-                if v > b and player_role == "Government":
-                    b = v
-                    ind = j
-                elif v < b and player_role != "Government":
-                    b = v
-                    ind = j
-                j += 1
-            action_to_take = ACTION_SPACE[ind]
-            old_qval = b
-            old_state = i
-            
-            # Update
-            # Q(S, A) = Q(S, A) + alpha[R + gamma * max_a Q(S', A) - Q(S, A)]
-            reward = GameBoard.act(old_state, action_to_take)
-            ns = reward[1]
-            NewStateAct = GameBoard.QGreedyat(ns)
-            NS = GameBoard.QTable[ns][NewStateAct[0]]
-            #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
-            if GameBoard.num_zombies() == 0:
-                print("winCase")
+        if r < gamma:
+            while GameBoard.States[st].person is None:
+                st = rd.randint(0, len(GameBoard.States) - 1)
+        else:
+            biggest = None
+            for x in range(len(GameBoard.States)):
+                arr = GameBoard.QTable[x]
+                exp = sum(arr) / len(arr)
+                if biggest is None:
+                    biggest = exp
+                    i = x
+                elif biggest < exp and player_role == "Government":
+                    biggest = exp
+                    i = x
+                elif biggest > exp and player_role != "Government":
+                    biggest = exp
+                    i = x
+            state = GameBoard.QTable[i]
+        b = 0
+        j = 0
+        ind = 0
+        for v in state:
+            if v > b and player_role == "Government":
+                b = v
+                ind = j
+            elif v < b and player_role != "Government":
+                b = v
+                ind = j
+            j += 1
+        action_to_take = ACTION_SPACE[ind]
+        old_qval = b
+        old_state = i
+        
+        # Update
+        # Q(S, A) = Q(S, A) + alpha[R + gamma * max_a Q(S', A) - Q(S, A)]
+        reward = GameBoard.act(old_state, action_to_take)
+        ns = reward[1]
+        NewStateAct = GameBoard.QGreedyat(ns)
+        NS = GameBoard.QTable[ns][NewStateAct[0]]
+        #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
+        if GameBoard.num_zombies() == 0:
+            print("winCase")
+            break
 
-            take_action = []
-            print("Enemy turn")
-            ta = ""
-            if player_role == "Government":
+        take_action = []
+        print("Enemy turn")
+        ta = ""
+        if player_role == "Government":
+            r = rd.randint(0, 5)
+            while r == 4:
                 r = rd.randint(0, 5)
-                while r == 4:
-                    r = rd.randint(0, 5)
-                ta = ACTION_SPACE[r]
-            else:
-                r = rd.randint(0, 4)
-                ta = ACTION_SPACE[r]
-            poss = GameBoard.get_possible_moves(ta, "Zombie")
-            
-            if len(poss) > 0:
-                r = rd.randint(0, len(poss) - 1)
-                a = poss[r]
-                if ta == "moveUp":
-                    GameBoard.moveUp(a)
-                elif ta == "moveDown":
-                    GameBoard.moveDown(a)
-                elif ta == "moveLeft":
-                    GameBoard.moveLeft(a)
-                elif ta == "moveRight":
-                    GameBoard.moveRight(a)
-                elif ta == "bite":
-                    GameBoard.bite(a)
-                elif ta == "heal":
-                    GameBoard.heal(a)
-            if GameBoard.num_zombies() == GameBoard.population:
-                print("loseCase")
+            ta = ACTION_SPACE[r]
+        else:
+            r = rd.randint(0, 4)
+            ta = ACTION_SPACE[r]
+        poss = GameBoard.get_possible_moves(ta, "Zombie")
+        
+        if len(poss) > 0:
+            r = rd.randint(0, len(poss) - 1)
+            a = poss[r]
+            if ta == "moveUp":
+                GameBoard.moveUp(a)
+            elif ta == "moveDown":
+                GameBoard.moveDown(a)
+            elif ta == "moveLeft":
+                GameBoard.moveLeft(a)
+            elif ta == "moveRight":
+                GameBoard.moveRight(a)
+            elif ta == "bite":
+                GameBoard.bite(a)
+            elif ta == "heal":
+                GameBoard.heal(a)
+        if GameBoard.num_zombies() == GameBoard.population:
+            print("loseCase")
+            break
+        for event in P:
             if event.type == pygame.QUIT:
                 running = False
+                break 
                 
         # Update the display
         pygame.display.update()
