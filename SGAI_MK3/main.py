@@ -200,30 +200,27 @@ while running:
         print("Enemy turn")
         ta = ""
         if player_role == "Government":
-            r = rd.randint(0, 5)
-            while r == 4:
-                r = rd.randint(0, 5)
-            ta = ACTION_SPACE[r]
+            GameBoard.zombie_move()
         else:
             r = rd.randint(0, 4)
             ta = ACTION_SPACE[r]
-        poss = GameBoard.get_possible_moves(ta, "Zombie")
-        
-        if len(poss) > 0:
-            r = rd.randint(0, len(poss) - 1)
-            a = poss[r]
-            if ta == "moveUp":
-                GameBoard.moveUp(a)
-            elif ta == "moveDown":
-                GameBoard.moveDown(a)
-            elif ta == "moveLeft":
-                GameBoard.moveLeft(a)
-            elif ta == "moveRight":
-                GameBoard.moveRight(a)
-            elif ta == "bite":
-                GameBoard.bite(a)
-            elif ta == "heal":
-                GameBoard.heal(a)
+            poss = GameBoard.get_possible_moves(ta, "Zombie")        
+            if len(poss) > 0:
+                r = rd.randint(0, len(poss) - 1)
+                a = poss[r]
+                if ta == "moveUp":
+                    GameBoard.moveUp(a)
+                elif ta == "moveDown":
+                    GameBoard.moveDown(a)
+                elif ta == "moveLeft":
+                    GameBoard.moveLeft(a)
+                elif ta == "moveRight":
+                    GameBoard.moveRight(a)
+                elif ta == "bite":
+                    GameBoard.bite(a)
+                elif ta == "heal":
+                    GameBoard.heal(a)
+
         if GameBoard.num_zombies() == GameBoard.population:
             print("loseCase")
             break

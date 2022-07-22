@@ -341,5 +341,27 @@ class Board:
             self.bite(rd.choice(possible_move_coords))
         else:            
             # No zombies can bite, move the zombie that is nearest to a person.
-            
+            # Get all coordinates
+            human_coords = [self.toCoord(ind) for ind in self.get_possible_states(1)]
+            zombie_coords = [self.toCoord(ind) for ind in self.get_possible_states(-1)]
+            min_dist = 9999999
+            selected_human, selected_zombie = (-1, -1), (-1, -1)
 
+            # Find the zombie and human with minimum move distance
+            for human in human_coords:
+                for zombie in zombie_coords:
+                    dist = abs(human[0] - zombie[0]) + abs(human[1] - zombie[1])
+                    if dist < min_dist:
+                        min_dist = dist
+                        selected_human, selected_zombie = human, zombie
+            
+            diff_x = selected_human[0] - selected_zombie[0]
+            diff_y = selected_human[1] - selected_zombie[1]
+            
+            # Top Left corner is (0, 0)
+            if abs(diff_y) > abs(diff_x):
+                if diff_y > 0: self.moveDown(selected_zombie)
+                else: self.moveUp(selected_zombie)
+            else:
+                if diff_x > 0: self.moveRight(selected_zombie)
+                else: self.moveLeft(selected_zombie)
