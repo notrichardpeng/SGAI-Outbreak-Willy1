@@ -56,7 +56,7 @@ class Board:
         is valid and which people/zombies it applies to
         """
         poss = []
-        B = self.clone(self.States)
+        B = self.clone(self.States)     #Clone a new board
 
         if role == "Zombie":
             for idx in range(len(self.States)):
@@ -64,7 +64,7 @@ class Board:
                 state = self.States[idx]
                 if state.person is not None:
                     if action == "bite":
-                        # if the current space isn't a zombie and it is adjacent a space that is a zombie
+                        # if the current space isn't a zombie and it is adjacent to a space that is a zombie
                         if not state.person.isZombie and self.isAdjacentTo(
                             self.toCoord(idx), True
                         ):
@@ -332,3 +332,14 @@ class Board:
                 s = rd.randint(0, len(poss) - 1)
             self.States[poss[s]].person.isZombie = True
             used.append(s)
+
+    #Zombie AI logic
+    def zombie_move(self):
+        # First check if any zombie can bite
+        possible_move_coords = self.get_possible_moves("bite", "Zombie")
+        if len(possible_move_coords) > 0:                
+            self.bite(rd.choice(possible_move_coords))
+        else:            
+            # No zombies can bite, move the zombie that is nearest to a person.
+            
+
