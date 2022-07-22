@@ -1,7 +1,7 @@
 import pygame
 from Board import Board
 import PygameFunctions as PF
-import random as rd
+import random as rd 
 
 # Constants
 ROWS = 6
@@ -9,7 +9,7 @@ COLUMNS = 6
 BORDER = 150                    # Number of pixels to offset grid to the top-left side
 CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
 ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite"]
-SELF_PLAY = False
+SELF_PLAY = True
 AI_PLAY_WAITTIME_MS = 300
 
 # Player role variables
@@ -36,6 +36,30 @@ take_action = []
 playerMoved = False
 font = pygame.font.SysFont("Comic Sans", 20)
 
+# Option menu
+AIPlayButton = pygame.Rect(340, 450, 400, 250)
+govtButton = pygame.Rect(300, 300, 200, 100)
+zomButton = pygame.Rect(650, 300, 200, 100)
+
+proceed = False
+while proceed == False:
+    for event in pygame.event.get():
+        PF.display_options_screen()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            x, y = event.pos
+            if AIPlayButton.collidepoint(pygame.mouse.get_pos()):
+                SELF_PLAY = False
+                proceed = True
+            elif govtButton.collidepoint(pygame.mouse.get_pos()):
+                SELF_PLAY = True
+                player_role = "Government"
+                proceed = True
+            elif zomButton.collidepoint(pygame.mouse.get_pos()):
+                SELF_PLAY = True
+                player_role = "Zombie"
+                proceed = True
+        elif event.type == pygame.QUIT:
+            pygame.quit()
 
 
 while running:

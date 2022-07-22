@@ -129,6 +129,21 @@ def display_lose_screen():
         if event.type == pygame.QUIT:
             return
 
+def display_options_screen():
+    screen.fill(BACKGROUND)
+    screen.blit(
+        pygame.font.SysFont("Comic Sans", 32).render("Who do you want to play?", True, WHITE), (400, 200),
+    )
+    screen.blit(
+        pygame.font.SysFont("Comic Sans", 32).render("or", True, WHITE), (560, 450),
+    )
+
+    display_image(screen, "Assets/govt.png",  (200, 100), (300, 300))
+    display_image(screen, "Assets/zom.png",  (200, 100), (650, 300))
+    display_image(screen, "Assets/self_play.png",  (400, 250), (340, 450))
+    pygame.display.update()
+    
+
 def direction(coord1, coord2):
     if coord2[1] > coord1[1]:
         return "moveDown"
