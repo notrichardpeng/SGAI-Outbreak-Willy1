@@ -122,42 +122,46 @@ while running:
             playerMoved = False
             take_action = []
             
-            # Make a list of all possible actions that the computer can take
-            possible_actions = [
-                ACTION_SPACE[i]
-                for i in range(6)
-                if (i != 4 and player_role == "Government") or (i != 5 and player_role == "Zombie")
-            ]
-            
-            # Figure out all possible moves and select an action
-            possible_move_coords = []
-            while len(possible_move_coords) == 0 and len(possible_actions) != 0:
-                action = rd.choice(possible_actions)
-                possible_move_coords = GameBoard.get_possible_moves(action, "Government" if player_role == "Zombie" else "Zombie")
-                possible_actions.remove(action)
-            
-            # No valid moves, player wins
-            if len(possible_actions) == 0 and len(possible_move_coords) == 0:
-                PF.display_win_screen()
-                running = False
-                continue
-            
-            # Select the destination coordinates
-            move_coord = rd.choice(possible_move_coords)
-            
-            # Implement the selected action
-            if action == "moveUp":
-                GameBoard.moveUp(move_coord)
-            elif action == "moveDown":
-                GameBoard.moveDown(move_coord)
-            elif action == "moveLeft":
-                GameBoard.moveLeft(move_coord)
-            elif action == "moveRight":
-                GameBoard.moveRight(move_coord)
-            elif action == "bite":
-                GameBoard.bite(move_coord)
-            elif action == "heal":
-                GameBoard.heal(move_coord)
+            if player_role == "Government":
+                GameBoard.zombie_move()
+            else:
+                # Make a list of all possible actions that the computer can take
+                # This huge chunk is only for AI as government, might not be worth it to keep since we will be training a smarter AI
+                possible_actions = [
+                    ACTION_SPACE[i]
+                    for i in range(6)
+                    if (i != 4 and player_role == "Government") or (i != 5 and player_role == "Zombie")
+                ]
+                
+                # Figure out all possible moves and select an action
+                possible_move_coords = []
+                while len(possible_move_coords) == 0 and len(possible_actions) != 0:
+                    action = rd.choice(possible_actions)
+                    possible_move_coords = GameBoard.get_possible_moves(action, "Government" if player_role == "Zombie" else "Zombie")
+                    possible_actions.remove(action)
+                
+                # No valid moves, player wins
+                if len(possible_actions) == 0 and len(possible_move_coords) == 0:
+                    PF.display_win_screen()
+                    running = False
+                    continue
+                
+                # Select the destination coordinates
+                move_coord = rd.choice(possible_move_coords)
+                
+                # Implement the selected action
+                if action == "moveUp":
+                    GameBoard.moveUp(move_coord)
+                elif action == "moveDown":
+                    GameBoard.moveDown(move_coord)
+                elif action == "moveLeft":
+                    GameBoard.moveLeft(move_coord)
+                elif action == "moveRight":
+                    GameBoard.moveRight(move_coord)
+                elif action == "bite":
+                    GameBoard.bite(move_coord)
+                elif action == "heal":
+                    GameBoard.heal(move_coord)
 
         # Update the display
         pygame.display.update()
@@ -220,30 +224,27 @@ while running:
         print("Enemy turn")
         ta = ""
         if player_role == "Government":
-            r = rd.randint(0, 5)
-            while r == 4:
-                r = rd.randint(0, 5)
-            ta = ACTION_SPACE[r]
+            GameBoard.zombie_move()
         else:
             r = rd.randint(0, 4)
             ta = ACTION_SPACE[r]
-        poss = GameBoard.get_possible_moves(ta, "Zombie")
-        
-        if len(poss) > 0:
-            r = rd.randint(0, len(poss) - 1)
-            a = poss[r]
-            if ta == "moveUp":
-                GameBoard.moveUp(a)
-            elif ta == "moveDown":
-                GameBoard.moveDown(a)
-            elif ta == "moveLeft":
-                GameBoard.moveLeft(a)
-            elif ta == "moveRight":
-                GameBoard.moveRight(a)
-            elif ta == "bite":
-                GameBoard.bite(a)
-            elif ta == "heal":
-                GameBoard.heal(a)
+            poss = GameBoard.get_possible_moves(ta, "Zombie")        
+            if len(poss) > 0:
+                r = rd.randint(0, len(poss) - 1)
+                a = poss[r]
+                if ta == "moveUp":
+                    GameBoard.moveUp(a)
+                elif ta == "moveDown":
+                    GameBoard.moveDown(a)
+                elif ta == "moveLeft":
+                    GameBoard.moveLeft(a)
+                elif ta == "moveRight":
+                    GameBoard.moveRight(a)
+                elif ta == "bite":
+                    GameBoard.bite(a)
+                elif ta == "heal":
+                    GameBoard.heal(a)
+
         if GameBoard.num_zombies() == GameBoard.population:
             print("loseCase")
             break
