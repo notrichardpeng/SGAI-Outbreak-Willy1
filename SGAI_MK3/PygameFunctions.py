@@ -4,6 +4,7 @@ BACKGROUND = "#DDC2A1"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (233, 222, 188)
+HOSPITAL_COLOR = (191, 209, 255)
 LINE_WIDTH = 5
 
 image_assets = [
@@ -44,12 +45,12 @@ def get_action(GameBoard, pixel_x, pixel_y):
                 return (board_x, board_y)
     return None
 
-def run(GameBoard):
+def run(GameBoard, hasHospital):
     """
     Draw the screen and return any events.
     """
     screen.fill(BACKGROUND)
-    build_grid(GameBoard) # Draw the grid
+    build_grid(GameBoard, hasHospital) # Draw the grid
     display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200)) # Draw the heal icon
     display_people(GameBoard)
     return pygame.event.get()
@@ -62,7 +63,7 @@ def display_image(screen, itemStr, dimensions, position):
     v = pygame.transform.scale(v, dimensions)
     screen.blit(v, position)
 
-def build_grid(GameBoard):
+def build_grid(GameBoard, hasHospital):
     """
     Draw the grid on the screen.
     """
@@ -73,6 +74,10 @@ def build_grid(GameBoard):
     pygame.draw.rect(screen, BLACK, [GameBoard.display_border - LINE_WIDTH, GameBoard.display_border + grid_height, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])  # bottom
     pygame.draw.rect(screen, BLACK, [GameBoard.display_border - LINE_WIDTH, GameBoard.display_border - LINE_WIDTH, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])   # top
     pygame.draw.rect(screen, CELL_COLOR, [GameBoard.display_border, GameBoard.display_border, grid_width, grid_height]) # Fill the inside wioth the cell color
+    
+    if hasHospital == True:
+        pygame.draw.rect(screen, HOSPITAL_COLOR, [150, 150, 300, 300])
+
     # Draw the vertical lines
     i = GameBoard.display_border + GameBoard.display_cell_dimensions[0]
     while i < GameBoard.display_border + grid_width:
@@ -137,10 +142,19 @@ def display_options_screen():
     screen.blit(
         pygame.font.SysFont("Comic Sans", 32).render("or", True, WHITE), (560, 450),
     )
+    screen.blit(
+        pygame.font.SysFont("Comic Sans", 32).render("Yes Hospital", True, WHITE), (300, 500),
+    )
+    screen.blit(
+        pygame.font.SysFont("Comic Sans", 32).render("No Hospital", True, WHITE), (650, 500),
+    )
 
     display_image(screen, "Assets/govt.png",  (200, 100), (300, 300))
     display_image(screen, "Assets/zom.png",  (200, 100), (650, 300))
-    display_image(screen, "Assets/self_play.png",  (400, 250), (340, 450))
+    # Yes Hospital
+    display_image(screen, "Assets/self_play.png",  (400, 250), (150, 480))
+    # No Hospital
+    display_image(screen, "Assets/self_play.png",  (400, 250), (500, 480))
     pygame.display.update()
     
 

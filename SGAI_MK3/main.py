@@ -29,15 +29,16 @@ epochs = 1000
 epochs_ran = 0
 Original_Board = GameBoard.clone(GameBoard.States)
 
-
 # Initialize variables
 running = True
 take_action = []
 playerMoved = False
 font = pygame.font.SysFont("Comic Sans", 20)
+hospital = False
 
 # Option menu
-AIPlayButton = pygame.Rect(340, 450, 400, 250)
+AIYesHosButton = pygame.Rect(150, 480, 400, 250)
+AINoHosButton = pygame.Rect(500, 480, 400, 250)
 govtButton = pygame.Rect(300, 300, 200, 100)
 zomButton = pygame.Rect(650, 300, 200, 100)
 
@@ -47,8 +48,13 @@ while proceed == False:
         PF.display_options_screen()
         if event.type == pygame.MOUSEBUTTONDOWN:
             x, y = event.pos
-            if AIPlayButton.collidepoint(pygame.mouse.get_pos()):
+            if AIYesHosButton.collidepoint(pygame.mouse.get_pos()):
                 SELF_PLAY = False
+                hospital = True
+                proceed = True
+            elif AINoHosButton.collidepoint(pygame.mouse.get_pos()):
+                SELF_PLAY = False
+                hospital = False
                 proceed = True
             elif govtButton.collidepoint(pygame.mouse.get_pos()):
                 SELF_PLAY = True
@@ -63,7 +69,7 @@ while proceed == False:
 
 
 while running:
-    P = PF.run(GameBoard)
+    P = PF.run(GameBoard, hospital)
 
     if SELF_PLAY:
         
