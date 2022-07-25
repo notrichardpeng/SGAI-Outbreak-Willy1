@@ -66,8 +66,6 @@ Original_Board = GameBoard.clone(GameBoard.States)
 
 while running:
     P = PF.run(GameBoard, hospital)
-    if len(take_action) == 2:
-        PF.select(take_action[1])
     if self_play:
         # Event Handling
         for event in P:
@@ -101,7 +99,8 @@ while running:
         PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
 
         # Draws selection box
-
+        if len(take_action) == 2:
+            PF.select(take_action[1])
         # Action handling
         if len(take_action) > 1:
             if take_action[0] == "move":
