@@ -24,7 +24,6 @@ person_dimensions = (20, 60)
 pygame.display.set_caption("Outbreak!")
 screen.fill(BACKGROUND)
 
-
 def get_action(GameBoard, pixel_x, pixel_y):
     """
     Get the action that the click represents.
@@ -162,6 +161,14 @@ def display_options_screen():
     display_image(screen, "Assets/DefaultButton.png",  (200, 100), (650, 600))
     pygame.display.update()
     
+def select(coord):
+    left = coord[0] * 100 + 150
+    top = coord[1] * 100 + 150
+    color = (161, 182, 194)
+    # Drawing Rectangle
+    pygame.draw.rect(screen, color, pygame.Rect(left, top, 100 + LINE_WIDTH, 100 + LINE_WIDTH),  LINE_WIDTH+3)
+    pygame.display.update()
+
 
 def direction(coord1, coord2):
     if coord2[1] > coord1[1]:
