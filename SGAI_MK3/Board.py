@@ -2,7 +2,6 @@ from tracemalloc import start
 from State import State
 import random as rd
 from Person import Person
-from typing import Tuple
 
 VACCINE_DURATION = 5
 MOVE_ACTIONS = ["moveUp", "moveDown", "moveLeft", "moveRight"]
@@ -161,7 +160,7 @@ class Board:
 
         return ret
 
-    def move(self, from_coords, new_coords) -> Tuple[bool, int]:
+    def move(self, from_coords, new_coords):
         """
         Check if the move is valid.
         If valid, then implement the move and return [True, destination_idx]
@@ -183,19 +182,19 @@ class Board:
             return [True, destination_idx]
         return [False, destination_idx]
 
-    def moveUp(self, coords) -> Tuple[bool, int]:
+    def moveUp(self, coords):
         new_coords = (coords[0], coords[1] - 1)
         return self.move(coords, new_coords)
 
-    def moveDown(self, coords) -> Tuple[bool, int]:
+    def moveDown(self, coords):
         new_coords = (coords[0], coords[1] + 1)
         return self.move(coords, new_coords)
 
-    def moveLeft(self, coords) -> Tuple[bool, int]:
+    def moveLeft(self, coords):
         new_coords = (coords[0] - 1, coords[1])
         return self.move(coords, new_coords)
 
-    def moveRight(self, coords) -> Tuple[bool, int]:
+    def moveRight(self, coords):
         new_coords = (coords[0] + 1, coords[1])
         return self.move(coords, new_coords)
 
