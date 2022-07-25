@@ -269,7 +269,7 @@ class Board:
             chance = 50
         r = rd.randint(0, 100)
         if r < chance:            
-            self.States[i].person.isZombie = True
+            self.States[i].person = Person(True)
         return [True, i]
 
     def heal(self, coords):
@@ -286,7 +286,7 @@ class Board:
         if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
             if not self.isAdjacentTo(self.toCoord(i), False):                
-                return [False, None]            
+                return [False, None]
             # Was the zombie already half-cured?
             if p.halfCured == False and (p.isInHospital(coords) == False or self.hasHospital == False):
                 p.halfCured = True
