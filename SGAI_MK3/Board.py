@@ -66,7 +66,7 @@ class Board:
                 if state.person is not None:
                     if action == "bite":
                         # if the current space isn't a zombie and it is adjacent to a space that is a zombie
-                        if not state.person.isZombie and self.isAdjacentTo(
+                        if not state.person.isZombie and not state.person.isVaccinated and self.isAdjacentTo(
                             self.toCoord(idx), True
                         ):
                             poss.append(B.toCoord(state.location))
@@ -138,7 +138,7 @@ class Board:
             if (
                 self.isValidCoordinate(coord)
                 and self.States[self.toIndex(coord)].person is not None
-                and not self.States[self.toIndex(coord)].person.stunned
+                and not self.States[self.toIndex(coord)].person.isStunned
                 and self.States[self.toIndex(coord)].person.isZombie == is_zombie
             ):
                 ret = True
@@ -278,7 +278,7 @@ class Board:
             # Was the zombie already half-cured?
             if newP.halfCured == False and (newP.isInHospital(coords) == False or self.hasHospital == False):
                 newP.halfCured = True
-                newP.stunned = True
+                newP.isStunned = True
             elif (newP.halfCured == True or (newP.isInHospital(coords) == True and self.hasHospital == True)):
                 newP.isZombie = False
                 newP.wasCured = True                
@@ -295,13 +295,36 @@ class Board:
         indexes = []
         i = 0
         for state in self.States:
-            if state.person != None and not state.person.stunned:
+            if state.person != None and not state.person.isStunned:
                 if rn == 1 and state.person.isZombie == False:
                     indexes.append(i)
                 elif rn == -1 and state.person.isZombie:
                     indexes.append(i)
             i += 1
         return indexes
+
+    def get_possible_human_targets(self):
+        coords = []
+        i = 0
+        for state in self.States:
+            if state.person is not None and not state.person.isZombie:
+                coords.append(self.toCoord(i))
+            i += 1
+        return coords
+
+    def get_possible_zombies_to_move(self):
+        coords = []
+        i = 0
+        for state in self.States:
+            c = self.toCoord(i)
+            if (state.person is not None 
+                and state.person.isZombie 
+                and not state.person.isStunned 
+                and not self.isAdjacentTo(c, False)
+                ):
+                coords.append(c)
+            i += 1
+        return coords
 
     def step(self, role_number, learningRate):
         P = self.get_possible_states(role_number)
@@ -352,12 +375,14 @@ class Board:
         # First check if any zombie can bite
         possible_move_coords = self.get_possible_moves("bite", "Zombie")
         if len(possible_move_coords) > 0:                
-            self.bite(rd.choice(possible_move_coords))
+            coord = rd.choice(possible_move_coords)
+            self.bite(coord)
+            print("Bite " + str(coord))
         else:            
             # No zombies can bite, move the zombie that is nearest to a person.
             # Get all coordinates
-            human_coords = [self.toCoord(ind) for ind in self.get_possible_states(1)]
-            zombie_coords = [self.toCoord(ind) for ind in self.get_possible_states(-1)]
+            human_coords = self.get_possible_human_targets()
+            zombie_coords = self.get_possible_zombies_to_move()
             min_dist = 9999999
             selected_human, selected_zombie = (-1, -1), (-1, -1)
 
@@ -365,13 +390,15 @@ class Board:
             for human in human_coords:
                 for zombie in zombie_coords:
                     dist = abs(human[0] - zombie[0]) + abs(human[1] - zombie[1])
-                    if dist < min_dist:
+                    if dist < min_dist and dist > 1: # if distance is 1, then the person can already be bitten, so let's move another zombie
                         min_dist = dist
                         selected_human, selected_zombie = human, zombie
             
             diff_x = selected_human[0] - selected_zombie[0]
             diff_y = selected_human[1] - selected_zombie[1]
             
+            print("Move " + str(selected_zombie))
+
             # Top Left corner is (0, 0)
             if abs(diff_y) > abs(diff_x):
                 if diff_y > 0: self.moveDown(selected_zombie)
@@ -382,5 +409,5 @@ class Board:
 
     def remove_stuns(self):
         for state in self.States:
-            if state.person is not None and state.person.stunned:
-                state.person.stunned = False
+            if state.person is not None and state.person.isStunned:
+                state.person.isStunned = False

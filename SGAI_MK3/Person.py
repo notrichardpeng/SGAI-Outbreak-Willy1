@@ -6,7 +6,7 @@ class Person:
         self.isVaccinated = False
         self.halfCured = False
         self.wasCured = False
-        self.stunned = False
+        self.isStunned = False
 
     def clone(self):
         ret = Person(self.isZombie)
@@ -15,7 +15,7 @@ class Person:
         ret.isVaccinated = self.isVaccinated
         ret.halfCured = self.halfCured
         ret.wasCured = self.wasCured
-        ret.stunned = self.stunned
+        ret.isStunned = self.isStunned
         return ret
 
     # Checks whether a piece is in the hospital
