@@ -5,6 +5,7 @@ from Person import Person
 from typing import Tuple
 
 VACCINE_DURATION = 5
+MOVE_ACTIONS = ["moveUp", "moveDown", "moveLeft", "moveRight"]
 
 class Board:
     def __init__(self, dimensions, border, cell_dimensions, pr, h):
@@ -332,8 +333,13 @@ class Board:
         coords = []
         i = 0
         for state in self.States:
-            if state.person is not None and not state.person.isZombie:
-                coords.append(self.toCoord(i))
+            c = self.toCoord(i)
+            if (
+                state.person is not None 
+                and not state.person.isZombie
+                and not self.isAdjacentTo(c, True)
+            ):
+                coords.append(c)
             i += 1
         return coords
 
@@ -393,7 +399,7 @@ class Board:
             while s in used:
                 s = rd.randint(0, len(poss) - 1)
             self.States[poss[s]].person.isZombie = True
-            used.append(s)
+            used.append(s)    
 
     #Zombie AI logic
     def zombie_move(self):
@@ -419,18 +425,55 @@ class Board:
                         min_dist = dist
                         selected_human, selected_zombie = human, zombie
             
-            diff_x = selected_human[0] - selected_zombie[0]
-            diff_y = selected_human[1] - selected_zombie[1]
-            
-            print("Move " + str(selected_zombie))
+            # If not moving is the best option, then move a random zombie not threatening a person
+            if selected_zombie == (-1, -1): 
+                bored_zombies = [] # Zombies not adjacent to a person
+                busy_zombies = []  # Zombies adjacent to a person
+                for i in range(len(self.States)):
+                    state = self.States[i]
+                    if state.person is not None and state.person.isZombie:
+                        c = self.toCoord(i)
+                        if not self.isAdjacentTo(c, False):
+                            bored_zombies.append(c)
+                        else:
+                            busy_zombies.append(c)
 
-            # Top Left corner is (0, 0)
-            if abs(diff_y) > abs(diff_x):
-                if diff_y > 0: self.moveDown(selected_zombie)
-                else: self.moveUp(selected_zombie)
-            else:
-                if diff_x > 0: self.moveRight(selected_zombie)
-                else: self.moveLeft(selected_zombie)
+                if len(bored_zombies) == 0:
+                    bored_zombies = busy_zombies
+                
+                # Repeat until a valid move is found
+                has_moved = False
+                count = 10
+                while not has_moved and count > 0:                    
+                    zombie = rd.choice(bored_zombies)
+                    action = rd.choice(MOVE_ACTIONS)
+                    if action == "moveUp":
+                        has_moved = self.moveUp(zombie)[0]
+                    elif action == "moveDown":
+                        has_moved = self.moveDown(zombie)[0]
+                    elif action == "moveLeft":
+                        has_moved = self.moveLeft(zombie)[0]
+                    elif action == "moveRight":
+                        has_moved = self.moveRight(zombie)[0]
+
+                    # If we tried so many times and there's still not a valid move, there probably just isn't any,
+                    # perhaps because all the zombies are surrounded by vaccinated humans. In that case, we don't
+                    # want the loop to keep running and crash the game.
+                    count -= 1 
+
+            else: 
+                diff_x = selected_human[0] - selected_zombie[0]
+                diff_y = selected_human[1] - selected_zombie[1]
+                
+                print("Move " + str(selected_zombie))
+
+                # Top Left corner is (0, 0)
+                if abs(diff_y) > abs(diff_x):
+                    if diff_y > 0: self.moveDown(selected_zombie)
+                    else: self.moveUp(selected_zombie)
+                else:
+                    if diff_x > 0: self.moveRight(selected_zombie)
+                    else: self.moveLeft(selected_zombie)
 
     def update_effects(self):        
         for state in self.States:
