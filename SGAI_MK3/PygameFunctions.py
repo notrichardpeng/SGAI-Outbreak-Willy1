@@ -12,6 +12,7 @@ image_assets = [
     "person_vax.png",
     "person_zombie.png",
     "person_half_zombie.png",
+    "kill_background.png",
 ]
 
 # Initialize pygame
@@ -64,7 +65,8 @@ def display_image(screen, itemStr, dimensions, position):
     Draw an image on the screen at the indicated position.
     """
     v = pygame.image.load(itemStr).convert_alpha()
-    v = pygame.transform.scale(v, dimensions)
+    if len(dimensions) != 0:
+        v = pygame.transform.scale(v, dimensions)
     screen.blit(v, position)
 
 def build_grid(GameBoard, hasHospital):
@@ -178,6 +180,11 @@ def select(coord):
     pygame.draw.rect(screen, color, pygame.Rect(left, top, 100 + LINE_WIDTH, 100 + LINE_WIDTH),  LINE_WIDTH+3)
     pygame.display.update()
 
+def kill_animation(frame):
+    char = "Assets/" + image_assets[4]
+    display_image(screen, char, (), (0,0))
+    display_image(screen, "Assets/zombiedeath/sprite_" + str(frame) + ".png", (200, 200), (400, 350))
+    display_image(screen, "Assets/watergun/sprite_" + str(frame) + ".png", (200, 200), (600, 350))
 
 def direction(coord1, coord2):
     if coord2[1] > coord1[1]:

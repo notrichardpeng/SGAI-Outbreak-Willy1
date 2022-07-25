@@ -25,6 +25,7 @@ font = pygame.font.SysFont("Comic Sans", 20)
 self_play = False
 hospital = False
 
+
 # Option menu
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
 HospitalOnButton = pygame.Rect(700, 250, 100, 100)
@@ -65,7 +66,8 @@ Original_Board = GameBoard.clone(GameBoard.States)
 
 
 while running:
-    P = PF.run(GameBoard, hospital)
+    if SELF_PLAY:
+        P = PF.run(GameBoard, hospital)
     if self_play:
         # Event Handling
         for event in P:
@@ -180,7 +182,7 @@ while running:
 
                     
             GameBoard.update_effects()
-        
+
         # Update the display
         pygame.display.update()        
     else:
