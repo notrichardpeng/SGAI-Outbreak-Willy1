@@ -30,6 +30,14 @@ class Board:
                     r += 1
         return r
 
+    def num_humans(self):
+        r = 0
+        for state in self.States:
+            if state.person != None:
+                if not state.person.isZombie:
+                    r += 1
+        return r
+        
     def act(self, oldstate, givenAction):
         cell = self.toCoord(oldstate)
         f = []
@@ -45,9 +53,11 @@ class Board:
             f = self.heal(cell)
         elif givenAction == "bite":
             f = self.bite(cell)
+        elif givenAction == "kill":
+            f = self.kill(cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
         if f[0] == False:
-            reward = 0
+            reward = -1000
         return [reward, f[1]]
 
     def get_possible_moves(self, action, role):
@@ -92,6 +102,9 @@ class Board:
                 if state.person != None:
                     if action == "heal":
                         if state.person.isZombie or state.person.isVaccinated == False:
+                            poss.append(B.toCoord(state.location))
+                    elif action == "kill":
+                        if state.person.isZombie:
                             poss.append(B.toCoord(state.location))
                     else:
                         if state.person.isZombie:
@@ -286,6 +299,17 @@ class Board:
             if p.isVaccinated:
                 return [False, None]
             p.isVaccinated = True            
+        return [True, i]
+
+    def kill(self, coords):
+        i = self.toIndex(coords)
+        if self.States[i].person is None or self.States[i].person.isZombie == False:
+            return [False, None]
+        p = self.States[i].person
+        newP = p.clone()
+        if newP.isZombie:
+            newP = None
+        self.States[i].person = newP
         return [True, i]
 
     def get_possible_states(self, rn):
