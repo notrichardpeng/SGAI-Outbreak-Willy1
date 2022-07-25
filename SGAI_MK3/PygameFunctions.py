@@ -42,8 +42,6 @@ def get_action(GameBoard, pixel_x, pixel_y):
             board_y = int((pixel_y - GameBoard.display_border) / GameBoard.display_cell_dimensions[1])
             # Return the grid position if it is a valid position on the board
             if (board_x >= 0 and board_x < GameBoard.columns and board_y >= 0 and board_y < GameBoard.rows):
-                print(str(board_x))
-                print(str(board_y))
                 return (board_x, board_y)
     return None
 
