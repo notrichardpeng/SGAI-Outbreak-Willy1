@@ -43,6 +43,8 @@ class Board:
             f = self.heal(cell)
         elif givenAction == "bite":
             f = self.bite(cell)
+        elif givenAction == "kill":
+            f = self.kill(cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
         if f[0] == False:
             reward = 0
@@ -90,6 +92,9 @@ class Board:
                 if state.person != None:
                     if action == "heal":
                         if state.person.isZombie or state.person.isVaccinated == False:
+                            poss.append(B.toCoord(state.location))
+                    elif action == "kill":
+                        if state.person.isZombie:
                             poss.append(B.toCoord(state.location))
                     else:
                         if state.person.isZombie:
@@ -277,6 +282,17 @@ class Board:
         elif newP.isZombie == False and newP.isVaccinated == False:
             newP.isVaccinated = True
             newP.turnsVaccinated = 1
+        self.States[i].person = newP
+        return [True, i]
+
+    def kill(self, coords):
+        i = self.toIndex(coords)
+        if self.States[i].person is None or self.States[i].person.isZombie == False:
+            return [False, None]
+        p = self.States[i].person
+        newP = p.clone()
+        if newP.isZombie:
+            newP = None
         self.States[i].person = newP
         return [True, i]
 
