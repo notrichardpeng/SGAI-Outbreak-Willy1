@@ -11,6 +11,7 @@ image_assets = [
     "person_normal.png",
     "person_vax.png",
     "person_zombie.png",
+    "person_half_zombie.png",
 ]
 
 # Initialize pygame
@@ -99,8 +100,10 @@ def display_people(GameBoard):
             char = "Assets/" + image_assets[0]
             if p.isVaccinated:
                 char = "Assets/" + image_assets[1]
-            elif p.isZombie:
+            elif p.isZombie and p.halfCured == False:
                 char = "Assets/" + image_assets[2]
+            elif p.isZombie and p.halfCured:
+                char = "Assets/" + image_assets[3]
             coords = (
                 int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0] + GameBoard.display_border + 35,
                 int(x / GameBoard.columns) * GameBoard.display_cell_dimensions[1] + GameBoard.display_border + 20,
@@ -137,24 +140,26 @@ def display_lose_screen():
 def display_options_screen():
     screen.fill(BACKGROUND)
     screen.blit(
-        pygame.font.SysFont("Comic Sans", 32).render("Who do you want to play?", True, WHITE), (400, 200),
+        pygame.font.SysFont("Comic Sans", 32).render("Yes Hospital Self Play", True, WHITE), (200, 200),
     )
     screen.blit(
-        pygame.font.SysFont("Comic Sans", 32).render("or", True, WHITE), (560, 450),
+        pygame.font.SysFont("Comic Sans", 32).render("No Hospital Self Play", True, WHITE), (650, 200),
     )
     screen.blit(
-        pygame.font.SysFont("Comic Sans", 32).render("Yes Hospital", True, WHITE), (300, 500),
+        pygame.font.SysFont("Comic Sans", 32).render("Yes Hospital AI", True, WHITE), (300, 500),
     )
     screen.blit(
-        pygame.font.SysFont("Comic Sans", 32).render("No Hospital", True, WHITE), (650, 500),
+        pygame.font.SysFont("Comic Sans", 32).render("No Hospital AI", True, WHITE), (650, 500),
     )
 
-    display_image(screen, "Assets/govt.png",  (200, 100), (300, 300))
-    display_image(screen, "Assets/zom.png",  (200, 100), (650, 300))
-    # Yes Hospital
-    display_image(screen, "Assets/self_play.png",  (400, 250), (150, 480))
-    # No Hospital
-    display_image(screen, "Assets/self_play.png",  (400, 250), (500, 480))
+    # SPYesHosButton
+    display_image(screen, "Assets/DefaultButton.png",  (200, 100), (300, 300))
+    # AIYesHosButton
+    display_image(screen, "Assets/DefaultButton.png",  (200, 100), (300, 600))
+    # SPNoHosButton
+    display_image(screen, "Assets/DefaultButton.png",  (200, 100), (650, 300))
+    # AINoHosButton
+    display_image(screen, "Assets/DefaultButton.png",  (200, 100), (650, 600))
     pygame.display.update()
     
 

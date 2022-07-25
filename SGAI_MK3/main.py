@@ -17,18 +17,6 @@ player_role = "Government"      # Valid options are "Government" and "Zombie"
 roleToRoleNum = {"Government": 1, "Zombie": -1}
 roleToRoleBoolean = {"Government": False, "Zombie": True}       # False means Human, True means Zombie. Switching this would turn Humans to Zombies, and vice versa. 
 
-#Create the game board
-GameBoard = Board((ROWS,COLUMNS), BORDER, CELL_DIMENSIONS, roleToRoleNum[player_role])
-GameBoard.populate()
-
-# Self play variables
-alpha = 0.1
-gamma = 0.6
-epsilon = 0.1
-epochs = 1000
-epochs_ran = 0
-Original_Board = GameBoard.clone(GameBoard.States)
-
 # Initialize variables
 running = True
 take_action = []
@@ -37,10 +25,10 @@ font = pygame.font.SysFont("Comic Sans", 20)
 hospital = False
 
 # Option menu
-AIYesHosButton = pygame.Rect(150, 480, 400, 250)
-AINoHosButton = pygame.Rect(500, 480, 400, 250)
-govtButton = pygame.Rect(300, 300, 200, 100)
-zomButton = pygame.Rect(650, 300, 200, 100)
+AIYesHosButton = pygame.Rect(300, 600, 200, 100)
+AINoHosButton = pygame.Rect(650, 600, 200, 100)
+SPYesHosButton = pygame.Rect(300, 300, 200, 100)
+SPNoHosButton = pygame.Rect(650, 300, 200, 100)
 
 proceed = False
 while proceed == False:
@@ -56,16 +44,30 @@ while proceed == False:
                 SELF_PLAY = False
                 hospital = False
                 proceed = True
-            elif govtButton.collidepoint(pygame.mouse.get_pos()):
+            elif SPYesHosButton.collidepoint(pygame.mouse.get_pos()):
                 SELF_PLAY = True
                 player_role = "Government"
+                hospital = True
                 proceed = True
-            elif zomButton.collidepoint(pygame.mouse.get_pos()):
+            elif SPNoHosButton.collidepoint(pygame.mouse.get_pos()):
                 SELF_PLAY = True
-                player_role = "Zombie"
+                player_role = "Government"
+                hospital = False
                 proceed = True
         elif event.type == pygame.QUIT:
             pygame.quit()
+
+#Create the game board
+GameBoard = Board((ROWS,COLUMNS), BORDER, CELL_DIMENSIONS, roleToRoleNum[player_role], hospital)
+GameBoard.populate()
+
+# Self play variables
+alpha = 0.1
+gamma = 0.6
+epsilon = 0.1
+epochs = 1000
+epochs_ran = 0
+Original_Board = GameBoard.clone(GameBoard.States)
 
 
 while running:

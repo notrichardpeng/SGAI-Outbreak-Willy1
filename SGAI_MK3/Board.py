@@ -6,12 +6,13 @@ from typing import Tuple
 
 
 class Board:
-    def __init__(self, dimensions, border, cell_dimensions, pr):
+    def __init__(self, dimensions, border, cell_dimensions, pr, h):
         self.rows = dimensions[0]
         self.columns = dimensions[1]
         self.display_border = border
         self.display_cell_dimensions = cell_dimensions
         self.Player_Role = pr
+        self.hasHospital = h
         self.population = 0
         self.States = []
         self.QTable = []
@@ -121,7 +122,7 @@ class Board:
         )
 
     def clone(self, L: list):
-        NB = Board((self.rows, self.columns), self.display_border, self.display_cell_dimensions, self.Player_Role)
+        NB = Board((self.rows, self.columns), self.display_border, self.display_cell_dimensions, self.Player_Role, self.hasHospital)
         NB.States = L.copy()
         return NB
 
@@ -268,10 +269,12 @@ class Board:
             return [False, None]
         p = self.States[i].person
         newP = p.clone()
-        newP.isZombie = False
-        if newP.wasCured == False:
+        if newP.isZombie == True and newP.halfCured == False and (newP.isInHospital(coords) == False or self.hasHospital == False):
+            newP.halfCured = True
+        elif newP.isZombie == True and (newP.halfCured == True or (newP.isInHospital(coords) == True and self.hasHospital == True)):
+            newP.isZombie = False
             newP.wasCured = True
-        if newP.isVaccinated == False:
+        elif newP.isZombie == False and newP.isVaccinated == False:
             newP.isVaccinated = True
             newP.turnsVaccinated = 1
         self.States[i].person = newP
