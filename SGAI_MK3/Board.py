@@ -56,7 +56,7 @@ class Board:
             f = self.kill(cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
         if f[0] == False:
-            reward = 0
+            reward = -1000
         return [reward, f[1]]
 
     def get_possible_moves(self, action, role):
