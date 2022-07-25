@@ -29,7 +29,6 @@ AIYesHosButton = pygame.Rect(300, 600, 200, 100)
 AINoHosButton = pygame.Rect(650, 600, 200, 100)
 SPYesHosButton = pygame.Rect(300, 300, 200, 100)
 SPNoHosButton = pygame.Rect(650, 300, 200, 100)
-
 proceed = False
 while proceed == False:
     for event in pygame.event.get():
@@ -72,7 +71,8 @@ Original_Board = GameBoard.clone(GameBoard.States)
 
 while running:
     P = PF.run(GameBoard, hospital)
-
+    if len(take_action) == 2:
+        PF.select(take_action[1])
     if SELF_PLAY:
         
         # Event Handling
@@ -83,23 +83,27 @@ while running:
                 if action == "heal":                                        # Process a "heal" intention if take_action is currently empty
                     if take_action == []:
                         take_action.append("heal")
-                elif action != None:                                        # Otherwise, get the coordinate of a valid grid cell that was clicked
-                    idx = GameBoard.toIndex(action)                         # Get the corresponding 1D index from the 2D grid location that was clicked
+                elif action != None:                                         # Otherwise, get the coordinate of a valid grid cell that was clicked
+                    idx = GameBoard.toIndex(action)                        # Get the corresponding 1D index from the 2D grid location that was clicked
                     if take_action == []:                                   # Check that the click corresponds to an intention to move a player
                         # Returns true if the space is not empty and it is a piece belonging to the player.
                         if ( (GameBoard.States[idx].person is not None) and (GameBoard.States[idx].person.isZombie == roleToRoleBoolean[player_role]) ):
                             take_action.append("move")
                     if take_action != []:                                   # Only append a coordinate if there is a pending "heal" or "move" intention
                         take_action.append(action)
+                        if len(take_action) > 2:
+                            if take_action[1] == take_action[2]:
+                                take_action = []
             if event.type == pygame.QUIT:
                 running = False
-        
         # Display the current action
         PF.screen.blit(
             font.render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
         PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
+
+        # Draws selection box
 
         # Action handling
         if len(take_action) > 1:
@@ -123,7 +127,6 @@ while running:
                 if result[0] != False:
                     playerMoved = True
                 take_action = []
-
         # Computer turn
         if playerMoved:
             pygame.display.update()
