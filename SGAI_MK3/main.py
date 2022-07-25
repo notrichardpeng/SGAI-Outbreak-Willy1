@@ -8,7 +8,12 @@ ROWS = 6
 COLUMNS = 6
 BORDER = 150                    # Number of pixels to offset grid to the top-left side
 CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
+<<<<<<< HEAD
 ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite"]
+=======
+ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite", "kill"]
+SELF_PLAY = True
+>>>>>>> 15d5532d5852935e87bcc5343d41d05551e401ca
 AI_PLAY_WAITTIME_MS = 300
 
 # Player role variables
@@ -76,8 +81,11 @@ while running:
                 if action == "heal":                                        # Process a "heal" intention if take_action is currently empty
                     if take_action == []:
                         take_action.append("heal")
-                elif action != None:                                         # Otherwise, get the coordinate of a valid grid cell that was clicked
-                    idx = GameBoard.toIndex(action)                        # Get the corresponding 1D index from the 2D grid location that was clicked
+                elif action == "kill":                                        # Process a "heal" intention if take_action is currently empty
+                    if take_action == []:
+                        take_action.append("kill")
+                elif action != None:                                        # Otherwise, get the coordinate of a valid grid cell that was clicked
+                    idx = GameBoard.toIndex(action)                         # Get the corresponding 1D index from the 2D grid location that was clicked
                     if take_action == []:                                   # Check that the click corresponds to an intention to move a player
                         # Returns true if the space is not empty and it is a piece belonging to the player.
                         if ( (GameBoard.States[idx].person is not None) and (GameBoard.States[idx].person.isZombie == roleToRoleBoolean[player_role]) ):
@@ -120,6 +128,12 @@ while running:
                 if result[0] != False:
                     playerMoved = True
                 take_action = []
+            elif take_action[0] == "kill":
+                result = GameBoard.kill(take_action[1])
+                if result[0] != False:
+                    playerMoved = True
+                take_action = []
+
         # Computer turn
         if playerMoved:
             pygame.display.update()
@@ -166,6 +180,9 @@ while running:
                     GameBoard.bite(move_coord)
                 elif action == "heal":
                     GameBoard.heal(move_coord)
+                elif action == "kill":
+                    GameBoard.kill(move_coord)
+
                     
             GameBoard.update_effects()
         
@@ -250,6 +267,8 @@ while running:
                     GameBoard.bite(a)
                 elif ta == "heal":
                     GameBoard.heal(a)
+                elif ta == "kill":
+                    GameBoard.kill(a)
 
         if GameBoard.num_zombies() == GameBoard.population:
             print("loseCase")
