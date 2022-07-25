@@ -63,13 +63,12 @@ epsilon = 0.1
 epochs = 1000
 epochs_ran = 0
 Original_Board = GameBoard.clone(GameBoard.States)
-
-
+clock = pygame.time.Clock()
+frame = 0
 while running:
-    if SELF_PLAY:
-        P = PF.run(GameBoard, hospital)
     if self_play:
-        # Event Handling
+        P = PF.run(GameBoard, hospital)
+        # Event a
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = pygame.mouse.get_pos()
@@ -126,6 +125,12 @@ while running:
                     playerMoved = True
                 take_action = []
             elif take_action[0] == "kill":
+                while frame < 9:
+                    PF.kill_animation(frame)
+                    pygame.display.update()
+                    clock.tick(8)
+                    frame += 1
+                frame = 0
                 result = GameBoard.kill(take_action[1])
                 if result[0] != False:
                     playerMoved = True
