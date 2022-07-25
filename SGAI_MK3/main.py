@@ -170,10 +170,10 @@ while running:
                     GameBoard.bite(move_coord)
                 elif action == "heal":
                     GameBoard.heal(move_coord)
+            GameBoard.remove_stuns()
 
         # Update the display
-        pygame.display.update()
-
+        pygame.display.update()        
     else:
         if epochs_ran % 100 == 0:
             print("Board Reset!")
@@ -256,6 +256,9 @@ while running:
         if GameBoard.num_zombies() == GameBoard.population:
             print("loseCase")
             break
+        
+        GameBoard.remove_stuns()
+
         for event in P:
             if event.type == pygame.QUIT:
                 running = False

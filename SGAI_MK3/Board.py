@@ -138,6 +138,7 @@ class Board:
             if (
                 self.isValidCoordinate(coord)
                 and self.States[self.toIndex(coord)].person is not None
+                and not self.States[self.toIndex(coord)].person.stunned
                 and self.States[self.toIndex(coord)].person.isZombie == is_zombie
             ):
                 ret = True
@@ -271,6 +272,7 @@ class Board:
         newP = p.clone()
         if newP.isZombie == True and newP.halfCured == False and (newP.isInHospital(coords) == False or self.hasHospital == False):
             newP.halfCured = True
+            newP.stunned = True
         elif newP.isZombie == True and (newP.halfCured == True or (newP.isInHospital(coords) == True and self.hasHospital == True)):
             newP.isZombie = False
             newP.wasCured = True
@@ -284,7 +286,7 @@ class Board:
         indexes = []
         i = 0
         for state in self.States:
-            if state.person != None:
+            if state.person != None and not state.person.stunned:
                 if rn == 1 and state.person.isZombie == False:
                     indexes.append(i)
                 elif rn == -1 and state.person.isZombie:
@@ -368,3 +370,8 @@ class Board:
             else:
                 if diff_x > 0: self.moveRight(selected_zombie)
                 else: self.moveLeft(selected_zombie)
+
+    def remove_stuns(self):
+        for state in self.States:
+            if state.person is not None and state.person.stunned:
+                state.person.stunned = False
