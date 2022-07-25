@@ -4,6 +4,7 @@ import random as rd
 from Person import Person
 from typing import Tuple
 
+VACCINE_DURATION = 5
 
 class Board:
     def __init__(self, dimensions, border, cell_dimensions, pr, h):
@@ -407,7 +408,14 @@ class Board:
                 if diff_x > 0: self.moveRight(selected_zombie)
                 else: self.moveLeft(selected_zombie)
 
-    def remove_stuns(self):
+    def update_effects(self):        
         for state in self.States:
-            if state.person is not None and state.person.isStunned:
-                state.person.isStunned = False
+            if state.person is not None:
+                if state.person.isStunned: state.person.isStunned = False                
+                if state.person.isVaccinated:
+                    state.person.turnsVaccinated += 1
+                    if state.person.turnsVaccinated >= VACCINE_DURATION:
+                        state.person.turnsVaccinated = 0
+                        state.person.isVaccinated = False
+                        state.person.wasVaccinated = True                
+

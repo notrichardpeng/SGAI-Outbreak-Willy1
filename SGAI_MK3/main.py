@@ -173,8 +173,9 @@ while running:
                     GameBoard.bite(move_coord)
                 elif action == "heal":
                     GameBoard.heal(move_coord)
-            GameBoard.remove_stuns()
-
+                    
+            GameBoard.update_effects()
+        
         # Update the display
         pygame.display.update()        
     else:
@@ -236,6 +237,7 @@ while running:
         ta = ""
         if player_role == "Government":
             GameBoard.zombie_move()
+            GameBoard.update_effects()
         else:
             r = rd.randint(0, 4)
             ta = ACTION_SPACE[r]
@@ -258,9 +260,7 @@ while running:
 
         if GameBoard.num_zombies() == GameBoard.population:
             print("loseCase")
-            break
-        
-        GameBoard.remove_stuns()
+            break        
 
         for event in P:
             if event.type == pygame.QUIT:
