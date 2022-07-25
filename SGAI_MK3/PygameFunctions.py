@@ -140,31 +140,36 @@ def display_lose_screen():
         if event.type == pygame.QUIT:
             return
 
-def display_options_screen():
+def display_options_screen(self_play, hospital, hover):
     screen.fill(BACKGROUND)
+
     screen.blit(
-        pygame.font.SysFont("Comic Sans", 32).render("Yes Hospital Self Play", True, WHITE), (200, 200),
+        pygame.font.SysFont("Calibri", 40).render("OPTIONS", True, WHITE), (500, 100),
     )
     screen.blit(
-        pygame.font.SysFont("Comic Sans", 32).render("No Hospital Self Play", True, WHITE), (650, 200),
+        pygame.font.SysFont("Calibri", 32).render("Self Play?", True, WHITE), (325, 200),
     )
     screen.blit(
-        pygame.font.SysFont("Comic Sans", 32).render("Yes Hospital AI", True, WHITE), (300, 500),
+        pygame.font.SysFont("Calibri", 32).render("Hospital On?", True, WHITE), (675, 200),
     )
     screen.blit(
-        pygame.font.SysFont("Comic Sans", 32).render("No Hospital AI", True, WHITE), (650, 500),
+        pygame.font.SysFont("Calibri", 24).render("Proceed to game...", True, WHITE), (975, 600),
     )
 
-    # SPYesHosButton
-    display_image(screen, "Assets/DefaultButton.png",  (200, 100), (300, 300))
-    # AIYesHosButton
-    display_image(screen, "Assets/DefaultButton.png",  (200, 100), (300, 600))
-    # SPNoHosButton
-    display_image(screen, "Assets/DefaultButton.png",  (200, 100), (650, 300))
-    # AINoHosButton
-    display_image(screen, "Assets/DefaultButton.png",  (200, 100), (650, 600))
+    if self_play:
+        display_image(screen, "Assets/checked_box.png", (100, 100), (350, 250))
+    else:
+        display_image(screen, "Assets/unchecked_box.png", (100, 100), (350, 250))
+    if hospital:
+        display_image(screen, "Assets/checked_box.png", (100, 100), (700, 250))
+    else:
+        display_image(screen, "Assets/unchecked_box.png", (100, 100), (700, 250))
+    if hover:
+        display_image(screen, "Assets/checked_box.png", (100, 100), (1050, 650))
+    else:
+        display_image(screen, "Assets/unchecked_box.png", (100, 100), (1050, 650))
     pygame.display.update()
-    
+
 def select(coord):
     left = coord[0] * 100 + 150
     top = coord[1] * 100 + 150

@@ -22,37 +22,32 @@ running = True
 take_action = []
 playerMoved = False
 font = pygame.font.SysFont("Comic Sans", 20)
+self_play = False
 hospital = False
 
 # Option menu
-AIYesHosButton = pygame.Rect(300, 600, 200, 100)
-AINoHosButton = pygame.Rect(650, 600, 200, 100)
-SPYesHosButton = pygame.Rect(300, 300, 200, 100)
-SPNoHosButton = pygame.Rect(650, 300, 200, 100)
+SelfPlayButton = pygame.Rect(350, 250, 100, 100)
+HospitalOnButton = pygame.Rect(700, 250, 100, 100)
+ProceedButton = pygame.Rect(1050, 650, 100, 100)
+
+
 proceed = False
+hover = False
 while proceed == False:
     for event in pygame.event.get():
-        PF.display_options_screen()
+        PF.display_options_screen(self_play, hospital, hover)
         if event.type == pygame.MOUSEBUTTONDOWN:
-            x, y = event.pos
-            if AIYesHosButton.collidepoint(pygame.mouse.get_pos()):
-                SELF_PLAY = False
-                hospital = True
+            if SelfPlayButton.collidepoint(pygame.mouse.get_pos()):
+                self_play = not self_play
+            elif HospitalOnButton.collidepoint(pygame.mouse.get_pos()):
+                hospital = not hospital
+            elif ProceedButton.collidepoint(pygame.mouse.get_pos()):
                 proceed = True
-            elif AINoHosButton.collidepoint(pygame.mouse.get_pos()):
-                SELF_PLAY = False
-                hospital = False
-                proceed = True
-            elif SPYesHosButton.collidepoint(pygame.mouse.get_pos()):
-                SELF_PLAY = True
-                player_role = "Government"
-                hospital = True
-                proceed = True
-            elif SPNoHosButton.collidepoint(pygame.mouse.get_pos()):
-                SELF_PLAY = True
-                player_role = "Government"
-                hospital = False
-                proceed = True
+        elif event.type == pygame.MOUSEMOTION:
+            if ProceedButton.collidepoint(pygame.mouse.get_pos()):
+                hover = True
+            else:
+                hover = False
         elif event.type == pygame.QUIT:
             pygame.quit()
 
@@ -73,8 +68,7 @@ while running:
     P = PF.run(GameBoard, hospital)
     if len(take_action) == 2:
         PF.select(take_action[1])
-    if SELF_PLAY:
-        
+    if self_play:
         # Event Handling
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
