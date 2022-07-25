@@ -303,8 +303,13 @@ class Board:
         coords = []
         i = 0
         for state in self.States:
-            if state.person is not None and not state.person.isZombie:
-                coords.append(self.toCoord(i))
+            c = self.toCoord(i)
+            if (
+                state.person is not None 
+                and not state.person.isZombie
+                and not self.isAdjacentTo(c, True)
+            ):
+                coords.append(c)
             i += 1
         return coords
 
