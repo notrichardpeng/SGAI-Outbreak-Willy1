@@ -29,7 +29,6 @@ AIYesHosButton = pygame.Rect(300, 600, 200, 100)
 AINoHosButton = pygame.Rect(650, 600, 200, 100)
 SPYesHosButton = pygame.Rect(300, 300, 200, 100)
 SPNoHosButton = pygame.Rect(650, 300, 200, 100)
-
 proceed = False
 while proceed == False:
     for event in pygame.event.get():
@@ -72,7 +71,8 @@ Original_Board = GameBoard.clone(GameBoard.States)
 
 while running:
     P = PF.run(GameBoard, hospital)
-
+    if len(take_action) == 2:
+        PF.select(take_action[1])
     if SELF_PLAY:
         
         # Event Handling
@@ -94,15 +94,19 @@ while running:
                             take_action.append("move")
                     if take_action != []:                                   # Only append a coordinate if there is a pending "heal" or "move" intention
                         take_action.append(action)
+                        if len(take_action) > 2:
+                            if take_action[1] == take_action[2]:
+                                take_action = []
             if event.type == pygame.QUIT:
                 running = False
-        
         # Display the current action
         PF.screen.blit(
             font.render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
         PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
+
+        # Draws selection box
 
         # Action handling
         if len(take_action) > 1:
@@ -181,9 +185,11 @@ while running:
                 elif action == "kill":
                     GameBoard.kill(move_coord)
 
+                    
+            GameBoard.update_effects()
+        
         # Update the display
-        pygame.display.update()
-
+        pygame.display.update()        
     else:
         if epochs_ran % 100 == 0:
             print("Board Reset!")
@@ -243,6 +249,7 @@ while running:
         ta = ""
         if player_role == "Government":
             GameBoard.zombie_move()
+            GameBoard.update_effects()
         else:
             r = rd.randint(0, 4)
             ta = ACTION_SPACE[r]
@@ -267,7 +274,8 @@ while running:
 
         if GameBoard.num_zombies() == GameBoard.population:
             print("loseCase")
-            break
+            break        
+
         for event in P:
             if event.type == pygame.QUIT:
                 running = False
