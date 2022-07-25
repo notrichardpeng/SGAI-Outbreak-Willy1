@@ -300,7 +300,7 @@ while running:
                     GameBoard.kill(a)
         print(GameBoard.num_zombies())
         print(GameBoard.population)
-        if GameBoard.num_humans() is 0:
+        if GameBoard.num_humans() is -2:
             print("loseCase")
             break
         for event in P:
