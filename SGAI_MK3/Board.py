@@ -303,10 +303,15 @@ class Board:
 
     def kill(self, coords):
         i = self.toIndex(coords)
+        # Ensures we cannot kill empty spaces or humans, only zombies
         if self.States[i].person is None or self.States[i].person.isZombie == False:
             return [False, None]
+        # If not adjacent to a human, then we cannot kill the zombie
+        if not self.isAdjacentTo(self.toCoord(i), False):                
+            return [False, None]  
         p = self.States[i].person
         newP = p.clone()
+        # Gets rid of zombie
         if newP.isZombie:
             newP = None
         self.States[i].person = newP
