@@ -276,6 +276,7 @@ while running:
         ta = ""
         if player_role == "Government":
             GameBoard.zombie_move()
+            GameBoard.update_effects()
         else:
             r = rd.randint(0, 4)
             ta = ACTION_SPACE[r]
@@ -295,6 +296,8 @@ while running:
                     GameBoard.bite(a)
                 elif ta == "heal":
                     GameBoard.heal(a)
+                elif ta == "kill":
+                    GameBoard.kill(a)
         print(GameBoard.num_zombies())
         print(GameBoard.population)
         if GameBoard.num_humans() is 0:
