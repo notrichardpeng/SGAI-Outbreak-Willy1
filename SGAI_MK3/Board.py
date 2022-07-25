@@ -29,6 +29,14 @@ class Board:
                     r += 1
         return r
 
+    def num_humans(self):
+        r = 0
+        for state in self.States:
+            if state.person != None:
+                if not state.person.isZombie:
+                    r += 1
+        return r
+        
     def act(self, oldstate, givenAction):
         cell = self.toCoord(oldstate)
         f = []
@@ -48,7 +56,7 @@ class Board:
             f = self.kill(cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
         if f[0] == False:
-            reward = 0
+            reward = -1000
         return [reward, f[1]]
 
     def get_possible_moves(self, action, role):
