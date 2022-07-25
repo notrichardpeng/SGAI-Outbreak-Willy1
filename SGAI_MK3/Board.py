@@ -29,6 +29,14 @@ class Board:
                     r += 1
         return r
 
+    def num_humans(self):
+        r = 0
+        for state in self.States:
+            if state.person != None:
+                if not state.person.isZombie:
+                    r += 1
+        return r
+        
     def act(self, oldstate, givenAction):
         cell = self.toCoord(oldstate)
         f = []

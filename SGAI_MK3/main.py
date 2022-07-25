@@ -191,7 +191,7 @@ while running:
         # Update the display
         pygame.display.update()        
     else:
-        if epochs_ran % 100 == 0:
+        if epochs_ran % 20 == 0:
             print("Board Reset!")
             GameBoard = Original_Board  # reset environment        
         pygame.time.wait(AI_PLAY_WAITTIME_MS)        
@@ -199,10 +199,14 @@ while running:
         r = rd.uniform(0.0, 1.0)
         st = rd.randint(0, len(GameBoard.States) - 1)
         state = GameBoard.QTable[st]
-
+        randomization = False
         if r < gamma:
+            #print("random!!!")
+            randomization = True
             while GameBoard.States[st].person is None:
                 st = rd.randint(0, len(GameBoard.States) - 1)
+                state = GameBoard.QTable[st]
+                    #print(st)
         else:
             biggest = None
             for x in range(len(GameBoard.States)):
@@ -218,6 +222,7 @@ while running:
                     biggest = exp
                     i = x
             state = GameBoard.QTable[i]
+            #print(state)
         b = 0
         j = 0
         ind = 0
@@ -229,19 +234,47 @@ while running:
                 b = v
                 ind = j
             j += 1
-        action_to_take = ACTION_SPACE[ind]
-        old_qval = b
-        old_state = i
+        action_to_take = ACTION_SPACE[ind] #actual action e.g. cure bite etc
+        print(state)
+        print(action_to_take)
+        old_qval = b #updates old q-val
+        if randomization == True:
+            old_state = st
+        else:
+            old_state = i
         
         # Update
         # Q(S, A) = Q(S, A) + alpha[R + gamma * max_a Q(S', A) - Q(S, A)]
         reward = GameBoard.act(old_state, action_to_take)
-        ns = reward[1]
-        NewStateAct = GameBoard.QGreedyat(ns)
-        NS = GameBoard.QTable[ns][NewStateAct[0]]
+        ns = reward[1] #what state (0-35)
+        if GameBoard.num_zombies() is 1 or GameBoard.num_zombies is 0:
+            reward[0] = 10000
+        #UPDATE 
+        statecor = GameBoard.toCoord(ns)
+        print(statecor)
+        if action_to_take == "moveUp":
+            GameBoard.moveUp(statecor)
+        elif action_to_take == "moveDown":
+            GameBoard.moveDown(statecor)
+        elif action_to_take == "moveLeft":
+            GameBoard.moveLeft(statecor)
+        elif action_to_take == "moveRight":
+            GameBoard.moveRight(statecor)
+        elif action_to_take == "bite":
+            GameBoard.bite(statecor)
+        elif action_to_take == "heal":
+            GameBoard.heal(statecor)
+        #pygame.display.update()
+        NewStateAct = GameBoard.QGreedyat(ns) # action_index, qvalue
+        NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
+        #qtable
+        GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]
+        print(GameBoard.QTable[old_state][NewStateAct[0]])
+
         #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
         if GameBoard.num_zombies() == 0:
             print("winCase")
+            GameBoard = Original_Board
             break
 
         take_action = []
@@ -249,7 +282,6 @@ while running:
         ta = ""
         if player_role == "Government":
             GameBoard.zombie_move()
-            GameBoard.update_effects()
         else:
             r = rd.randint(0, 4)
             ta = ACTION_SPACE[r]
@@ -269,13 +301,11 @@ while running:
                     GameBoard.bite(a)
                 elif ta == "heal":
                     GameBoard.heal(a)
-                elif ta == "kill":
-                    GameBoard.kill(a)
-
-        if GameBoard.num_zombies() == GameBoard.population:
+        print(GameBoard.num_zombies())
+        print(GameBoard.population)
+        if GameBoard.num_humans() is 0:
             print("loseCase")
-            break        
-
+            break
         for event in P:
             if event.type == pygame.QUIT:
                 running = False
@@ -283,3 +313,4 @@ while running:
                 
         # Update the display
         pygame.display.update()
+        epochs_ran += 1
