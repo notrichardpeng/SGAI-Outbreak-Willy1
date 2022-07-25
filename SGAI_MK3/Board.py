@@ -270,13 +270,22 @@ class Board:
             return [False, None]
         p = self.States[i].person
         newP = p.clone()
-        if newP.isZombie == True and newP.halfCured == False and (newP.isInHospital(coords) == False or self.hasHospital == False):
-            newP.halfCured = True
-            newP.stunned = True
-        elif newP.isZombie == True and (newP.halfCured == True or (newP.isInHospital(coords) == True and self.hasHospital == True)):
-            newP.isZombie = False
-            newP.wasCured = True
-        elif newP.isZombie == False and newP.isVaccinated == False:
+
+        if newP.isZombie:
+            # If not adjacent to a human, then we cannot cure the zombie
+            if not self.isAdjacentTo(self.toCoord(i), False):                
+                return [False, None]            
+            # Was the zombie already half-cured?
+            if newP.halfCured == False and (newP.isInHospital(coords) == False or self.hasHospital == False):
+                newP.halfCured = True
+                newP.stunned = True
+            elif (newP.halfCured == True or (newP.isInHospital(coords) == True and self.hasHospital == True)):
+                newP.isZombie = False
+                newP.wasCured = True                
+        elif newP.isZombie == False:
+            # If the person is already vaccinated, don't make the player lose a turn
+            if newP.isVaccinated:
+                return [False, None]
             newP.isVaccinated = True
             newP.turnsVaccinated = 1
         self.States[i].person = newP
