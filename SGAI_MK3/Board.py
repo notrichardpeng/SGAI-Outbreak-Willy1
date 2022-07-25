@@ -254,10 +254,8 @@ class Board:
         elif p.wasVaccinated and p.wasCured:
             chance = 50
         r = rd.randint(0, 100)
-        if r < chance:
-            newP = p.clone()
-            newP.isZombie = True
-            self.States[i].person = newP
+        if r < chance:            
+            self.States[i].person.isZombie = True
         return [True, i]
 
     def heal(self, coords):
@@ -269,27 +267,24 @@ class Board:
         i = self.toIndex(coords)
         if self.States[i].person is None:
             return [False, None]
-        p = self.States[i].person
-        newP = p.clone()
+        p = self.States[i].person        
 
-        if newP.isZombie:
+        if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
             if not self.isAdjacentTo(self.toCoord(i), False):                
                 return [False, None]            
             # Was the zombie already half-cured?
-            if newP.halfCured == False and (newP.isInHospital(coords) == False or self.hasHospital == False):
-                newP.halfCured = True
-                newP.isStunned = True
-            elif (newP.halfCured == True or (newP.isInHospital(coords) == True and self.hasHospital == True)):
-                newP.isZombie = False
-                newP.wasCured = True                
-        elif newP.isZombie == False:
+            if p.halfCured == False and (p.isInHospital(coords) == False or self.hasHospital == False):
+                p.halfCured = True
+                p.isStunned = True
+            elif (p.halfCured == True or (p.isInHospital(coords) == True and self.hasHospital == True)):
+                p.isZombie = False
+                p.wasCured = True                
+        elif p.isZombie == False:
             # If the person is already vaccinated, don't make the player lose a turn
-            if newP.isVaccinated:
+            if p.isVaccinated:
                 return [False, None]
-            newP.isVaccinated = True
-            newP.turnsVaccinated = 1
-        self.States[i].person = newP
+            p.isVaccinated = True            
         return [True, i]
 
     def get_possible_states(self, rn):
