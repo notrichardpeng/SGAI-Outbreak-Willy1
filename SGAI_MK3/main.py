@@ -67,7 +67,7 @@ clock = pygame.time.Clock()
 frame = 0
 while running:
     P = PF.run(GameBoard, hospital)
-    if self_play:
+    if self_play:        
         # Event a
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
@@ -314,6 +314,7 @@ while running:
                     GameBoard.kill(a)
         print(GameBoard.num_zombies())
         print(GameBoard.population)
+        print(GameBoard.num_humans())
         if GameBoard.num_humans() is 0:
             print("loseCase")
             # reset people
