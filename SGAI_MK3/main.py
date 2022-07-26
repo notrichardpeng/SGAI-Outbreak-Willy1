@@ -66,6 +66,7 @@ Original_Board = GameBoard.clone(GameBoard.States)
 clock = pygame.time.Clock()
 frame = 0
 while running:
+    P = PF.run(GameBoard, hospital)
     if self_play:
         P = PF.run(GameBoard, hospital)
         # Event a
@@ -125,15 +126,17 @@ while running:
                     playerMoved = True
                 take_action = []
             elif take_action[0] == "kill":
-                while frame < 9:
-                    PF.kill_animation(frame)
-                    pygame.display.update()
-                    clock.tick(8)
-                    frame += 1
-                frame = 0
                 result = GameBoard.kill(take_action[1])
                 if result[0] != False:
                     playerMoved = True
+                    # Plays kill animation
+                    while frame < 9:
+                        PF.kill_animation(frame)
+                        pygame.display.update()
+                        # clock.tick(8) sets frames per second to 8
+                        clock.tick(8)
+                        frame += 1
+                    frame = 0
                 take_action = []
 
         # Computer turn

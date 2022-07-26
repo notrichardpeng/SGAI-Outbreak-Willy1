@@ -186,6 +186,7 @@ def select(coord):
 
 def kill_animation(frame):
     char = "Assets/" + image_assets[4]
+    # Draws background first and then draws the specified frame. The animations have the same number of frames and are already made to be synched up
     display_image(screen, char, (), (0,0))
     display_image(screen, "Assets/zombiedeath/sprite_" + str(frame) + ".png", (200, 200), (400, 350))
     display_image(screen, "Assets/watergun/sprite_" + str(frame) + ".png", (200, 200), (600, 350))
