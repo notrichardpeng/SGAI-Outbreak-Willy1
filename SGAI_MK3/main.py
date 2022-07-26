@@ -251,7 +251,7 @@ while running:
         # Q(S, A) = Q(S, A) + alpha[R + gamma * max_a Q(S', A) - Q(S, A)]
         reward = GameBoard.act(old_state, action_to_take)
         ns = reward[1] #what state (0-35)
-        if GameBoard.num_zombies() is 1 or GameBoard.num_zombies is 0:
+        if GameBoard.num_zombies() == 1 or GameBoard.num_zombies == 0:
             reward[0] = 10000
         #UPDATE 
         statecor = GameBoard.toCoord(ns)
@@ -268,65 +268,75 @@ while running:
             GameBoard.bite(statecor)
         elif action_to_take == "heal":
             GameBoard.heal(statecor)
-        #pygame.display.update()
-        NewStateAct = GameBoard.QGreedyat(ns) # action_index, qvalue
-        NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
-        #qtable
-        GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]
-        print(GameBoard.QTable[old_state][NewStateAct[0]])
-
-        #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
-        if GameBoard.num_zombies() == 0:
-            print("winCase")
-            GameBoard = Original_Board
-            # reset people
+        elif action_to_take == "kill":
+            GameBoard.kill(statecor)
+        # print new state
+        print("new state:")
+        print(ns)
+        if (ns > 35 or ns < 0):
             GameBoard.population = 0
             GameBoard.populate()
-            
-            #break
-
-        take_action = []
-        print("Enemy turn")
-        ta = ""
-        if player_role == "Government":
-            GameBoard.zombie_move()
-            GameBoard.update_effects()
-        else:
-            r = rd.randint(0, 4)
-            ta = ACTION_SPACE[r]
-            poss = GameBoard.get_possible_moves(ta, "Zombie")        
-            if len(poss) > 0:
-                r = rd.randint(0, len(poss) - 1)
-                a = poss[r]
-                if ta == "moveUp":
-                    GameBoard.moveUp(a)
-                elif ta == "moveDown":
-                    GameBoard.moveDown(a)
-                elif ta == "moveLeft":
-                    GameBoard.moveLeft(a)
-                elif ta == "moveRight":
-                    GameBoard.moveRight(a)
-                elif ta == "bite":
-                    GameBoard.bite(a)
-                elif ta == "heal":
-                    GameBoard.heal(a)
-                elif ta == "kill":
-                    GameBoard.kill(a)
-        print(GameBoard.num_zombies())
-        print(GameBoard.population)
-        print(GameBoard.num_humans())
-        if GameBoard.num_humans() is 0:
-            print("loseCase")
-            # reset people
-            GameBoard.population = 0
-            GameBoard.populate()
-            # Shows Q-Table in Terminal
             print(GameBoard.QTable)
-        for event in P:
-            if event.type == pygame.QUIT:
-                running = False
-                break 
+        else:
+            #pygame.display.update()
+            NewStateAct = GameBoard.QGreedyat(ns) # action_index, qvalue
+            NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
+            #qtable
+            GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]
+            print(GameBoard.QTable[old_state][NewStateAct[0]])
+
+            #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
+            if GameBoard.num_zombies() == 0:
+                print("winCase")
+                GameBoard = Original_Board
+                # reset people
+                GameBoard.population = 0
+                GameBoard.populate()
                 
-        # Update the display
-        pygame.display.update()
-        epochs_ran += 1
+                #break
+
+            take_action = []
+            print("Enemy turn")
+            ta = ""
+            if player_role == "Government":
+                GameBoard.zombie_move()
+                GameBoard.update_effects()
+            else:
+                r = rd.randint(0, 4)
+                ta = ACTION_SPACE[r]
+                poss = GameBoard.get_possible_moves(ta, "Zombie")        
+                if len(poss) > 0:
+                    r = rd.randint(0, len(poss) - 1)
+                    a = poss[r]
+                    if ta == "moveUp":
+                        GameBoard.moveUp(a)
+                    elif ta == "moveDown":
+                        GameBoard.moveDown(a)
+                    elif ta == "moveLeft":
+                        GameBoard.moveLeft(a)
+                    elif ta == "moveRight":
+                        GameBoard.moveRight(a)
+                    elif ta == "bite":
+                        GameBoard.bite(a)
+                    elif ta == "heal":
+                        GameBoard.heal(a)
+                    elif ta == "kill":
+                        GameBoard.kill(a)
+            print(GameBoard.num_zombies())
+            print(GameBoard.population)
+            print(GameBoard.num_humans())
+            if GameBoard.num_humans() is 0:
+                print("loseCase")
+                # reset people
+                GameBoard.population = 0
+                GameBoard.populate()
+                # Shows Q-Table in Terminal
+                print(GameBoard.QTable)
+            for event in P:
+                if event.type == pygame.QUIT:
+                    running = False
+                    break 
+                    
+            # Update the display
+            pygame.display.update()
+            epochs_ran += 1
