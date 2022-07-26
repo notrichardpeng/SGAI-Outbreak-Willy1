@@ -161,18 +161,24 @@ def display_options_screen(self_play, hospital, hover):
         pygame.font.SysFont("Calibri", 24).render("Proceed to game...", True, WHITE), (975, 600),
     )
 
-    if self_play:
-        display_image(screen, "Assets/checked_box.png", (100, 100), (350, 250))
-    else:
-        display_image(screen, "Assets/unchecked_box.png", (100, 100), (350, 250))
-    if hospital:
-        display_image(screen, "Assets/checked_box.png", (100, 100), (700, 250))
-    else:
-        display_image(screen, "Assets/unchecked_box.png", (100, 100), (700, 250))
-    if hover:
+    if hover == "proceed":
         display_image(screen, "Assets/checked_box.png", (100, 100), (1050, 650))
     else:
         display_image(screen, "Assets/unchecked_box.png", (100, 100), (1050, 650))
+    if hover == "hospital":
+        display_image(screen, "Assets/checked_box.png", (100, 100), (700, 250))
+    else:
+        if hospital:
+            display_image(screen, "Assets/checked_box.png", (100, 100), (700, 250))
+        else:
+            display_image(screen, "Assets/unchecked_box.png", (100, 100), (700, 250))
+    if hover == "self":
+        display_image(screen, "Assets/checked_box.png", (100, 100), (350, 250))
+    else:
+        if self_play: 
+            display_image(screen, "Assets/checked_box.png", (100, 100), (350, 250))
+        else:
+            display_image(screen, "Assets/unchecked_box.png", (100, 100), (350, 250))
     pygame.display.update()
 
 def select(coord):

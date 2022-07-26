@@ -33,10 +33,11 @@ ProceedButton = pygame.Rect(1050, 650, 100, 100)
 
 
 proceed = False
-hover = False
+hover = ""
 while proceed == False:
     for event in pygame.event.get():
         PF.display_options_screen(self_play, hospital, hover)
+        hover = ""
         if event.type == pygame.MOUSEBUTTONDOWN:
             if SelfPlayButton.collidepoint(pygame.mouse.get_pos()):
                 self_play = not self_play
@@ -46,9 +47,11 @@ while proceed == False:
                 proceed = True
         elif event.type == pygame.MOUSEMOTION:
             if ProceedButton.collidepoint(pygame.mouse.get_pos()):
-                hover = True
-            else:
-                hover = False
+                hover = "proceed"
+            elif HospitalOnButton.collidepoint(pygame.mouse.get_pos()):
+                hover = "hospital"
+            elif SelfPlayButton.collidepoint(pygame.mouse.get_pos()):
+                hover = "self" 
         elif event.type == pygame.QUIT:
             pygame.quit()
 
