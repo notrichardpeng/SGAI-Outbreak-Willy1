@@ -67,8 +67,7 @@ clock = pygame.time.Clock()
 frame = 0
 while running:
     P = PF.run(GameBoard, hospital)
-    if self_play:
-        P = PF.run(GameBoard, hospital)
+    if self_play:        
         # Event a
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:

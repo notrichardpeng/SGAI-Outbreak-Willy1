@@ -284,7 +284,8 @@ class Board:
 
         if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
-            if not self.isAdjacentTo(self.toCoord(i), False):                
+            if not self.isAdjacentTo(self.toCoord(i), False):     
+                print("Invalid Move! Can only heal zombies adjacent to humans.")           
                 return [False, None]
             # Was the zombie already half-cured?
             if p.halfCured == False and (p.isInHospital(coords) == False or self.hasHospital == False):
@@ -306,7 +307,8 @@ class Board:
         if self.States[i].person is None or self.States[i].person.isZombie == False:
             return [False, None]
         # If not adjacent to a human, then we cannot kill the zombie
-        if not self.isAdjacentTo(self.toCoord(i), False):                
+        if not self.isAdjacentTo(self.toCoord(i), False):
+            print("Invalid Moves! Can only kill zombies adjacent to humans.")
             return [False, None]  
         p = self.States[i].person
         newP = p.clone()

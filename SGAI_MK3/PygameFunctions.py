@@ -67,8 +67,7 @@ def display_image(screen, itemStr, dimensions, position):
     """
     Draw an image on the screen at the indicated position.
     """
-    v = pygame.image.load(itemStr).convert_alpha()
-    print(itemStr)
+    v = pygame.image.load(itemStr).convert_alpha()    
     if len(dimensions) != 0:
         v = pygame.transform.scale(v, dimensions)
     screen.blit(v, position)
