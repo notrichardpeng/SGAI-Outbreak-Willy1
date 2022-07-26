@@ -17,6 +17,7 @@ class Board:
         self.population = 0
         self.States = []
         self.QTable = []
+        self.base_score = 1000
         for s in range(dimensions[0] * dimensions[1]):
             self.States.append(State(None, s))
             self.QTable.append([0] * 6)
@@ -284,7 +285,8 @@ class Board:
         action_type = ""
         if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
-            if not self.isAdjacentTo(self.toCoord(i), False):                
+            if not self.isAdjacentTo(self.toCoord(i), False):     
+                print("Invalid Move! Can only heal zombies adjacent to humans.")           
                 return [False, None]
             # Was the zombie already half-cured?
             if p.halfCured == False and (p.isInHospital(coords) == False or self.hasHospital == False):
@@ -309,7 +311,8 @@ class Board:
         if self.States[i].person is None or self.States[i].person.isZombie == False:
             return [False, None]
         # If not adjacent to a human, then we cannot kill the zombie
-        if not self.isAdjacentTo(self.toCoord(i), False):                
+        if not self.isAdjacentTo(self.toCoord(i), False):
+            print("Invalid Moves! Can only kill zombies adjacent to humans.")
             return [False, None]  
         p = self.States[i].person
         newP = p.clone()
@@ -433,7 +436,7 @@ class Board:
                 busy_zombies = []  # Zombies adjacent to a person
                 for i in range(len(self.States)):
                     state = self.States[i]
-                    if state.person is not None and state.person.isZombie:
+                    if state.person is not None and state.person.isZombie and not state.person.isStunned:
                         c = self.toCoord(i)
                         if not self.isAdjacentTo(c, False):
                             bored_zombies.append(c)
@@ -445,10 +448,10 @@ class Board:
                 
                 # Repeat until a valid move is found
                 has_moved = False
-                count = 10
-                while not has_moved and count > 0:                    
+                count = 5
+                while len(bored_zombies) > 0 and not has_moved and count > 0:                    
                     zombie = rd.choice(bored_zombies)
-                    action = rd.choice(MOVE_ACTIONS)
+                    action = rd.choice(MOVE_ACTIONS)                    
                     if action == "moveUp":
                         has_moved = self.moveUp(zombie)[0]
                     elif action == "moveDown":
@@ -477,7 +480,14 @@ class Board:
                     if diff_x > 0: self.moveRight(selected_zombie)
                     else: self.moveLeft(selected_zombie)
 
-    def update_effects(self):        
+    # Each human is worth 300 points
+    def total_score(self):
+        return self.num_humans() * 300 + self.base_score
+
+    def update(self):
+        if self.base_score > 100: self.base_score -= 25 # Winning the game quicker means higher score
+
+        # Update effects of vaccination and stun
         for state in self.States:
             if state.person is not None:
                 if state.person.isStunned: state.person.isStunned = False                
@@ -486,5 +496,5 @@ class Board:
                     if state.person.turnsVaccinated >= VACCINE_DURATION:
                         state.person.turnsVaccinated = 0
                         state.person.isVaccinated = False
-                        state.person.wasVaccinated = True                
+                        state.person.wasVaccinated = True
 

@@ -67,7 +67,7 @@ clock = pygame.time.Clock()
 frame = 0
 while running:
     P = PF.run(GameBoard, hospital)
-    if self_play:
+    if self_play:        
         # Event a
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
@@ -203,12 +203,21 @@ while running:
                     GameBoard.heal(move_coord)
                 elif action == "kill":
                     GameBoard.kill(move_coord)
+            
+            GameBoard.update()
 
-                    
-            GameBoard.update_effects()
+            if GameBoard.num_zombies() == 0:
+                print("You won! Your score is: " + str(GameBoard.total_score()))
+                break
+            if GameBoard.num_humans() == 0:
+                print("You lost!")
+                break
+
 
         # Update the display
-        pygame.display.update()        
+        pygame.display.update()
+
+    # AI Algorithm        
     else:
         if epochs_ran % 20 == 0:
             print("Board Reset!")
@@ -294,14 +303,18 @@ while running:
         if GameBoard.num_zombies() == 0:
             print("winCase")
             GameBoard = Original_Board
-            break
+            # reset people
+            GameBoard.population = 0
+            GameBoard.populate()
+            
+            #break
 
         take_action = []
         print("Enemy turn")
         ta = ""
         if player_role == "Government":
             GameBoard.zombie_move()
-            GameBoard.update_effects()
+            GameBoard.update()
         else:
             r = rd.randint(0, 4)
             ta = ACTION_SPACE[r]
@@ -325,9 +338,14 @@ while running:
                     GameBoard.kill(a)
         print(GameBoard.num_zombies())
         print(GameBoard.population)
-        if GameBoard.num_humans() is -2:
+        print(GameBoard.num_humans())
+        if GameBoard.num_humans() is 0:
             print("loseCase")
-            break
+            # reset people
+            GameBoard.population = 0
+            GameBoard.populate()
+            # Shows Q-Table in Terminal
+            print(GameBoard.QTable)
         for event in P:
             if event.type == pygame.QUIT:
                 running = False
