@@ -68,7 +68,6 @@ frame = 0
 while running:
     P = PF.run(GameBoard, hospital)
     if self_play:
-        P = PF.run(GameBoard, hospital)
         # Event a
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
@@ -192,7 +191,9 @@ while running:
             GameBoard.update_effects()
 
         # Update the display
-        pygame.display.update()        
+        pygame.display.update()
+
+    # AI Algorithm        
     else:
         if epochs_ran % 20 == 0:
             print("Board Reset!")
@@ -278,7 +279,11 @@ while running:
         if GameBoard.num_zombies() == 0:
             print("winCase")
             GameBoard = Original_Board
-            break
+            # reset people
+            GameBoard.population = 0
+            GameBoard.populate()
+            
+            #break
 
         take_action = []
         print("Enemy turn")
@@ -309,9 +314,13 @@ while running:
                     GameBoard.kill(a)
         print(GameBoard.num_zombies())
         print(GameBoard.population)
-        if GameBoard.num_humans() is -2:
+        if GameBoard.num_humans() is 0:
             print("loseCase")
-            break
+            # reset people
+            GameBoard.population = 0
+            GameBoard.populate()
+            # Shows Q-Table in Terminal
+            print(GameBoard.QTable)
         for event in P:
             if event.type == pygame.QUIT:
                 running = False
