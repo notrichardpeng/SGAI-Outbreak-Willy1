@@ -17,6 +17,7 @@ class Board:
         self.population = 0
         self.States = []
         self.QTable = []
+        self.total_score = 0
         for s in range(dimensions[0] * dimensions[1]):
             self.States.append(State(None, s))
             self.QTable.append([0] * 6)
@@ -432,7 +433,7 @@ class Board:
                 busy_zombies = []  # Zombies adjacent to a person
                 for i in range(len(self.States)):
                     state = self.States[i]
-                    if state.person is not None and state.person.isZombie:
+                    if state.person is not None and state.person.isZombie and not state.person.isStunned:
                         c = self.toCoord(i)
                         if not self.isAdjacentTo(c, False):
                             bored_zombies.append(c)
@@ -444,10 +445,10 @@ class Board:
                 
                 # Repeat until a valid move is found
                 has_moved = False
-                count = 10
-                while not has_moved and count > 0:                    
+                count = 5
+                while len(bored_zombies) > 0 and not has_moved and count > 0:                    
                     zombie = rd.choice(bored_zombies)
-                    action = rd.choice(MOVE_ACTIONS)
+                    action = rd.choice(MOVE_ACTIONS)                    
                     if action == "moveUp":
                         has_moved = self.moveUp(zombie)[0]
                     elif action == "moveDown":

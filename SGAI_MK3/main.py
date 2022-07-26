@@ -186,9 +186,16 @@ while running:
                     GameBoard.heal(move_coord)
                 elif action == "kill":
                     GameBoard.kill(move_coord)
-
-                    
+            
             GameBoard.update_effects()
+
+            if GameBoard.num_zombies() == 0:
+                print("winCase")                
+                break
+            if GameBoard.num_humans() == 0:
+                print("loseCase")
+                break
+
 
         # Update the display
         pygame.display.update()        
