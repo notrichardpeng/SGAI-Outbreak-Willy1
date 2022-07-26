@@ -231,13 +231,15 @@ while running:
         st = rd.randint(0, len(GameBoard.States) - 1)
         state = GameBoard.QTable[st]
         randomization = False
-        if r < gamma:
-            #print("random!!!")
+
+        # Chooses random action - exploration
+        if r < gamma:            
             randomization = True
             while GameBoard.States[st].person is None:
                 st = rd.randint(0, len(GameBoard.States) - 1)
-                state = GameBoard.QTable[st]
-                    #print(st)
+                state = GameBoard.QTable[st]                    
+
+        # Chooses best action - exploitation
         else:
             biggest = None
             for x in range(len(GameBoard.States)):
@@ -253,7 +255,7 @@ while running:
                     biggest = exp
                     i = x
             state = GameBoard.QTable[i]
-            #print(state)
+            
         b = 0
         j = 0
         ind = 0
@@ -295,60 +297,37 @@ while running:
             GameBoard.bite(statecor)
         elif action_to_take == "heal":
             GameBoard.heal(statecor)
-        #pygame.display.update()
+                
+        print("action_index: " + str(ns))
         NewStateAct = GameBoard.QGreedyat(ns) # action_index, qvalue
         NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
-        #qtable
+        
+        #Update QTable
         GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]
         print(GameBoard.QTable[old_state][NewStateAct[0]])
 
         #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
         if GameBoard.num_zombies() == 0:
-            print("winCase")
-            GameBoard = Original_Board
+            print("Humans Win!")            
             # reset people
-            GameBoard.population = 0
-            GameBoard.populate()
-            
-            #break
-
-        take_action = []
-        print("Enemy turn")
-        ta = ""
-        if player_role == "Government":
-            GameBoard.zombie_move()
-            GameBoard.update()
-        else:
-            r = rd.randint(0, 4)
-            ta = ACTION_SPACE[r]
-            poss = GameBoard.get_possible_moves(ta, "Zombie")        
-            if len(poss) > 0:
-                r = rd.randint(0, len(poss) - 1)
-                a = poss[r]
-                if ta == "moveUp":
-                    GameBoard.moveUp(a)
-                elif ta == "moveDown":
-                    GameBoard.moveDown(a)
-                elif ta == "moveLeft":
-                    GameBoard.moveLeft(a)
-                elif ta == "moveRight":
-                    GameBoard.moveRight(a)
-                elif ta == "bite":
-                    GameBoard.bite(a)
-                elif ta == "heal":
-                    GameBoard.heal(a)
-                elif ta == "kill":
-                    GameBoard.kill(a)
-        print(GameBoard.num_zombies())
-        print(GameBoard.population)
-        print(GameBoard.num_humans())
-        if GameBoard.num_humans() is 0:
-            print("loseCase")
-            # reset people
-            GameBoard.population = 0
-            GameBoard.populate()
-            # Shows Q-Table in Terminal
+            GameBoard.clean_board()
+            GameBoard.populate() 
             print(GameBoard.QTable)
+
+
+
+        # Zombies turn
+        take_action = []        
+        GameBoard.zombie_move()
+        GameBoard.update()
+        
+        if GameBoard.num_humans() == 0:
+            print("Zombies Win")
+            # reset people
+            GameBoard.clean_board()
+            GameBoard.populate()
+            print(GameBoard.QTable)   
+
         for event in P:
             if event.type == pygame.QUIT:
                 running = False
@@ -357,3 +336,5 @@ while running:
         # Update the display
         pygame.display.update()
         epochs_ran += 1
+
+        print("\n\n\n\n\n\n")
