@@ -2,7 +2,6 @@ from tracemalloc import start
 from State import State
 import random as rd
 from Person import Person
-from typing import Tuple
 
 VACCINE_DURATION = 5
 MOVE_ACTIONS = ["moveUp", "moveDown", "moveLeft", "moveRight"]
@@ -161,7 +160,7 @@ class Board:
 
         return ret
 
-    def move(self, from_coords, new_coords) -> Tuple[bool, int]:
+    def move(self, from_coords, new_coords):
         """
         Check if the move is valid.
         If valid, then implement the move and return [True, destination_idx]
@@ -183,19 +182,19 @@ class Board:
             return [True, destination_idx]
         return [False, destination_idx]
 
-    def moveUp(self, coords) -> Tuple[bool, int]:
+    def moveUp(self, coords):
         new_coords = (coords[0], coords[1] - 1)
         return self.move(coords, new_coords)
 
-    def moveDown(self, coords) -> Tuple[bool, int]:
+    def moveDown(self, coords):
         new_coords = (coords[0], coords[1] + 1)
         return self.move(coords, new_coords)
 
-    def moveLeft(self, coords) -> Tuple[bool, int]:
+    def moveLeft(self, coords):
         new_coords = (coords[0] - 1, coords[1])
         return self.move(coords, new_coords)
 
-    def moveRight(self, coords) -> Tuple[bool, int]:
+    def moveRight(self, coords):
         new_coords = (coords[0] + 1, coords[1])
         return self.move(coords, new_coords)
 
@@ -269,7 +268,7 @@ class Board:
             chance = 50
         r = rd.randint(0, 100)
         if r < chance:            
-            self.States[i].person.isZombie = True
+            self.States[i].person = Person(True)
         return [True, i]
 
     def heal(self, coords):
@@ -286,7 +285,7 @@ class Board:
         if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
             if not self.isAdjacentTo(self.toCoord(i), False):                
-                return [False, None]            
+                return [False, None]
             # Was the zombie already half-cured?
             if p.halfCured == False and (p.isInHospital(coords) == False or self.hasHospital == False):
                 p.halfCured = True
@@ -303,10 +302,15 @@ class Board:
 
     def kill(self, coords):
         i = self.toIndex(coords)
+        # Ensures we cannot kill empty spaces or humans, only zombies
         if self.States[i].person is None or self.States[i].person.isZombie == False:
             return [False, None]
+        # If not adjacent to a human, then we cannot kill the zombie
+        if not self.isAdjacentTo(self.toCoord(i), False):                
+            return [False, None]  
         p = self.States[i].person
         newP = p.clone()
+        # Gets rid of zombie
         if newP.isZombie:
             newP = None
         self.States[i].person = newP

@@ -25,6 +25,7 @@ font = pygame.font.SysFont("Comic Sans", 20)
 self_play = False
 hospital = False
 
+
 # Option menu
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
 HospitalOnButton = pygame.Rect(700, 250, 100, 100)
@@ -62,12 +63,13 @@ epsilon = 0.1
 epochs = 1000
 epochs_ran = 0
 Original_Board = GameBoard.clone(GameBoard.States)
-
-
+clock = pygame.time.Clock()
+frame = 0
 while running:
     P = PF.run(GameBoard, hospital)
     if self_play:
-        # Event Handling
+        P = PF.run(GameBoard, hospital)
+        # Event a
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = pygame.mouse.get_pos()
@@ -127,6 +129,14 @@ while running:
                 result = GameBoard.kill(take_action[1])
                 if result[0] != False:
                     playerMoved = True
+                    # Plays kill animation
+                    while frame < 9:
+                        PF.kill_animation(frame)
+                        pygame.display.update()
+                        # clock.tick(8) sets frames per second to 8
+                        clock.tick(8)
+                        frame += 1
+                    frame = 0
                 take_action = []
 
         # Computer turn
@@ -180,7 +190,7 @@ while running:
 
                     
             GameBoard.update_effects()
-        
+
         # Update the display
         pygame.display.update()        
     else:
