@@ -77,11 +77,15 @@ while running:
                 x, y = pygame.mouse.get_pos()
                 action = PF.get_action(GameBoard, x, y)                     # Can only return "heal", coordinate of grid clicked, or None. 
                 if action == "heal":                                        # Process a "heal" intention if take_action is currently empty
-                    if take_action == []:
-                        take_action.append("heal")
+                    take_action.append("heal")
+                    if len(take_action) > 1:
+                        if take_action[0] == take_action[1]:
+                            take_action = []
                 elif action == "kill":                                        # Process a "heal" intention if take_action is currently empty
-                    if take_action == []:
-                        take_action.append("kill")
+                    take_action.append("kill")
+                    if len(take_action) > 1:
+                        if take_action[0] == take_action[1]:
+                            take_action = []
                 elif action != None:                                        # Otherwise, get the coordinate of a valid grid cell that was clicked
                     idx = GameBoard.toIndex(action)                         # Get the corresponding 1D index from the 2D grid location that was clicked
                     if take_action == []:                                   # Check that the click corresponds to an intention to move a player
