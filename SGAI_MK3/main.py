@@ -187,13 +187,13 @@ while running:
                 elif action == "kill":
                     GameBoard.kill(move_coord)
             
-            GameBoard.update_effects()
+            GameBoard.update()
 
             if GameBoard.num_zombies() == 0:
-                print("winCase")                
+                print("You won! Your score is: " + str(GameBoard.total_score()))
                 break
             if GameBoard.num_humans() == 0:
-                print("loseCase")
+                print("You lost!")
                 break
 
 
@@ -291,7 +291,7 @@ while running:
         ta = ""
         if player_role == "Government":
             GameBoard.zombie_move()
-            GameBoard.update_effects()
+            GameBoard.update()
         else:
             r = rd.randint(0, 4)
             ta = ACTION_SPACE[r]

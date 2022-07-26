@@ -17,7 +17,7 @@ class Board:
         self.population = 0
         self.States = []
         self.QTable = []
-        self.total_score = 0
+        self.base_score = 1000
         for s in range(dimensions[0] * dimensions[1]):
             self.States.append(State(None, s))
             self.QTable.append([0] * 6)
@@ -477,7 +477,14 @@ class Board:
                     if diff_x > 0: self.moveRight(selected_zombie)
                     else: self.moveLeft(selected_zombie)
 
-    def update_effects(self):        
+    # Each human is worth 300 points
+    def total_score(self):
+        return self.num_humans() * 300 + self.base_score
+
+    def update(self):
+        if self.base_score > 100: self.base_score -= 25 # Winning the game quicker means higher score
+
+        # Update effects of vaccination and stun
         for state in self.States:
             if state.person is not None:
                 if state.person.isStunned: state.person.isStunned = False                
@@ -486,5 +493,5 @@ class Board:
                     if state.person.turnsVaccinated >= VACCINE_DURATION:
                         state.person.turnsVaccinated = 0
                         state.person.isVaccinated = False
-                        state.person.wasVaccinated = True                
+                        state.person.wasVaccinated = True
 
