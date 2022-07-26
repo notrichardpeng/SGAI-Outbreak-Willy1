@@ -189,7 +189,22 @@ def kill_animation(frame):
     display_image(screen, char, (), (0,0))
     display_image(screen, "Assets/zombiedeath/sprite_" + str(frame) + ".png", (200, 200), (400, 350))
     display_image(screen, "Assets/watergun/sprite_" + str(frame) + ".png", (200, 200), (600, 350))
-    
+
+def half_heal_animation(frame):
+    image = str(frame)
+    if frame < 10:
+        image = "0" + str(frame)
+    display_image(screen, "Assets/heal1_background.png", (), (0, 200))
+    display_image(screen, "Assets/heal1_zombie/sprite_" + image + ".png", (200, 200), (428, 350))    
+    display_image(screen, "Assets/heal1_human/sprite_" + image + ".png", (200, 200), (572, 350))
+
+def full_heal_animation(frame):
+    image = str(frame)
+    if frame < 10:
+        image = "0" + str(frame)
+    display_image(screen, "Assets/heal2_background.png", (), (0, 200))
+    display_image(screen, "Assets/heal2_zombie/sprite_" + image + ".png", (200, 200), (428, 350))    
+    display_image(screen, "Assets/heal2_human/sprite_" + image + ".png", (200, 200), (572, 350))
 
 def direction(coord1, coord2):
     if coord2[1] > coord1[1]:
