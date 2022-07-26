@@ -140,7 +140,7 @@ while running:
                             PF.full_heal_animation(frame)
                             pygame.display.update()
                             # clock.tick(12) sets frames per second to 12
-                            clock.tick(12)
+                            clock.tick(8)
                             frame += 1
                         frame = 0
                 take_action = []
