@@ -57,7 +57,7 @@ class Board:
             f = self.kill(cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
         if f[0] == False:
-            reward = -1000
+            return [-1000, oldstate]
         return [reward, f[1]]
 
     def get_possible_moves(self, action, role):
@@ -168,13 +168,13 @@ class Board:
         If invalid, then return [False, None]
         If the space is currently occupied, then return [False, destination_idx]
         """
-        # Get the start and destination index (1D)
-        start_idx = self.toIndex(from_coords)
-        destination_idx = self.toIndex(new_coords)
-        
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
-            return [False, destination_idx]
+            return [False, self.toIndex(from_coords)]
+        
+        # Get the start and destination index (1D)
+        start_idx = self.toIndex(from_coords)
+        destination_idx = self.toIndex(new_coords)                
         
         # Check if the destination is currently occupied
         if self.States[destination_idx].person is None:
@@ -383,6 +383,11 @@ class Board:
         # new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
         # QTable[state][acti] = new_value
 
+    def clean_board(self):
+        for state in self.States:
+            state.person = None
+        self.population = 0
+
     def populate(self):
         total = rd.randint(7, ((self.rows * self.columns) / 3))
         poss = []
@@ -410,7 +415,7 @@ class Board:
         if len(possible_move_coords) > 0:                
             coord = rd.choice(possible_move_coords)
             self.bite(coord)
-            print("Bite " + str(coord))
+            print("Zombie: Bite " + str(coord))
         else:            
             # No zombies can bite, move the zombie that is nearest to a person.
             # Get all coordinates
@@ -467,7 +472,7 @@ class Board:
                 diff_x = selected_human[0] - selected_zombie[0]
                 diff_y = selected_human[1] - selected_zombie[1]
                 
-                print("Move " + str(selected_zombie))
+                print("Zombie: Move " + str(selected_zombie))
 
                 # Top Left corner is (0, 0)
                 if abs(diff_y) > abs(diff_x):
