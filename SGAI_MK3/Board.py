@@ -281,7 +281,7 @@ class Board:
         if self.States[i].person is None:
             return [False, None]
         p = self.States[i].person        
-
+        action_type = ""
         if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
             if not self.isAdjacentTo(self.toCoord(i), False):                
@@ -290,15 +290,18 @@ class Board:
             if p.halfCured == False and (p.isInHospital(coords) == False or self.hasHospital == False):
                 p.halfCured = True
                 p.isStunned = True
+                action_type = "half"
             elif (p.halfCured == True or (p.isInHospital(coords) == True and self.hasHospital == True)):
                 p.isZombie = False
-                p.wasCured = True                
+                p.wasCured = True
+                action_type = "full"                
         elif p.isZombie == False:
             # If the person is already vaccinated, don't make the player lose a turn
             if p.isVaccinated:
                 return [False, None]
-            p.isVaccinated = True            
-        return [True, i]
+            p.isVaccinated = True   
+            action_type = "vaccine"         
+        return [True, i, action_type]
 
     def kill(self, coords):
         i = self.toIndex(coords)

@@ -68,7 +68,6 @@ frame = 0
 while running:
     P = PF.run(GameBoard, hospital)
     if self_play:
-        P = PF.run(GameBoard, hospital)
         # Event a
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
@@ -124,6 +123,23 @@ while running:
                 result = GameBoard.heal(take_action[1])
                 if result[0] != False:
                     playerMoved = True
+                    if result[2] == "half":
+                        # Half heal animation
+                        while frame < 12:
+                            PF.half_heal_animation(frame)
+                            pygame.display.update()
+                            # clock.tick(12) sets frames per second to 12
+                            clock.tick(12)
+                            frame += 1
+                        frame = 0
+                    elif result[2] == "full":
+                        while frame < 16:
+                            PF.full_heal_animation(frame)
+                            pygame.display.update()
+                            # clock.tick(12) sets frames per second to 12
+                            clock.tick(12)
+                            frame += 1
+                        frame = 0
                 take_action = []
             elif take_action[0] == "kill":
                 result = GameBoard.kill(take_action[1])
