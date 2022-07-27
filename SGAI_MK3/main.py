@@ -318,7 +318,7 @@ while running:
         # Q(S, A) = Q(S, A) + alpha[R + gamma * max_a Q(S', A) - Q(S, A)]
         reward = GameBoard.act(old_state, action_to_take)
         ns = reward[1] #what state (0-35)
-        if GameBoard.num_zombies() is 1 or GameBoard.num_zombies is 0:
+        if GameBoard.num_zombies() == 1 or GameBoard.num_zombies == 0:
             reward[0] = 10000
         #UPDATE 
         statecor = GameBoard.toCoord(ns)
@@ -335,44 +335,54 @@ while running:
             GameBoard.bite(statecor)
         elif action_to_take == "heal":
             GameBoard.heal(statecor)
-                
+        elif action_to_take == "kill":
+            GameBoard.kill(statecor)
+
+        # print new state
         print("action_index: " + str(ns))
-        NewStateAct = GameBoard.QGreedyat(ns) # action_index, qvalue
-        NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
-        
-        #Update QTable
-        GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]
-        print(GameBoard.QTable[old_state][NewStateAct[0]])
-
-        #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
-        if GameBoard.num_zombies() == 0:
-            print("Humans Win!")            
-            # reset people
-            GameBoard.clean_board()
-            GameBoard.populate() 
-            print(GameBoard.QTable)
-
-
-
-        # Zombies turn
-        take_action = []        
-        GameBoard.zombie_move()
-        GameBoard.update()
-        
-        if GameBoard.num_humans() == 0:
-            print("Zombies Win")
-            # reset people
-            GameBoard.clean_board()
+        if (ns > 35 or ns < 0):
+            GameBoard.population = 0
             GameBoard.populate()
-            print(GameBoard.QTable)   
+            print(GameBoard.QTable)
+            print("Game ended due to invalid move")
+            print("\n\n\n\n\n\n")
+        else:
+            NewStateAct = GameBoard.QGreedyat(ns) # action_index, qvalue
+            NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
+            
+            #Update QTable
+            GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]
+            print(GameBoard.QTable[old_state][NewStateAct[0]])
 
-        for event in P:
-            if event.type == pygame.QUIT:
-                running = False
-                break 
-                
-        # Update the display
-        pygame.display.update()
-        epochs_ran += 1
+            #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
 
-        print("\n\n\n\n\n\n")
+            if GameBoard.num_zombies() == 0:
+                print("Humans Win!")            
+                # reset people
+                GameBoard.clean_board()
+                GameBoard.populate() 
+                print(GameBoard.QTable)
+                print("\n\n\n\n\n\n")
+
+            # Zombies turn
+            take_action = []        
+            GameBoard.zombie_move()
+            GameBoard.update()
+
+
+            if GameBoard.num_humans() == 0:
+                print("Zombies Win")
+                # reset people
+                GameBoard.clean_board()
+                GameBoard.populate()
+                print(GameBoard.QTable)
+                print("\n\n\n\n\n\n")   
+
+            for event in P:
+                if event.type == pygame.QUIT:
+                    running = False
+                    break 
+                    
+            # Update the display
+            pygame.display.update()
+            epochs_ran += 1

@@ -20,7 +20,7 @@ class Board:
         self.base_score = 1000
         for s in range(dimensions[0] * dimensions[1]):
             self.States.append(State(None, s))
-            self.QTable.append([0] * 6)
+            self.QTable.append([0] * 7)
 
     def num_zombies(self):
         r = 0
