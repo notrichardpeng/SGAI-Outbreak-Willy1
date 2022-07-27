@@ -1,3 +1,4 @@
+from numpy import isin
 import pygame
 from Board import Board
 import PygameFunctions as PF
@@ -85,50 +86,38 @@ while running:
     if self_play:        
         # Event a 
         for event in P:
-            if event.type == pygame.MOUSEBUTTONUP:
-                x, y = pygame.mouse.get_pos()
-                action = PF.get_action(GameBoard, x, y)                     # returns move if the thing pressed is a human game piece
-                if HealButton.collidepoint(pygame.mouse.get_pos()):         # if heal button is clicked, action is heal and updates UI to show selected healbutton
+            if HealButton.collidepoint(pygame.mouse.get_pos()):
+                if event.type == pygame.MOUSEBUTTONUP:                          # If heal button is let go of, select heal and update heal button image to selected
                     take_action.append("heal")
                     heal_button = "select"
-                    if len(take_action) > 1:
-                        if take_action[0] == take_action[1]:
-                            heal_button = "button"                          # if heal button is pressed again, turns heal button back to normal
-                            take_action = []
-                elif KillButton.collidepoint(pygame.mouse.get_pos()):       # if kill button is clicked, action is kill and updates UI to show selected kill button
+                elif event.type == pygame.MOUSEBUTTONDOWN:                      # If heal button is pressed, update heal button image to pressed
+                    heal_button = "press"
+                elif heal_button != "select":                                   # If mouse is over heal button, update heal button to hovering
+                    heal_button = "hover"                       
+            elif heal_button != "select":
+                heal_button = "button"
+            if KillButton.collidepoint(pygame.mouse.get_pos()):
+                if event.type == pygame.MOUSEBUTTONUP:                          # If kill button is let go of, select kill and update kill button image to selected
                     take_action.append("kill")
                     kill_button = "select"
-                    if len(take_action) > 1:
-                        if take_action[0] == take_action[1]:
-                            kill_button = "button"                          # if kill button is pressed again, turns kill button back to normal
-                            take_action = []
-                elif action != None:                                        # Otherwise, get the coordinate of a valid grid cell that was clicked
-                    idx = GameBoard.toIndex(action)                         # Get the corresponding 1D index from the 2D grid location that was clicked
-                    if take_action == []:                                   # Check that the click corresponds to an intention to move a player
-                        # Returns true if the space is not empty and it is a piece belonging to the player.
-                        if ( (GameBoard.States[idx].person is not None) and (GameBoard.States[idx].person.isZombie == roleToRoleBoolean[player_role]) ):
-                            take_action.append("move")
-                    if take_action != []:                                   # Only append a coordinate if there is a pending "heal" or "move" intention
-                        take_action.append(action)
-                        if len(take_action) > 2:
-                            if take_action[1] == take_action[2]:
-                                take_action = []
-            elif event.type == pygame.MOUSEBUTTONDOWN:                      # if mouse is pressed down
-                if HealButton.collidepoint(pygame.mouse.get_pos()):         # if press down happens over heal button, update heal button image
-                    heal_button = "press"
-                if KillButton.collidepoint(pygame.mouse.get_pos()):         # if press down happens over kill button, update kill button image
+                elif event.type == pygame.MOUSEBUTTONDOWN:                      # If kill button is pressed, update kill button image to pressed
                     kill_button = "press"
-            elif event.type == pygame.MOUSEMOTION: 
-                if heal_button != "select":
-                    if HealButton.collidepoint(pygame.mouse.get_pos()):
-                        heal_button = "hover"
-                    else:
-                        heal_button = "button"
-                if kill_button != "select":
-                    if KillButton.collidepoint(pygame.mouse.get_pos()) and kill_button != "select":
-                        kill_button = "hover"
-                    else:
-                        kill_button = "button"
+                elif kill_button != "select":
+                    kill_button = "hover"                                       # If mouse is over kill button, update kill button to hovering
+            elif kill_button != "select":
+                kill_button = "button"
+            if event.type == pygame.MOUSEBUTTONUP:
+                if len(take_action) < 2:                                        # Checks if list is less than 2
+                    x, y = pygame.mouse.get_pos()                               
+                    action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile
+                    if action != None:
+                        idx = GameBoard.toIndex(action)
+                        if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
+                            if ( (GameBoard.States[idx].person is not None) and (GameBoard.States[idx].person.isZombie == roleToRoleBoolean[player_role]) ):
+                                take_action.append(action)
+                        else:                                                   # Otherwise, add selected tile as destination
+                            print(action)
+                            take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
         # Display the current action
@@ -138,31 +127,40 @@ while running:
         )
         PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
 
-        # Draws selection box
+        # Deselects or overrides action button
         if len(take_action) == 2:
-            PF.select(take_action[1])
+            if take_action[0] == take_action[1]:
+                take_action = []
+                kill_button, heal_button = "button", "button"
+            elif isinstance(take_action[1], str):
+                take_action.pop(0)
+
+        # Draws selection of game piece
+        if len(take_action) == 1:
+            if not isinstance(take_action[0], str):
+                PF.select(take_action[0])
+
         # Action handling
-        if len(take_action) > 1:
-            if take_action[0] == "move":
-                if len(take_action) > 2:                                    #Makes sure the second coordinate is clicked
-                    directionToMove = PF.direction(take_action[1], take_action[2])
-                    result = [False, None]
-                    if directionToMove == "moveUp":
-                        result = GameBoard.moveUp(take_action[1])
-                    elif directionToMove == "moveDown":
-                        result = GameBoard.moveDown(take_action[1])                                 
-                    elif directionToMove == "moveLeft":
-                        result = GameBoard.moveLeft(take_action[1])
-                    elif directionToMove == "moveRight":
-                        result = GameBoard.moveRight(take_action[1])
-                    if result[0] != False:
-                        playerMoved = True
-                    take_action = []
+        if len(take_action) == 2:
+            if not isinstance(take_action[0], str):
+                directionToMove = PF.direction(take_action[0], take_action[1])
+                result = [False, None]
+                if directionToMove == "moveUp":
+                    result = GameBoard.moveUp(take_action[0])
+                elif directionToMove == "moveDown":
+                    result = GameBoard.moveDown(take_action[0])                                 
+                elif directionToMove == "moveLeft":
+                    result = GameBoard.moveLeft(take_action[0])
+                elif directionToMove == "moveRight":
+                    result = GameBoard.moveRight(take_action[0])
+                if result[0] != False:
+                    playerMoved = True
+                take_action = []
             elif take_action[0] == "heal":
                 result = GameBoard.heal(take_action[1])
                 if result[0] != False:
                     playerMoved = True
-                    heal_button = "button"                                  # turns heal button back to normal
+                    heal_button = "button"
                     if result[2] == "half": 
                         # Half heal animation
                         while frame < 12:
@@ -190,7 +188,9 @@ while running:
                         frame = 0
                 take_action = []
             elif take_action[0] == "kill":
+                kill_button = "button"
                 result = GameBoard.kill(take_action[1])
+                print(result)
                 if result[0] != False:
                     playerMoved = True
                     kill_button = "button"                                  # turns kill button back to normal
