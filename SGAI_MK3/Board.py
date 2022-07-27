@@ -17,6 +17,7 @@ class Board:
         self.population = 0
         self.States = []
         self.QTable = []
+        self.base_score = 1000
         for s in range(dimensions[0] * dimensions[1]):
             self.States.append(State(None, s))
             self.QTable.append([0] * 7)
@@ -56,7 +57,7 @@ class Board:
             f = self.kill(cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
         if f[0] == False:
-            reward = -1000
+            return [-1000, oldstate]
         return [reward, f[1]]
 
     def get_possible_moves(self, action, role):
@@ -167,13 +168,13 @@ class Board:
         If invalid, then return [False, None]
         If the space is currently occupied, then return [False, destination_idx]
         """
-        # Get the start and destination index (1D)
-        start_idx = self.toIndex(from_coords)
-        destination_idx = self.toIndex(new_coords)
-        
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
-            return [False, destination_idx]
+            return [False, self.toIndex(from_coords)]
+        
+        # Get the start and destination index (1D)
+        start_idx = self.toIndex(from_coords)
+        destination_idx = self.toIndex(new_coords)                
         
         # Check if the destination is currently occupied
         if self.States[destination_idx].person is None:
@@ -281,7 +282,7 @@ class Board:
         if self.States[i].person is None:
             return [False, None]
         p = self.States[i].person        
-
+        action_type = ""
         if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
             if not self.isAdjacentTo(self.toCoord(i), False):     
@@ -291,15 +292,18 @@ class Board:
             if p.halfCured == False and (p.isInHospital(coords) == False or self.hasHospital == False):
                 p.halfCured = True
                 p.isStunned = True
+                action_type = "half"
             elif (p.halfCured == True or (p.isInHospital(coords) == True and self.hasHospital == True)):
                 p.isZombie = False
-                p.wasCured = True                
+                p.wasCured = True
+                action_type = "full"                
         elif p.isZombie == False:
             # If the person is already vaccinated, don't make the player lose a turn
             if p.isVaccinated:
                 return [False, None]
-            p.isVaccinated = True            
-        return [True, i]
+            p.isVaccinated = True   
+            action_type = "vaccine"         
+        return [True, i, action_type]
 
     def kill(self, coords):
         i = self.toIndex(coords)
@@ -382,6 +386,11 @@ class Board:
         # new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
         # QTable[state][acti] = new_value
 
+    def clean_board(self):
+        for state in self.States:
+            state.person = None
+        self.population = 0
+
     def populate(self):
         total = rd.randint(7, ((self.rows * self.columns) / 3))
         poss = []
@@ -409,7 +418,7 @@ class Board:
         if len(possible_move_coords) > 0:                
             coord = rd.choice(possible_move_coords)
             self.bite(coord)
-            print("Bite " + str(coord))
+            print("Zombie: Bite " + str(coord))
         else:            
             # No zombies can bite, move the zombie that is nearest to a person.
             # Get all coordinates
@@ -432,7 +441,7 @@ class Board:
                 busy_zombies = []  # Zombies adjacent to a person
                 for i in range(len(self.States)):
                     state = self.States[i]
-                    if state.person is not None and state.person.isZombie:
+                    if state.person is not None and state.person.isZombie and not state.person.isStunned:
                         c = self.toCoord(i)
                         if not self.isAdjacentTo(c, False):
                             bored_zombies.append(c)
@@ -444,10 +453,10 @@ class Board:
                 
                 # Repeat until a valid move is found
                 has_moved = False
-                count = 10
-                while not has_moved and count > 0:                    
+                count = 5
+                while len(bored_zombies) > 0 and not has_moved and count > 0:                    
                     zombie = rd.choice(bored_zombies)
-                    action = rd.choice(MOVE_ACTIONS)
+                    action = rd.choice(MOVE_ACTIONS)                    
                     if action == "moveUp":
                         has_moved = self.moveUp(zombie)[0]
                     elif action == "moveDown":
@@ -466,7 +475,7 @@ class Board:
                 diff_x = selected_human[0] - selected_zombie[0]
                 diff_y = selected_human[1] - selected_zombie[1]
                 
-                print("Move " + str(selected_zombie))
+                print("Zombie: Move " + str(selected_zombie))
 
                 # Top Left corner is (0, 0)
                 if abs(diff_y) > abs(diff_x):
@@ -476,7 +485,14 @@ class Board:
                     if diff_x > 0: self.moveRight(selected_zombie)
                     else: self.moveLeft(selected_zombie)
 
-    def update_effects(self):        
+    # Each human is worth 300 points
+    def total_score(self):
+        return self.num_humans() * 300 + self.base_score
+
+    def update(self):
+        if self.base_score > 100: self.base_score -= 25 # Winning the game quicker means higher score
+
+        # Update effects of vaccination and stun
         for state in self.States:
             if state.person is not None:
                 if state.person.isStunned: state.person.isStunned = False                
@@ -485,5 +501,5 @@ class Board:
                     if state.person.turnsVaccinated >= VACCINE_DURATION:
                         state.person.turnsVaccinated = 0
                         state.person.isVaccinated = False
-                        state.person.wasVaccinated = True                
+                        state.person.wasVaccinated = True
 

@@ -33,10 +33,11 @@ ProceedButton = pygame.Rect(1050, 650, 100, 100)
 
 
 proceed = False
-hover = False
+hover = ""
 while proceed == False:
     for event in pygame.event.get():
         PF.display_options_screen(self_play, hospital, hover)
+        hover = ""
         if event.type == pygame.MOUSEBUTTONDOWN:
             if SelfPlayButton.collidepoint(pygame.mouse.get_pos()):
                 self_play = not self_play
@@ -46,9 +47,11 @@ while proceed == False:
                 proceed = True
         elif event.type == pygame.MOUSEMOTION:
             if ProceedButton.collidepoint(pygame.mouse.get_pos()):
-                hover = True
-            else:
-                hover = False
+                hover = "proceed"
+            elif HospitalOnButton.collidepoint(pygame.mouse.get_pos()):
+                hover = "hospital"
+            elif SelfPlayButton.collidepoint(pygame.mouse.get_pos()):
+                hover = "self" 
         elif event.type == pygame.QUIT:
             pygame.quit()
 
@@ -74,11 +77,15 @@ while running:
                 x, y = pygame.mouse.get_pos()
                 action = PF.get_action(GameBoard, x, y)                     # Can only return "heal", coordinate of grid clicked, or None. 
                 if action == "heal":                                        # Process a "heal" intention if take_action is currently empty
-                    if take_action == []:
-                        take_action.append("heal")
+                    take_action.append("heal")
+                    if len(take_action) > 1:
+                        if take_action[0] == take_action[1]:
+                            take_action = []
                 elif action == "kill":                                        # Process a "heal" intention if take_action is currently empty
-                    if take_action == []:
-                        take_action.append("kill")
+                    take_action.append("kill")
+                    if len(take_action) > 1:
+                        if take_action[0] == take_action[1]:
+                            take_action = []
                 elif action != None:                                        # Otherwise, get the coordinate of a valid grid cell that was clicked
                     idx = GameBoard.toIndex(action)                         # Get the corresponding 1D index from the 2D grid location that was clicked
                     if take_action == []:                                   # Check that the click corresponds to an intention to move a player
@@ -123,6 +130,23 @@ while running:
                 result = GameBoard.heal(take_action[1])
                 if result[0] != False:
                     playerMoved = True
+                    if result[2] == "half":
+                        # Half heal animation
+                        while frame < 12:
+                            PF.half_heal_animation(frame)
+                            pygame.display.update()
+                            # clock.tick(12) sets frames per second to 12
+                            clock.tick(12)
+                            frame += 1
+                        frame = 0
+                    elif result[2] == "full":
+                        while frame < 16:
+                            PF.full_heal_animation(frame)
+                            pygame.display.update()
+                            # clock.tick(12) sets frames per second to 12
+                            clock.tick(8)
+                            frame += 1
+                        frame = 0
                 take_action = []
             elif take_action[0] == "kill":
                 result = GameBoard.kill(take_action[1])
@@ -186,9 +210,16 @@ while running:
                     GameBoard.heal(move_coord)
                 elif action == "kill":
                     GameBoard.kill(move_coord)
+            
+            GameBoard.update()
 
-                    
-            GameBoard.update_effects()
+            if GameBoard.num_zombies() == 0:
+                print("You won! Your score is: " + str(GameBoard.total_score()))
+                break
+            if GameBoard.num_humans() == 0:
+                print("You lost!")
+                break
+
 
         # Update the display
         pygame.display.update()
@@ -204,13 +235,15 @@ while running:
         st = rd.randint(0, len(GameBoard.States) - 1)
         state = GameBoard.QTable[st]
         randomization = False
-        if r < gamma:
-            #print("random!!!")
+
+        # Chooses random action - exploration
+        if r < gamma:            
             randomization = True
             while GameBoard.States[st].person is None:
                 st = rd.randint(0, len(GameBoard.States) - 1)
-                state = GameBoard.QTable[st]
-                    #print(st)
+                state = GameBoard.QTable[st]                    
+
+        # Chooses best action - exploitation
         else:
             biggest = None
             for x in range(len(GameBoard.States)):
@@ -226,7 +259,7 @@ while running:
                     biggest = exp
                     i = x
             state = GameBoard.QTable[i]
-            #print(state)
+            
         b = 0
         j = 0
         ind = 0
@@ -270,68 +303,47 @@ while running:
             GameBoard.heal(statecor)
         elif action_to_take == "kill":
             GameBoard.kill(statecor)
+
         # print new state
-        print("new state:")
-        print(ns)
+        print("action_index: " + str(ns))
         if (ns > 35 or ns < 0):
             GameBoard.population = 0
             GameBoard.populate()
             print(GameBoard.QTable)
+            print("Game ended due to invalid move")
+            print("\n\n\n\n\n\n")
         else:
-            #pygame.display.update()
             NewStateAct = GameBoard.QGreedyat(ns) # action_index, qvalue
             NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
-            #qtable
+            
+            #Update QTable
             GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]
             print(GameBoard.QTable[old_state][NewStateAct[0]])
 
             #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
-            if GameBoard.num_zombies() == 0:
-                print("winCase")
-                GameBoard = Original_Board
-                # reset people
-                GameBoard.population = 0
-                GameBoard.populate()
-                
-                #break
 
-            take_action = []
-            print("Enemy turn")
-            ta = ""
-            if player_role == "Government":
-                GameBoard.zombie_move()
-                GameBoard.update_effects()
-            else:
-                r = rd.randint(0, 4)
-                ta = ACTION_SPACE[r]
-                poss = GameBoard.get_possible_moves(ta, "Zombie")        
-                if len(poss) > 0:
-                    r = rd.randint(0, len(poss) - 1)
-                    a = poss[r]
-                    if ta == "moveUp":
-                        GameBoard.moveUp(a)
-                    elif ta == "moveDown":
-                        GameBoard.moveDown(a)
-                    elif ta == "moveLeft":
-                        GameBoard.moveLeft(a)
-                    elif ta == "moveRight":
-                        GameBoard.moveRight(a)
-                    elif ta == "bite":
-                        GameBoard.bite(a)
-                    elif ta == "heal":
-                        GameBoard.heal(a)
-                    elif ta == "kill":
-                        GameBoard.kill(a)
-            print(GameBoard.num_zombies())
-            print(GameBoard.population)
-            print(GameBoard.num_humans())
-            if GameBoard.num_humans() is 0:
-                print("loseCase")
+            if GameBoard.num_zombies() == 0:
+                print("Humans Win!")            
                 # reset people
-                GameBoard.population = 0
-                GameBoard.populate()
-                # Shows Q-Table in Terminal
+                GameBoard.clean_board()
+                GameBoard.populate() 
                 print(GameBoard.QTable)
+                print("\n\n\n\n\n\n")
+
+            # Zombies turn
+            take_action = []        
+            GameBoard.zombie_move()
+            GameBoard.update()
+
+
+            if GameBoard.num_humans() == 0:
+                print("Zombies Win")
+                # reset people
+                GameBoard.clean_board()
+                GameBoard.populate()
+                print(GameBoard.QTable)
+                print("\n\n\n\n\n\n")   
+
             for event in P:
                 if event.type == pygame.QUIT:
                     running = False

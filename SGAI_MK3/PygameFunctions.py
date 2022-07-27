@@ -161,18 +161,24 @@ def display_options_screen(self_play, hospital, hover):
         pygame.font.SysFont("Calibri", 24).render("Proceed to game...", True, WHITE), (975, 600),
     )
 
-    if self_play:
-        display_image(screen, "Assets/checked_box.png", (100, 100), (350, 250))
-    else:
-        display_image(screen, "Assets/unchecked_box.png", (100, 100), (350, 250))
-    if hospital:
-        display_image(screen, "Assets/checked_box.png", (100, 100), (700, 250))
-    else:
-        display_image(screen, "Assets/unchecked_box.png", (100, 100), (700, 250))
-    if hover:
+    if hover == "proceed":
         display_image(screen, "Assets/checked_box.png", (100, 100), (1050, 650))
     else:
         display_image(screen, "Assets/unchecked_box.png", (100, 100), (1050, 650))
+    if hover == "hospital":
+        display_image(screen, "Assets/checked_box.png", (100, 100), (700, 250))
+    else:
+        if hospital:
+            display_image(screen, "Assets/checked_box.png", (100, 100), (700, 250))
+        else:
+            display_image(screen, "Assets/unchecked_box.png", (100, 100), (700, 250))
+    if hover == "self":
+        display_image(screen, "Assets/checked_box.png", (100, 100), (350, 250))
+    else:
+        if self_play: 
+            display_image(screen, "Assets/checked_box.png", (100, 100), (350, 250))
+        else:
+            display_image(screen, "Assets/unchecked_box.png", (100, 100), (350, 250))
     pygame.display.update()
 
 def select(coord):
@@ -189,7 +195,22 @@ def kill_animation(frame):
     display_image(screen, char, (), (0,0))
     display_image(screen, "Assets/zombiedeath/sprite_" + str(frame) + ".png", (200, 200), (400, 350))
     display_image(screen, "Assets/watergun/sprite_" + str(frame) + ".png", (200, 200), (600, 350))
-    
+
+def half_heal_animation(frame):
+    image = str(frame)
+    if frame < 10:
+        image = "0" + str(frame)
+    display_image(screen, "Assets/heal1_background.png", (), (0, 200))
+    display_image(screen, "Assets/heal1_zombie/sprite_" + image + ".png", (200, 200), (428, 350))    
+    display_image(screen, "Assets/heal1_human/sprite_" + image + ".png", (200, 200), (572, 350))
+
+def full_heal_animation(frame):
+    image = str(frame)
+    if frame < 10:
+        image = "0" + str(frame)
+    display_image(screen, "Assets/heal2_background.png", (), (0, 200))
+    display_image(screen, "Assets/heal2_zombie/sprite_" + image + ".png", (200, 200), (428, 350))    
+    display_image(screen, "Assets/heal2_human/sprite_" + image + ".png", (200, 200), (572, 350))
 
 def direction(coord1, coord2):
     if coord2[1] > coord1[1]:
