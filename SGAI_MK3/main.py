@@ -70,6 +70,7 @@ clock = pygame.time.Clock()
 frame = 0 
 hovering = ""
 action_type = ""
+
 # Buttons
 kill_img = pygame.image.load("Assets/kill_button.png").convert_alpha()
 KillButton = kill_img.get_rect(topleft=(800, 50))
@@ -82,7 +83,7 @@ heal_button = "button"
 while running:
     P = PF.run(GameBoard, hospital, heal_button, kill_button)
     if self_play:        
-        # Event a
+        # Event a 
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = pygame.mouse.get_pos()
@@ -161,8 +162,8 @@ while running:
                 result = GameBoard.heal(take_action[1])
                 if result[0] != False:
                     playerMoved = True
-                    if result[2] == "half":
-                        heal_button = "button"                              # turns heal button back to normal
+                    heal_button = "button"                                  # turns heal button back to normal
+                    if result[2] == "half": 
                         # Half heal animation
                         while frame < 12:
                             PF.half_heal_animation(frame)
@@ -172,9 +173,16 @@ while running:
                             frame += 1
                         frame = 0
                     elif result[2] == "full":
-                        heal_button = "button"                              # turns heal button back to normal
                         while frame < 16:
                             PF.full_heal_animation(frame)
+                            pygame.display.update()
+                            # clock.tick(12) sets frames per second to 12
+                            clock.tick(8)
+                            frame += 1
+                        frame = 0
+                    elif result[2] == "vaccine": 
+                        while frame < 6:
+                            PF.vaccine_animation(frame)
                             pygame.display.update()
                             # clock.tick(12) sets frames per second to 12
                             clock.tick(8)

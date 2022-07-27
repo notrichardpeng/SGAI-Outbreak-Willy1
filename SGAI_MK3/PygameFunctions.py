@@ -209,6 +209,11 @@ def full_heal_animation(frame):
     display_image(screen, "Assets/heal2_zombie/sprite_" + image + ".png", (200, 200), (428, 350))    
     display_image(screen, "Assets/heal2_human/sprite_" + image + ".png", (200, 200), (572, 350))
 
+def vaccine_animation(frame):
+    display_image(screen, "Assets/heal2_background.png", (), (0, 200))
+    display_image(screen, "Assets/vaccine/sprite_" + str(frame) + ".png", (200, 200), (428, 350))    
+    display_image(screen, "Assets/heal2_human/sprite_0" + str(frame) + ".png", (200, 200), (572, 350))
+
 def direction(coord1, coord2):
     if coord2[1] > coord1[1]:
         return "moveDown"
