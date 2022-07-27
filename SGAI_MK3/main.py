@@ -269,8 +269,12 @@ while running:
     # AI Algorithm        
     else:
         if epochs_ran % 20 == 0:
-            print("Board Reset!")
-            GameBoard = Original_Board  # reset environment        
+            print("Draw")
+            # reset people
+            GameBoard.clean_board()
+            GameBoard.populate()
+            print(GameBoard.QTable)
+            print("\n\n\n\n\n\n")        
         pygame.time.wait(AI_PLAY_WAITTIME_MS)        
         i = 0
         r = rd.uniform(0.0, 1.0)
@@ -348,8 +352,9 @@ while running:
 
         # print new state
         print("action_index: " + str(ns))
-        if (ns > 35 or ns < 0):
-            GameBoard.population = 0
+        # In case of error
+        if (ns > 35 or ns < 0):   
+            GameBoard.clean_board()
             GameBoard.populate()
             print(GameBoard.QTable)
             print("Game ended due to invalid move")
