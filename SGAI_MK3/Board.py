@@ -56,8 +56,15 @@ class Board:
         elif givenAction == "kill":
             f = self.kill(cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
-        if givenAction == "bite" or f[0] == False:
-                return [-1000, oldstate]
+        # Invalid move rewards
+        if givenAction == "bite":
+            return [-1000, oldstate]
+        if f[0] == False: 
+            if f[1] == None:
+                reward = -1000
+            else:
+                reward = 0
+            return [reward, oldstate]
         return [reward, f[1]]
 
     def get_possible_moves(self, action, role):
@@ -170,7 +177,7 @@ class Board:
         """
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
-            return [False, self.toIndex(from_coords)]
+            return [False, None]
         
         # Get the start and destination index (1D)
         start_idx = self.toIndex(from_coords)
