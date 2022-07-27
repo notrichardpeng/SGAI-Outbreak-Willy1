@@ -20,7 +20,7 @@ class Board:
         self.base_score = 1000
         for s in range(dimensions[0] * dimensions[1]):
             self.States.append(State(None, s))
-            self.QTable.append([0] * 7)
+            self.QTable.append([rd.uniform(-100, 100)] * 7)
 
     def num_zombies(self):
         r = 0
@@ -50,9 +50,7 @@ class Board:
         elif givenAction == "moveRight":
             f = self.moveRight(cell)
         elif givenAction == "heal":
-            f = self.heal(cell)
-        elif givenAction == "bite":
-            f = self.bite(cell)
+            f = self.heal(cell)        
         elif givenAction == "kill":
             f = self.kill(cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
@@ -293,7 +291,7 @@ class Board:
         if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
             if not self.isAdjacentTo(self.toCoord(i), False):     
-                print("Invalid Move! Can only heal zombies adjacent to humans.")           
+                print("Invalid Heal!")           
                 return [False, None]
             # Was the zombie already half-cured?
             if p.halfCured == False and (p.isInHospital(coords) == False or self.hasHospital == False):
@@ -319,7 +317,7 @@ class Board:
             return [False, None]
         # If not adjacent to a human, then we cannot kill the zombie
         if not self.isAdjacentTo(self.toCoord(i), False):
-            print("Invalid Moves! Can only kill zombies adjacent to humans.")
+            print("Invalid Kill!")
             return [False, None]  
         p = self.States[i].person
         newP = p.clone()
@@ -431,26 +429,20 @@ class Board:
             possible_move_coords = self.get_possible_moves(action, "Zombie")
             cnt -= 1
         
-        if len(possible_move_coords) == 0:
-            print("No possible moves for zombies")
+        if len(possible_move_coords) == 0:            
             return
 
         coord = rd.choice(possible_move_coords)
         if action == "bite":
-            self.bite(coord)
-            print("Bite " + str(coord))
+            self.bite(coord)            
         elif action == "moveUp":
-            self.moveUp(coord)
-            print("Move up " + str(coord))
+            self.moveUp(coord)            
         elif action == "moveDown":
-            self.moveDown(coord)
-            print("Move down " + str(coord))
+            self.moveDown(coord)            
         elif action == "moveLeft":
-            self.moveLeft(coord)
-            print("Move left " + str(coord))
+            self.moveLeft(coord)            
         elif action == "moveRight":
-            self.moveRight(coord)
-            print("Move right " + str(coord))
+            self.moveRight(coord)            
 
     # Zombie AI logic
     def zombie_move(self):

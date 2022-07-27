@@ -32,13 +32,7 @@ class State:
         reward += self.nearest_zombie(GameBoard) - 3
         if action == "heal":
             reward += 5
-        elif action == "bite" and self.person is not None and self.person.isZombie:
-            chance = 0
-            if self.person.wasVaccinated != self.person.wasCured:
-                chance = 0.25
-            if self.person.wasVaccinated and self.person.wasCured:
-                chance = 0.5
-            reward = reward + int(5 * (2 + chance))
+
         return reward
 
     def adjacent(self, GameBoard):

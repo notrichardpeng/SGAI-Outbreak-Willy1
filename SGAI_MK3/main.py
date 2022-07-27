@@ -267,14 +267,7 @@ while running:
         pygame.display.update()
 
     # AI Algorithm        
-    else:
-        if epochs_ran % 20 == 0:
-            print("Draw")
-            # reset people
-            GameBoard.clean_board()
-            GameBoard.populate()
-            print(GameBoard.QTable)
-            print("\n\n\n\n\n\n")        
+    else:             
         pygame.time.wait(AI_PLAY_WAITTIME_MS)        
         i = 0
         r = rd.uniform(0.0, 1.0)
@@ -318,8 +311,8 @@ while running:
                 ind = j
             j += 1
         action_to_take = ACTION_SPACE[ind] #actual action e.g. cure bite etc
-        print(state)
-        print(action_to_take)
+        
+        print("AI's current action: " + str(action_to_take))        
         old_qval = b #updates old q-val
         if randomization == True:
             old_state = st
@@ -334,7 +327,7 @@ while running:
             reward[0] = 10000
         #UPDATE 
         statecor = GameBoard.toCoord(ns)
-        print(statecor)
+        print("AI's action coord: " + str(statecor))
         if action_to_take == "moveUp":
             GameBoard.moveUp(statecor)
         elif action_to_take == "moveDown":
@@ -349,12 +342,10 @@ while running:
             GameBoard.heal(statecor)
         elif action_to_take == "kill":
             GameBoard.kill(statecor)
-
-        # print new state
-        print("action_index: " + str(ns))
-        # In case of error
-        if (ns > 35 or ns < 0):   
-            GameBoard.clean_board()
+                
+        #In case of error
+        if (ns > 35 or ns < 0):
+            GameBoard.population = 0
             GameBoard.populate()
             print(GameBoard.QTable)
             print("Game ended due to invalid move")
@@ -364,8 +355,7 @@ while running:
             NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
             
             #Update QTable
-            GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]
-            print(GameBoard.QTable[old_state][NewStateAct[0]])
+            GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]            
 
             #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
 
@@ -394,8 +384,9 @@ while running:
             for event in P:
                 if event.type == pygame.QUIT:
                     running = False
-                    break 
+                    break
                     
             # Update the display
-            pygame.display.update()
-            epochs_ran += 1
+            pygame.display.update()    
+
+            print("\n")        
