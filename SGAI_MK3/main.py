@@ -211,7 +211,7 @@ while running:
             take_action = []
             
             if player_role == "Government":
-                GameBoard.zombie_move()
+                GameBoard.zombie_random_move()
             else:
                 # Make a list of all possible actions that the computer can take
                 # This huge chunk is only for AI as government, might not be worth it to keep since we will be training a smarter AI
@@ -374,7 +374,7 @@ while running:
 
             # Zombies turn
             take_action = []        
-            GameBoard.zombie_move()
+            GameBoard.zombie_random_move()
             GameBoard.update()
 
 

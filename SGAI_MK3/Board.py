@@ -411,7 +411,41 @@ class Board:
             self.States[poss[s]].person.isZombie = True
             used.append(s)    
 
-    #Zombie AI logic
+    # Dumb Zombie    
+    def zombie_random_move(self):
+        possible_move_coords = []
+        action = "bite"
+
+        cnt = 10
+        while len(possible_move_coords) == 0 and cnt > 0:
+            r = rd.randint(0, 5)
+            if r < 4: 
+                action = MOVE_ACTIONS[r]
+            possible_move_coords = self.get_possible_moves(action, "Zombie")
+            cnt -= 1
+        
+        if len(possible_move_coords) == 0:
+            print("No possible moves for zombies")
+            return
+
+        coord = rd.choice(possible_move_coords)
+        if action == "bite":
+            self.bite(coord)
+            print("Bite " + str(coord))
+        elif action == "moveUp":
+            self.moveUp(coord)
+            print("Move up " + str(coord))
+        elif action == "moveDown":
+            self.moveDown(coord)
+            print("Move down " + str(coord))
+        elif action == "moveLeft":
+            self.moveLeft(coord)
+            print("Move left " + str(coord))
+        elif action == "moveRight":
+            self.moveRight(coord)
+            print("Move right " + str(coord))
+
+    # Zombie AI logic
     def zombie_move(self):
         # First check if any zombie can bite
         possible_move_coords = self.get_possible_moves("bite", "Zombie")
