@@ -33,32 +33,29 @@ def get_action(GameBoard, pixel_x, pixel_y):
     Return None otherwise
     """
     # Check if the user clicked on the "heal" icon, return "heal" if so
-    heal_check = pixel_x >= 900 and pixel_x <= 1100 and pixel_y > 199 and pixel_y < 301
-    kill_check = pixel_x >= 950 and pixel_x <= 1100 and pixel_y > 50 and pixel_y < 150
-    if heal_check:
-        return "heal"
-    elif kill_check:
-        return "kill"
-    else:
-        # Get the grid (x,y) where the user clicked
-        if pixel_x > GameBoard.display_border and pixel_y > GameBoard.display_border:   # Clicking to the top or left of the border will result in a grid value of 0, which is valid
-            board_x = int((pixel_x - GameBoard.display_border) / GameBoard.display_cell_dimensions[0])
-            board_y = int((pixel_y - GameBoard.display_border) / GameBoard.display_cell_dimensions[1])
-            # Return the grid position if it is a valid position on the board
-            if (board_x >= 0 and board_x < GameBoard.columns and board_y >= 0 and board_y < GameBoard.rows):
-                return (board_x, board_y)
+
+    # Get the grid (x,y) where the user clicked
+    if pixel_x > GameBoard.display_border and pixel_y > GameBoard.display_border:   # Clicking to the top or left of the border will result in a grid value of 0, which is valid
+        board_x = int((pixel_x - GameBoard.display_border) / GameBoard.display_cell_dimensions[0])
+        board_y = int((pixel_y - GameBoard.display_border) / GameBoard.display_cell_dimensions[1])
+        # Return the grid position if it is a valid position on the board
+        if (board_x >= 0 and board_x < GameBoard.columns and board_y >= 0 and board_y < GameBoard.rows):
+            return (board_x, board_y)
     return None
 
-def run(GameBoard, hasHospital):
+def run(GameBoard, hasHospital, heal_button, kill_button):
     """
     Draw the screen and return any events.
     """
     screen.fill(BACKGROUND)
     build_grid(GameBoard, hasHospital) # Draw the grid
-    display_image(screen, "Assets/cure.jpeg", GameBoard.display_cell_dimensions, (950, 200)) # Draw the heal icon
-    display_image(screen, "Assets/water_gun.png", (150, 100), (950, 50)) # Draw the kill icon
+    display_buttons(heal_button, kill_button)
     display_people(GameBoard)
     return pygame.event.get()
+
+def display_buttons(heal_button, kill_button):
+    display_image(screen, "Assets/kill_" + kill_button + ".png", (), (800, 50))
+    display_image(screen, "Assets/heal_" + heal_button + ".png", (), (800, 200))
 
 def get_events():
     return pygame.event.get()
