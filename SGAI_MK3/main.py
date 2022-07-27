@@ -134,6 +134,10 @@ while running:
                 kill_button, heal_button = "button", "button"
             elif isinstance(take_action[1], str):
                 take_action.pop(0)
+                if take_action[0] == "heal":
+                    kill_button = "button"
+                else:
+                    heal_button = "button"
 
         # Draws selection of game piece
         if len(take_action) == 1:
