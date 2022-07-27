@@ -52,7 +52,9 @@ while proceed == False:
             pygame.quit()
 
 #Create the game board
-GameBoard = Board((ROWS,COLUMNS), BORDER, CELL_DIMENSIONS, roleToRoleNum[player_role], hospital)
+GameBoard = Board((ROWS,COLUMNS), BORDER, CELL_DIMENSIONS, hospital)
+print(GameBoard.States)
+exit()
 GameBoard.populate()
 
 # Self play variables

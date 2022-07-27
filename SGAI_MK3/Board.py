@@ -11,25 +11,24 @@ class Board:
         self.columns = dimensions[1]
         self.display_border = border
         self.display_cell_dimensions = cell_dimensions        
-        self.hasHospital = h
-        self.population = 0
-        self.States = []        
-
-    def num_zombies(self):
-        r = 0
-        for state in self.States:
-            if state.person != None:
-                if state.person.isZombie:
-                    r += 1
-        return r
+        self.hasHospital = h        
+        self.States = [[None for _ in range(dimensions[1])] for _ in range(dimensions[0])]
 
     def num_humans(self):
-        r = 0
-        for state in self.States:
-            if state.person != None:
-                if not state.person.isZombie:
-                    r += 1
-        return r
+        ret = 0
+        for row in States:
+            for person in row:
+                if person is not None and not person.isZombie:
+                    ret += 1
+        return ret
+
+    def num_zombies(self):
+        ret = 0
+        for row in States:
+            for person in row:
+                if person is not None and person.isZombie:
+                    ret += 1
+        return ret
             
     def get_possible_moves(self, action, role):
         """
@@ -237,18 +236,6 @@ class Board:
         self.States[i].person = newP
         return [True, i]
 
-    def get_possible_states(self, rn):
-        indexes = []
-        i = 0
-        for state in self.States:
-            if state.person != None and not state.person.isStunned:
-                if rn == 1 and state.person.isZombie == False:
-                    indexes.append(i)
-                elif rn == -1 and state.person.isZombie:
-                    indexes.append(i)
-            i += 1
-        return indexes
-
     def get_possible_human_targets(self):
         coords = []
         i = 0
@@ -275,32 +262,25 @@ class Board:
                 ):
                 coords.append(c)
             i += 1
-        return coords    
-
-    def clean_board(self):
-        for state in self.States:
-            state.person = None
-        self.population = 0
+        return coords        
 
     def populate(self):
-        total = rd.randint(7, ((self.rows * self.columns) / 3))
-        poss = []
-        for x in range(len(self.States)):
-            r = rd.randint(0, 100)
-            if r < 60 and self.population < total:
-                p = Person(False)
-                self.States[x].person = p
-                self.population = self.population + 1
-                poss.append(x)
-            else:
-                self.States[x].person = None
-        used = []
-        for x in range(4):
-            s = rd.randint(0, len(poss) - 1)
-            while s in used:
-                s = rd.randint(0, len(poss) - 1)
-            self.States[poss[s]].person.isZombie = True
-            used.append(s)
+        total_human = rd.randint(7, 11)
+        for _ in range(total_human):
+            r = rd.randint(0, self.rows)
+            c = rd.randint(0, self.columns)
+            while self.States[r][c] is not None:
+                r = rd.randint(0, self.rows)
+                c = rd.randint(0, self.columns)
+            self.states[r][c] = Person(False)
+        
+        for _ in range(4):
+            r = rd.randint(0, self.rows)
+            c = rd.randint(0, self.columns)
+            while self.States[r][c] is not None:
+                r = rd.randint(0, self.rows)
+                c = rd.randint(0, self.columns)
+            self.states[r][c] = Person(True)
 
     #Zombie AI logic
     def zombie_move(self):
@@ -389,4 +369,3 @@ class Board:
                         state.person.turnsVaccinated = 0
                         state.person.isVaccinated = False
                         state.person.wasVaccinated = True
-
