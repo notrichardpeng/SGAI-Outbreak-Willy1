@@ -253,10 +253,7 @@ while running:
                 if biggest is None:
                     biggest = exp
                     i = x
-                elif biggest < exp and player_role == "Government":
-                    biggest = exp
-                    i = x
-                elif biggest > exp and player_role != "Government":
+                elif biggest < exp:
                     biggest = exp
                     i = x
             state = GameBoard.QTable[i]
@@ -265,10 +262,7 @@ while running:
         j = 0
         ind = 0
         for v in state:
-            if v >= b and player_role == "Government":
-                b = v
-                ind = j
-            elif v < b and player_role != "Government":
+            if v >= b:
                 b = v
                 ind = j
             j += 1
