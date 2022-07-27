@@ -1,8 +1,15 @@
+from re import I
 import gym
 from gym import spaces
 import numpy as np
 from typing import Optional
 from gym.utils.renderer import Renderer
+
+INVALID_ACTION_REWARD = -10
+VALID_ACTION_REWARD = -10
+WIN_REWARD = 100
+LOSS_REWARD = -100
+
 
 class OutbreakEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array", "single_rgb_array"], "render_fps": 30}
@@ -11,6 +18,7 @@ class OutbreakEnv(gym.Env):
         self.render_mode = render_mode
         self.size = size
         self.window_size = 1024
+        self.max_moves = 100
 
         self.observation_space = spaces.Box(-1, 1, (size, size), dtype=int)
 
@@ -56,5 +64,15 @@ class OutbreakEnv(gym.Env):
         self.renderer.render_step()    
         
         return self.states
+
+    def step(self, action):
+        if self.move_count >= self.max_moves:
+            return (self.state, 0.0, True, self.info)
+        
+        reward = INVALID_ACTION_REWARD
+        self.state, move_reward, self.done = self.player_move(action)
+
+        # Zombies move
+        
 
     
