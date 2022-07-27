@@ -12,7 +12,7 @@ class OutbreakEnv(gym.Env):
         self.size = size
         self.window_size = 1024
 
-        self.observation_space = spaces.Box(-1, 1, (size, size))
+        self.observation_space = spaces.Box(-1, 1, (size, size), dtype=int)
 
         # up, left, down, right, heal, kill
         self.action_space = spaces.Discrete(size * size * 6)
@@ -34,24 +34,27 @@ class OutbreakEnv(gym.Env):
 
         self.renderer = Renderer(self.render_mode, self._render_frame)
 
-    def reset(self, seed=None, return_info=False, options=None):
-        # We need the following line to seed self.np_random
+
+
+    def reset(self, seed=None, return_info=False, options=None):        
         super().reset(seed=seed)
 
+        self.states = np.zeros(shape=(self.size*self.size))
+
+        total_human = self.np_random.integers(7, 10, size=1)
+        for _ in range(total_human):
+            r = self.np_random.integers(0, self.size-1, size=1)
+            while self.states[r] != 0: r = self.np_random.integers(0, self.size-1, size=1)
+            self.states[r] = 1
         
-
-        # Choose the agent's location uniformly at random
-        self._agent_location = self.np_random.integers(0, self.size, size=2)
-
-        # We will sample the target's location randomly until it does not coincide with the agent's location
-        self._target_location = self._agent_location
-        while np.array_equal(self._target_location, self._agent_location):
-            self._target_location = self.np_random.integers(0, self.size, size=2)
-
-        # clean the render collection and add the initial frame
+        for _ in range(4):
+            r = self.np_random.integers(0, self.size-1, size=1)
+            while self.states[r] != 0: r = self.np_random.integers(0, self.size-1, size=1)
+            self.states[r] = -1        
+        
         self.renderer.reset()
-        self.renderer.render_step()
+        self.renderer.render_step()    
+        
+        return self.states
 
-        observation = self._get_obs()
-        info = self._get_info()
-        return (observation, info) if return_info else observation
+    

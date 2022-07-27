@@ -2,7 +2,6 @@ import pygame
 from Board import Board
 import PygameFunctions as PF
 import random as rd 
-import Engine
 
 # Constants
 ROWS = 6
@@ -63,8 +62,6 @@ epochs_ran = 0
 Original_Board = GameBoard.clone(GameBoard.States)
 clock = pygame.time.Clock()
 frame = 0
-
-ENG = Engine()
 
 while running:
     P = PF.run(GameBoard, hospital)
