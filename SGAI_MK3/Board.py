@@ -1,26 +1,19 @@
-from tracemalloc import start
-from State import State
 import random as rd
-from Person import Person
+import State
+import Person
 
 VACCINE_DURATION = 5
 MOVE_ACTIONS = ["moveUp", "moveDown", "moveLeft", "moveRight"]
 
 class Board:
-    def __init__(self, dimensions, border, cell_dimensions, pr, h):
+    def __init__(self, dimensions, border, cell_dimensions, h):
         self.rows = dimensions[0]
         self.columns = dimensions[1]
         self.display_border = border
-        self.display_cell_dimensions = cell_dimensions
-        self.Player_Role = pr
+        self.display_cell_dimensions = cell_dimensions        
         self.hasHospital = h
         self.population = 0
-        self.States = []
-        self.QTable = []
-        self.base_score = 1000
-        for s in range(dimensions[0] * dimensions[1]):
-            self.States.append(State(None, s))
-            self.QTable.append([0] * 6)
+        self.States = []        
 
     def num_zombies(self):
         r = 0
@@ -37,29 +30,7 @@ class Board:
                 if not state.person.isZombie:
                     r += 1
         return r
-        
-    def act(self, oldstate, givenAction):
-        cell = self.toCoord(oldstate)
-        f = []
-        if givenAction == "moveUp":
-            f = self.moveUp(cell)
-        elif givenAction == "moveDown":
-            f = self.moveDown(cell)
-        elif givenAction == "moveLeft":
-            f = self.moveLeft(cell)
-        elif givenAction == "moveRight":
-            f = self.moveRight(cell)
-        elif givenAction == "heal":
-            f = self.heal(cell)
-        elif givenAction == "bite":
-            f = self.bite(cell)
-        elif givenAction == "kill":
-            f = self.kill(cell)
-        reward = self.States[oldstate].evaluate(givenAction, self)
-        if f[0] == False:
-            return [-1000, oldstate]
-        return [reward, f[1]]
-
+            
     def get_possible_moves(self, action, role):
         """
         Get the coordinates of people (or zombies) that are able
@@ -197,63 +168,7 @@ class Board:
 
     def moveRight(self, coords):
         new_coords = (coords[0] + 1, coords[1])
-        return self.move(coords, new_coords)
-
-    def QGreedyat(self, state_id):
-        biggest = self.QTable[state_id][0] * self.Player_Role
-        ind = 0
-        A = self.QTable[state_id]
-        i = 0
-        for qval in A:
-            if (qval * self.Player_Role) > biggest:
-                biggest = qval
-                ind = i
-            i += 1
-        return [ind, self.QTable[ind]]  # action_index, qvalue
-
-    def choose_action(self, state_id, lr):
-        L = lr * 100
-        r = rd.randint(0, 100)
-        if r < L:
-            return self.QGreedyat(state_id)
-        else:
-            if self.Player_Role == 1:  # Player is Govt
-                d = rd.randint(0, 4)
-            else:
-                d = rd.randint(0, 5)
-                while d != 4:
-                    d = rd.randint(0, 4)
-            return d
-
-    def choose_state(self, lr):
-        L = lr * 100
-        r = rd.randint(0, 100)
-        if r < L:
-            biggest = None
-            sid = None
-            for x in range(len(self.States)):
-                if self.States[x].person != None:
-                    q = self.QGreedyat(x)
-                    if biggest is None:
-                        biggest = q[1]
-                        sid = x
-                    elif q[1] > biggest:
-                        biggest = q[1]
-                        sid = x
-            return self.QGreedyat(sid)
-        else:
-            if self.Player_Role == -1:  # Player is Govt
-                d = rd.randint(0, len(self.States))
-                while self.States[d].person is None or self.States[d].person.isZombie:
-                    d = rd.randint(0, len(self.States))
-            else:
-                d = rd.randint(0, len(self.States))
-                while (
-                    self.States[d].person is None
-                    or self.States[d].person.isZombie == False
-                ):
-                    d = rd.randint(0, len(self.States))
-            return d
+        return self.move(coords, new_coords)   
 
     def bite(self, coords):
         i = self.toIndex(coords)
@@ -360,31 +275,7 @@ class Board:
                 ):
                 coords.append(c)
             i += 1
-        return coords
-
-    def step(self, role_number, learningRate):
-        P = self.get_possible_states(role_number)
-        r = rd.uniform(0, 1)
-        if r < learningRate:
-            rs = rd.randrange(0, len(self.States) - 1)
-            if role_number == 1:
-                while (
-                    self.States[rs].person is not None
-                    and self.States[rs].person.isZombie
-                ):
-                    rs = rd.randrange(0, len(self.States) - 1)
-            else:
-                while (
-                    self.States[rs].person is not None
-                    and self.States[rs].person.isZombie == False
-                ):
-                    rs = rd.randrange(0, len(self.States) - 1)
-
-            # random state and value
-        # old_value = QTable[state][acti]
-        # next_max = np.max(QTable[next_state])
-        # new_value = (1 - alpha) * old_value + alpha * (reward + gamma * next_max)
-        # QTable[state][acti] = new_value
+        return coords    
 
     def clean_board(self):
         for state in self.States:
@@ -409,7 +300,7 @@ class Board:
             while s in used:
                 s = rd.randint(0, len(poss) - 1)
             self.States[poss[s]].person.isZombie = True
-            used.append(s)    
+            used.append(s)
 
     #Zombie AI logic
     def zombie_move(self):
@@ -484,10 +375,6 @@ class Board:
                 else:
                     if diff_x > 0: self.moveRight(selected_zombie)
                     else: self.moveLeft(selected_zombie)
-
-    # Each human is worth 300 points
-    def total_score(self):
-        return self.num_humans() * 300 + self.base_score
 
     def update(self):
         if self.base_score > 100: self.base_score -= 25 # Winning the game quicker means higher score

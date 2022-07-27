@@ -1,15 +1,16 @@
-from re import I
 import gym
-from gym import spaces
 import numpy as np
+from gym import spaces
 from typing import Optional
 from gym.utils.renderer import Renderer
 
+import Board
+
 INVALID_ACTION_REWARD = -10
-VALID_ACTION_REWARD = -10
+VALID_ACTION_REWARD = 10
 WIN_REWARD = 100
 LOSS_REWARD = -100
-
+ACTION_SPACE = ["move_up", "move_down", "move_left", "move_right", "heal", "kill"]
 
 class OutbreakEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array", "single_rgb_array"], "render_fps": 30}
@@ -19,18 +20,12 @@ class OutbreakEnv(gym.Env):
         self.size = size
         self.window_size = 1024
         self.max_moves = 100
+        self.board = Board((size, size), 150, (100,100), False)
 
         self.observation_space = spaces.Box(-1, 1, (size, size), dtype=int)
 
         # up, left, down, right, heal, kill
-        self.action_space = spaces.Discrete(size * size * 6)
-
-        self._action_to_direction = {
-            0: np.array([1, 0]),
-            1: np.array([0, 1]),
-            2: np.array([-1, 0]),
-            3: np.array([0, -1]),
-        }
+        self.action_space = spaces.Discrete(size * size * 6)        
 
         if self.render_mode == "human":
             import pygame
@@ -42,37 +37,55 @@ class OutbreakEnv(gym.Env):
 
         self.renderer = Renderer(self.render_mode, self._render_frame)
 
-
+    def _get_info():
+        return "abc"        
 
     def reset(self, seed=None, return_info=False, options=None):        
         super().reset(seed=seed)
 
-        self.states = np.zeros(shape=(self.size*self.size))
-
-        total_human = self.np_random.integers(7, 10, size=1)
-        for _ in range(total_human):
-            r = self.np_random.integers(0, self.size-1, size=1)
-            while self.states[r] != 0: r = self.np_random.integers(0, self.size-1, size=1)
-            self.states[r] = 1
-        
-        for _ in range(4):
-            r = self.np_random.integers(0, self.size-1, size=1)
-            while self.states[r] != 0: r = self.np_random.integers(0, self.size-1, size=1)
-            self.states[r] = -1        
+        self.board = Board((self.ize, self.size), 150, (100,100), False)
+        self.board.populate()         
         
         self.renderer.reset()
         self.renderer.render_step()    
         
-        return self.states
+        return self.board
+
+    def player_move(self, action):
+        move = ACTION_SPACE[action]
+        
+    
+    def zombie_move(self, action):
+
 
     def step(self, action):
+        assert action , "ACTION ERROR {}".format(action)
+
         if self.move_count >= self.max_moves:
-            return (self.state, 0.0, True, self.info)
+            return (self.board, 0.0, True, self.info)
         
-        reward = INVALID_ACTION_REWARD
-        self.state, move_reward, self.done = self.player_move(action)
+        # AI Move
+
+        reward = 0
+        move_reward = self.player_move(action)
+        reward += move_reward        
+
+        if self.board.num_zombies() == 0:
+            reward += WIN_REWARD
+            self.done = True
+            return self.board, reward, self.done, self._get_info()
 
         # Zombies move
-        
+
+        self.board, move_reward, self.done = self.zombie_move()
+        if self.board.num_humans() == 0:
+            reward += LOSS_REWARD
+            self.done = True
+            return self.board, reward, self.done, self._get_info()
+
+        self.board.update_effects()
+        self.move_count += 1
+
+        return self.board, reward, self.done, self._get_info()
 
     
