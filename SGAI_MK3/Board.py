@@ -16,7 +16,7 @@ class Board:
 
     def num_humans(self):
         ret = 0
-        for row in States:
+        for row in self.States:
             for person in row:
                 if person is not None and not person.isZombie:
                     ret += 1
@@ -28,69 +28,7 @@ class Board:
             for person in row:
                 if person is not None and person.isZombie:
                     ret += 1
-        return ret
-            
-    def get_possible_moves(self, action, role):
-        """
-        Get the coordinates of people (or zombies) that are able
-        to make the specified move.
-        @param action - the action to return possibilities for (options are 'bite', 'moveUp', 'moveDown','moveLeft', 'moveRight', and 'heal')
-        @param role - either 'Zombie' or 'Government'; helps decide whether an action
-        is valid and which people/zombies it applies to
-        """
-        poss = []
-        B = self.clone(self.States)     #Clone a new board
-
-        if role == "Zombie":
-            for idx in range(len(self.States)):
-                B.States = [self.States[i].clone() for i in range(len(self.States))]
-                state = self.States[idx]
-                if state.person is not None:
-                    if action == "bite":
-                        # if the current space isn't a zombie and it is adjacent to a space that is a zombie
-                        if not state.person.isZombie and not state.person.isVaccinated and self.isAdjacentTo(
-                            self.toCoord(idx), True
-                        ):
-                            poss.append(B.toCoord(state.location))
-                    else:
-                        if state.person.isZombie:
-                            if action == "moveUp":
-                                if B.moveUp(B.toCoord(state.location))[0]:
-                                    poss.append(B.toCoord(state.location))
-                            elif action == "moveDown":
-                                if B.moveDown(B.toCoord(state.location))[0]:
-                                    poss.append(B.toCoord(state.location))
-                            elif action == "moveLeft":
-                                if B.moveLeft(B.toCoord(state.location))[0]:
-                                    poss.append(B.toCoord(state.location))
-                            elif action == "moveRight":
-                                if B.moveRight(B.toCoord(state.location))[0]:
-                                    poss.append(B.toCoord(state.location))
-
-        elif role == "Government":
-            for state in self.States:
-                if state.person != None:
-                    if action == "heal":
-                        if state.person.isZombie or state.person.isVaccinated == False:
-                            poss.append(B.toCoord(state.location))
-                    elif action == "kill":
-                        if state.person.isZombie:
-                            poss.append(B.toCoord(state.location))
-                    else:
-                        if state.person.isZombie:
-                            if action == "moveUp":
-                                if B.moveUp(B.toCoord(state.location)):
-                                    poss.append(B.toCoord(state.location))
-                            elif action == "moveDown":
-                                if B.moveDown(B.toCoord(state.location)):
-                                    poss.append(B.toCoord(state.location))
-                            elif action == "moveLeft":
-                                if B.moveLeft(B.toCoord(state.location)):
-                                    poss.append(B.toCoord(state.location))
-                            elif action == "moveRight":
-                                if B.moveRight(B.toCoord(state.location)):
-                                    poss.append(B.toCoord(state.location))
-        return poss
+        return ret                
 
     def toCoord(self, i):
         return (int(i % self.columns), int(i / self.rows))
@@ -285,9 +223,20 @@ class Board:
     #Zombie AI logic
     def zombie_move(self):
         # First check if any zombie can bite
-        possible_move_coords = self.get_possible_moves("bite", "Zombie")
-        if len(possible_move_coords) > 0:                
-            coord = rd.choice(possible_move_coords)
+        possible_bite = []
+        i = 0
+        for state in self.States:
+            if (
+                state is not None 
+                and not state.person.isZombie
+                and not state.person.isVaccinated 
+                and self.isAdjacentTo(self.toCoord(i), True)
+            ):
+                possible_bite.append(self.toCoord(i))
+            i += 1
+
+        if len(possible_bite) > 0:
+            coord = rd.choice(possible_bite)
             self.bite(coord)
             print("Zombie: Bite " + str(coord))
         else:            
