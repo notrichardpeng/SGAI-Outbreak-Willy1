@@ -86,20 +86,20 @@ while running:
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = pygame.mouse.get_pos()
-                action = PF.get_action(GameBoard, x, y)                     # Can only return "heal", coordinate of grid clicked, or None. 
-                if HealButton.collidepoint(pygame.mouse.get_pos()): # Process a "heal" intention if take_action is currently empty
+                action = PF.get_action(GameBoard, x, y)                     # returns move if the thing pressed is a human game piece
+                if HealButton.collidepoint(pygame.mouse.get_pos()):         # if heal button is clicked, action is heal and updates UI to show selected healbutton
                     take_action.append("heal")
                     heal_button = "select"
                     if len(take_action) > 1:
                         if take_action[0] == take_action[1]:
-                            heal_button = "button"
+                            heal_button = "button"                          # if heal button is pressed again, turns heal button back to normal
                             take_action = []
-                elif KillButton.collidepoint(pygame.mouse.get_pos()): # Process a "heal" intention if take_action is currently empty
+                elif KillButton.collidepoint(pygame.mouse.get_pos()):       # if kill button is clicked, action is kill and updates UI to show selected kill button
                     take_action.append("kill")
                     kill_button = "select"
                     if len(take_action) > 1:
                         if take_action[0] == take_action[1]:
-                            kill_button = "button"
+                            kill_button = "button"                          # if kill button is pressed again, turns kill button back to normal
                             take_action = []
                 elif action != None:                                        # Otherwise, get the coordinate of a valid grid cell that was clicked
                     idx = GameBoard.toIndex(action)                         # Get the corresponding 1D index from the 2D grid location that was clicked
@@ -112,10 +112,10 @@ while running:
                         if len(take_action) > 2:
                             if take_action[1] == take_action[2]:
                                 take_action = []
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if HealButton.collidepoint(pygame.mouse.get_pos()):
+            elif event.type == pygame.MOUSEBUTTONDOWN:                      # if mouse is pressed down
+                if HealButton.collidepoint(pygame.mouse.get_pos()):         # if press down happens over heal button, update heal button image
                     heal_button = "press"
-                if KillButton.collidepoint(pygame.mouse.get_pos()):
+                if KillButton.collidepoint(pygame.mouse.get_pos()):         # if press down happens over kill button, update kill button image
                     kill_button = "press"
             elif event.type == pygame.MOUSEMOTION: 
                 if heal_button != "select":
@@ -143,7 +143,7 @@ while running:
         # Action handling
         if len(take_action) > 1:
             if take_action[0] == "move":
-                if len(take_action) > 2:        #Makes sure the second coordinate is clicked
+                if len(take_action) > 2:                                    #Makes sure the second coordinate is clicked
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     result = [False, None]
                     if directionToMove == "moveUp":
@@ -162,7 +162,7 @@ while running:
                 if result[0] != False:
                     playerMoved = True
                     if result[2] == "half":
-                        heal_button = "button"
+                        heal_button = "button"                              # turns heal button back to normal
                         # Half heal animation
                         while frame < 12:
                             PF.half_heal_animation(frame)
@@ -172,7 +172,7 @@ while running:
                             frame += 1
                         frame = 0
                     elif result[2] == "full":
-                        heal_button = "button"
+                        heal_button = "button"                              # turns heal button back to normal
                         while frame < 16:
                             PF.full_heal_animation(frame)
                             pygame.display.update()
@@ -185,7 +185,7 @@ while running:
                 result = GameBoard.kill(take_action[1])
                 if result[0] != False:
                     playerMoved = True
-                    kill_button = "button"
+                    kill_button = "button"                                  # turns kill button back to normal
                     # Plays kill animation
                     while frame < 9:
                         PF.kill_animation(frame)

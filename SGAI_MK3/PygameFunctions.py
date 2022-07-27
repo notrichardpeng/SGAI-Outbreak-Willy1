@@ -54,8 +54,8 @@ def run(GameBoard, hasHospital, heal_button, kill_button):
     return pygame.event.get()
 
 def display_buttons(heal_button, kill_button):
-    display_image(screen, "Assets/kill_" + kill_button + ".png", (), (800, 50))
-    display_image(screen, "Assets/heal_" + heal_button + ".png", (), (800, 200))
+    display_image(screen, "Assets/kill_" + kill_button + ".png", (), (800, 50))         # draws specified kill button asset
+    display_image(screen, "Assets/heal_" + heal_button + ".png", (), (800, 200))        # draws specified heal button asset
 
 def get_events():
     return pygame.event.get()
