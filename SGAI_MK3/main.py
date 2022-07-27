@@ -9,7 +9,7 @@ ROWS = 6
 COLUMNS = 6
 BORDER = 150                    # Number of pixels to offset grid to the top-left side
 CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
-ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite", "kill"]
+ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "kill"]
 SELF_PLAY = True
 AI_PLAY_WAITTIME_MS = 50
 
