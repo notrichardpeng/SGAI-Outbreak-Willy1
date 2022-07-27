@@ -424,26 +424,20 @@ class Board:
             possible_move_coords = self.get_possible_moves(action, "Zombie")
             cnt -= 1
         
-        if len(possible_move_coords) == 0:
-            print("No possible moves for zombies")
+        if len(possible_move_coords) == 0:            
             return
 
         coord = rd.choice(possible_move_coords)
         if action == "bite":
-            self.bite(coord)
-            print("Bite " + str(coord))
+            self.bite(coord)            
         elif action == "moveUp":
-            self.moveUp(coord)
-            print("Move up " + str(coord))
+            self.moveUp(coord)            
         elif action == "moveDown":
-            self.moveDown(coord)
-            print("Move down " + str(coord))
+            self.moveDown(coord)            
         elif action == "moveLeft":
-            self.moveLeft(coord)
-            print("Move left " + str(coord))
+            self.moveLeft(coord)            
         elif action == "moveRight":
-            self.moveRight(coord)
-            print("Move right " + str(coord))
+            self.moveRight(coord)            
 
     # Zombie AI logic
     def zombie_move(self):
