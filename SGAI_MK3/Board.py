@@ -56,8 +56,8 @@ class Board:
         elif givenAction == "kill":
             f = self.kill(cell)
         reward = self.States[oldstate].evaluate(givenAction, self)
-        if f[0] == False:
-            return [-1000, oldstate]
+        if givenAction == "bite" or f[0] == False:
+                return [-1000, oldstate]
         return [reward, f[1]]
 
     def get_possible_moves(self, action, role):
@@ -257,7 +257,7 @@ class Board:
 
     def bite(self, coords):
         i = self.toIndex(coords)
-        if self.States[i] is None:
+        if self.States[i] is None or self.States[i].person is None:
             return False
         chance = 100
         p = self.States[i].person

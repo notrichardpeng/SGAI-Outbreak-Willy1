@@ -260,11 +260,11 @@ while running:
                     i = x
             state = GameBoard.QTable[i]
             
-        b = 0
+        b = -1000
         j = 0
         ind = 0
         for v in state:
-            if v > b and player_role == "Government":
+            if v >= b and player_role == "Government":
                 b = v
                 ind = j
             elif v < b and player_role != "Government":
