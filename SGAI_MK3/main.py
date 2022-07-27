@@ -343,6 +343,7 @@ while running:
         elif action_to_take == "kill":
             GameBoard.kill(statecor)
                 
+        #In case of error
         if (ns > 35 or ns < 0):
             GameBoard.population = 0
             GameBoard.populate()
