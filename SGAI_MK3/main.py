@@ -10,7 +10,7 @@ BORDER = 150                    # Number of pixels to offset grid to the top-lef
 CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
 ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite", "kill"]
 SELF_PLAY = True
-AI_PLAY_WAITTIME_MS = 300
+AI_PLAY_WAITTIME_MS = 50
 
 # Player role variables
 player_role = "Government"      # Valid options are "Government" and "Zombie"
@@ -347,7 +347,8 @@ while running:
         if (ns > 35 or ns < 0):
             GameBoard.population = 0
             GameBoard.populate()
-            print(GameBoard.QTable)
+            for row in range(35):
+                print(GameBoard.QTable[row])
             print("Game ended due to invalid move")
             print("\n\n\n\n\n\n")
         else:
@@ -364,7 +365,8 @@ while running:
                 # reset people
                 GameBoard.clean_board()
                 GameBoard.populate() 
-                print(GameBoard.QTable)
+                for row in range(35):
+                    print(GameBoard.QTable[row])
                 print("\n\n\n\n\n\n")
 
             # Zombies turn
@@ -378,7 +380,8 @@ while running:
                 # reset people
                 GameBoard.clean_board()
                 GameBoard.populate()
-                print(GameBoard.QTable)
+                for row in range(35):
+                    print(GameBoard.QTable[row])
                 print("\n\n\n\n\n\n")   
 
             for event in P:
