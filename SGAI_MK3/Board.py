@@ -173,30 +173,27 @@ class Board:
 
     def get_possible_human_targets(self):
         coords = []
-        i = 0
-        for state in self.states:
-            c = self.toCoord(i)
-            if (
-                state.person is not None 
-                and not state.person.isZombie
-                and not self.isAdjacentTo(c, True)
-            ):
-                coords.append(c)
-            i += 1
+        for r in range(self.rows):
+            for c in range(self.columns):
+                if (
+                    self.states[r][c] is not None 
+                    and not self.states[r][c].isZombie
+                    and not self.isAdjacentTo((r, c), True)
+                ):                    
+                    coords.append((r, c))            
         return coords
 
     def get_possible_zombies_to_move(self):
-        coords = []
-        i = 0
-        for state in self.states:
-            c = self.toCoord(i)
-            if (state.person is not None 
-                and state.person.isZombie 
-                and not state.person.isStunned 
-                and not self.isAdjacentTo(c, False)
+        coords = []        
+        for r in range(self.rows):
+            for c in range(self.columns):                            
+                if (
+                    self.states[r][c] is not None 
+                    and self.states[r][c].isZombie 
+                    and not self.states[r][c].isStunned 
+                    and not self.isAdjacentTo((r, c), False)
                 ):
-                coords.append(c)
-            i += 1
+                    coords.append((r, c))            
         return coords        
 
     def populate(self):
@@ -217,7 +214,7 @@ class Board:
                 c = rd.randint(0, self.columns-1)
             self.states[r][c] = Person(True)
 
-    # Zombie AI logic TODO: Fix skipping turns
+    # Zombie AI logic
     def zombie_move(self):
         # First check if any zombie can bite
         possible_bite = []        
@@ -233,15 +230,17 @@ class Board:
                     if not p.isVaccinated: possible_bite.append((r, c))
                     else: vaccine_bite.append((r, c))
 
+        board = Board(self)
+
         if len(possible_bite) > 0:
             coord = rd.choice(possible_bite)
-            self.bite(coord)
+            board.bite(coord)
             print("Zombie: Bite " + str(coord))
         else:            
             # No zombies can bite, move the zombie that is nearest to a person.
             # Get all coordinates
-            human_coords = self.get_possible_human_targets()
-            zombie_coords = self.get_possible_zombies_to_move()
+            human_coords = board.get_possible_human_targets()
+            zombie_coords = board.get_possible_zombies_to_move()
             min_dist = 9999999
             selected_human, selected_zombie = (-1, -1), (-1, -1)
 
@@ -256,38 +255,33 @@ class Board:
             # If not moving is the best option, then move a random zombie not threatening a person
             if selected_zombie == (-1, -1): 
                 bored_zombies = [] # Zombies not adjacent to a person
-                busy_zombies = []  # Zombies adjacent to a person
-                for i in range(len(self.states)):
-                    state = self.states[i]
-                    if state.person is not None and state.person.isZombie and not state.person.isStunned:
-                        c = self.toCoord(i)
-                        if not self.isAdjacentTo(c, False):
-                            bored_zombies.append(c)
-                        else:
-                            busy_zombies.append(c)
+                for r in range(board.rows):
+                    for c in range(board.columns):                                
+                        state = board.states[r][c]
+                        if state is not None and state.isZombie and not state.isStunned:                            
+                            if not board.isAdjacentTo((r, c), False):
+                                bored_zombies.append((r, c))
 
-                if len(bored_zombies) == 0:
-                    bored_zombies = busy_zombies
-                
-                # Repeat until a valid move is found
-                has_moved = False
-                count = 5
-                while len(bored_zombies) > 0 and not has_moved and count > 0:                    
-                    zombie = rd.choice(bored_zombies)
-                    action = rd.choice(MOVE_ACTIONS)                    
-                    if action == "moveUp":
-                        has_moved = self.moveUp(zombie)[0]
-                    elif action == "moveDown":
-                        has_moved = self.moveDown(zombie)[0]
-                    elif action == "moveLeft":
-                        has_moved = self.moveLeft(zombie)[0]
-                    elif action == "moveRight":
-                        has_moved = self.moveRight(zombie)[0]
+                if len(bored_zombies) > 0:                    
+                    # Repeat until a valid move is found
+                    has_moved = False
+                    count = 10
+                    while len(bored_zombies) > 0 and not has_moved and count > 0:                    
+                        zombie = rd.choice(bored_zombies)
+                        action = rd.choice(MOVE_ACTIONS)                    
+                        if action == "moveUp":
+                            has_moved = board.moveUp(zombie)
+                        elif action == "moveDown":
+                            has_moved = board.moveDown(zombie)
+                        elif action == "moveLeft":
+                            has_moved = board.moveLeft(zombie)
+                        elif action == "moveRight":
+                            has_moved = board.moveRight(zombie)
 
-                    # If we tried so many times and there's still not a valid move, there probably just isn't any,
-                    # perhaps because all the zombies are surrounded by vaccinated humans. In that case, we don't
-                    # want the loop to keep running and crash the game.
-                    count -= 1 
+                        # If we tried so many times and there's still not a valid move, there probably just isn't any,
+                        # perhaps because all the zombies are surrounded by vaccinated humans. In that case, we don't
+                        # want the loop to keep running and crash the game.
+                        count -= 1                 
 
             else: 
                 diff_x = selected_human[0] - selected_zombie[0]
@@ -297,11 +291,61 @@ class Board:
 
                 # Top Left corner is (0, 0)
                 if abs(diff_y) > abs(diff_x):
-                    if diff_y > 0: self.moveDown(selected_zombie)
-                    else: self.moveUp(selected_zombie)
+                    if diff_y > 0: board.moveDown(selected_zombie)
+                    else: board.moveUp(selected_zombie)
                 else:
-                    if diff_x > 0: self.moveRight(selected_zombie)
-                    else: self.moveLeft(selected_zombie)
+                    if diff_x > 0: board.moveRight(selected_zombie)
+                    else: board.moveLeft(selected_zombie)
+            
+        return board
+
+        
+
+
+
+    # Dumb Zombie AI
+    def zombie_random_move(self):
+        possible_move_coords = []
+        all_zombies = []
+        vulnerable_humans = []
+        
+        for r in range(self.rows):
+            for c in range(self.columns):
+                if self.states[r][c] is not None and self.states[r][c].isZombie:
+                    all_zombies.append((r, c))
+        
+        for r in range(self.rows):
+            for c in range(self.columns):
+                p = self.states[r][c]
+                if p is not None and not p.isZombie and not p.isVaccinated and self.isAdjacentTo((r, c), True):
+                    vulnerable_humans.append((r, c))            
+
+        action = "bite"
+        cnt = 30
+        has_moved = False
+
+        board = Board(self)
+        while not has_moved and cnt > 0:
+            r = rd.randint(0, 5)
+            if r < 4: 
+                action = MOVE_ACTIONS[r]
+            else: 
+                action = "bite"
+            
+            coord = rd.choice(all_zombies)
+            bite_coord = rd.choice(vulnerable_humans) if len(vulnerable_humans) > 0 else (-1, -1)
+            if action == "bite" and bite_coord != (-1, -1):
+                has_moved = self.bite(bite_coord)                
+            elif action == "moveUp":
+                has_moved = self.moveUp(coord)                
+            elif action == "moveDown":
+                has_moved = self.moveDown(coord)                
+            elif action == "moveLeft":
+                has_moved = self.moveLeft(coord)                
+            elif action == "moveRight":
+                has_moved = self.moveRight(coord)                
+
+            cnt -= 1
 
     def update(self):
         if self.base_score > 100: self.base_score -= 25 # Winning the game quicker means higher score
@@ -317,7 +361,7 @@ class Board:
                         state.person.isVaccinated = False
                         state.person.wasVaccinated = True
 
-    def make_move(self, action, row, col):
+    def government_make_move(self, action, row, col):
         board = Board(self)
 
         match action:
@@ -344,19 +388,19 @@ class Board:
             for row in range(self.rows):
                 for col in range(self.columns):
                     if self.states[row][col] is not None and not self.states[row][col].isZombie:
-                        result = self.make_move(action, row, col)
+                        result = self.government_make_move(action, row, col)
                         if result[0]: new_states.append(result[1])
 
         for row in range(self.rows):
             for col in range(self.columns):
                 if self.states[row][col] is not None and self.states[row][col].isZombie:
-                    result = self.make_move("kill", row, col)
+                    result = self.government_make_move("kill", row, col)
                     if result[0]: new_states.append(result[1])
 
         for row in range(self.rows):
             for col in range(self.columns):
                 if self.states[row][col] is not None and not self.states[row][col].isVaccinated:
-                    result = self.make_move("heal", row, col)
+                    result = self.government_make_move("heal", row, col)
                     if result[0]: new_states.append(result[1])
         
         return new_states

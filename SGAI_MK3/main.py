@@ -3,8 +3,10 @@ from Board import Board
 import PygameFunctions as PF
 import random as rd 
 
+from MCTS import *
+
 # Constants
-AI_PLAY_WAITTIME_MS = 300
+AI_PLAY_WAITTIME_MS = 5000
 
 # Initialize variables
 running = True
@@ -49,6 +51,8 @@ board = Board()
 clock = pygame.time.Clock()
 frame = 0
 
+mcts = MCTS()
+
 while running:
     P = PF.run(board, hospital)
     if self_play:        
@@ -56,7 +60,7 @@ while running:
         for event in P:
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = pygame.mouse.get_pos()
-                action = PF.get_action(GameBoard, x, y)                     # Can only return "heal", coordinate of grid clicked, or None. 
+                action = PF.get_action(board, x, y)                     # Can only return "heal", coordinate of grid clicked, or None. 
                 if action == "heal":                                        # Process a "heal" intention if take_action is currently empty
                     if take_action == []:
                         take_action.append("heal")
@@ -66,7 +70,7 @@ while running:
                 elif action != None:                                        # Otherwise, get the coordinate of a valid grid cell that was clicked                                                                 
                     if take_action == []:                                   # Check that the click corresponds to an intention to move a player
                         # Returns true if the space is not empty and it is a piece belonging to the player.
-                        if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
+                        if ((board.states[action[0]][action[1]] is not None) and (board.states[action[0]][action[1]].isZombie == False)):
                             take_action.append("move")
                     if take_action != []:                                   # Only append a coordinate if there is a pending "heal" or "move" intention
                         take_action.append(action)
@@ -86,18 +90,18 @@ while running:
                     directionToMove = PF.direction(take_action[1], take_action[2])
                     result = [False, None]
                     if directionToMove == "moveUp":
-                        result = GameBoard.moveUp(take_action[1])
+                        result = board.moveUp(take_action[1])
                     elif directionToMove == "moveDown":
-                        result = GameBoard.moveDown(take_action[1])
+                        result = board.moveDown(take_action[1])
                     elif directionToMove == "moveLeft":
-                        result = GameBoard.moveLeft(take_action[1])
+                        result = board.moveLeft(take_action[1])
                     elif directionToMove == "moveRight":
-                        result = GameBoard.moveRight(take_action[1])
+                        result = board.moveRight(take_action[1])
                     if result[0] != False:
                         playerMoved = True
                     take_action = []
             elif take_action[0] == "heal":
-                result = GameBoard.heal(take_action[1])
+                result = board.heal(take_action[1])
                 if result[0] != False:
                     playerMoved = True
                     if result[2] == "half":
@@ -119,7 +123,7 @@ while running:
                         frame = 0
                 take_action = []
             elif take_action[0] == "kill":
-                result = GameBoard.kill(take_action[1])
+                result = board.kill(take_action[1])
                 if result[0] != False:
                     playerMoved = True
                     # Plays kill animation
@@ -138,13 +142,13 @@ while running:
             playerMoved = False
             take_action = []
                         
-            GameBoard.zombie_move()                        
-            GameBoard.update()
+            board.zombie_move()                        
+            board.update()
 
-            if GameBoard.num_zombies() == 0:
-                print("You won! Your score is: " + str(GameBoard.total_score()))
+            if board.num_zombies() == 0:
+                print("You won! Your score is: " + str(board.total_score()))
                 break
-            if GameBoard.num_humans() == 0:
+            if board.num_humans() == 0:
                 print("You lost!")
                 break
 
@@ -154,21 +158,24 @@ while running:
 
     # AI Algorithm        
     else:        
-        pygame.time.wait(AI_PLAY_WAITTIME_MS)                        
+        pygame.time.wait(AI_PLAY_WAITTIME_MS)
 
+        best_move_next_board = mcts.search(board)
+        board = best_move_next_board.board
 
+        if board.num_zombies() == 0:
+            print("Humans Win")
+            board.clean_board()
+            board.populate()            
 
         # Zombies turn        
-        board.zombie_move()
-
+        board = board.zombie_move()
         board.update()
         
-        if GameBoard.num_humans() == 0:
-            print("Zombies Win")
-            # reset people
-            GameBoard.clean_board()
-            GameBoard.populate()
-            print(GameBoard.QTable)   
+        if board.num_humans() == 0:
+            print("Zombies Win")            
+            board.clean_board()
+            board.populate()              
 
         for event in P:
             if event.type == pygame.QUIT:
