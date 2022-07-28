@@ -162,7 +162,7 @@ class Board:
         else:
             # If the person is already vaccinated, don't make the player lose a turn
             if self.states[coords[0]][coords[1]].isVaccinated:
-                return False            
+                return (False, None)            
             self.states[coords[0]][coords[1]].isVaccinated = True
             return (True, "vaccine")
 

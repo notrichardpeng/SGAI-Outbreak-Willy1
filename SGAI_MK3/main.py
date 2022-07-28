@@ -205,7 +205,6 @@ while running:
                         
             GameBoard.zombie_random_move()            
             GameBoard.update()
-        pygame.display.update()
 
     # AI Algorithm        
     else:        
@@ -239,16 +238,8 @@ while running:
             print("Zombies Win")            
             GameBoard.clean_board()
             GameBoard.populate()              
-            print("\n\n\n")                    
+            print("\n\n\n")       
 
-        """
-        for event in P:
-            if event.type == pygame.QUIT:
-                running = False
-                break 
-        
-        # Update the display
-        pygame.display.update()                
-        """
+    pygame.display.update()
 
 
