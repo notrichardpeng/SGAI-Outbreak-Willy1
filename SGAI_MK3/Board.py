@@ -370,21 +370,21 @@ class Board:
     def make_move(self, action, row, col, debug=False):
         board = Board(self)
 
-        match action:
-            case "move_up":
-                if board.moveUp((row, col)): return (True, board)
-            case "move_down":
-                if board.moveDown((row, col)): return (True, board)
-            case "move_left":
-                if board.moveLeft((row, col)): return (True, board)
-            case "move_right":
-                if board.moveRight((row, col)): return (True, board)
-            case "kill":                
-                if board.kill((row, col), debug=debug): return (True, board)
-            case "heal":
-                if board.heal((row, col), debug=debug): return (True, board)
-            case "bite":
-                if board.bite((row, col)): return (True, board)
+        if action == "move_up":
+            if board.moveUp((row, col)): return (True, board)        
+        elif action == "move_down":
+            if board.moveDown((row, col)): return (True, board)
+        elif action == "move_left":
+            if board.moveLeft((row, col)): return (True, board)
+        elif action == "move_right":
+            if board.moveRight((row, col)): return (True, board)
+        elif action == "kill":                
+            if board.kill((row, col), debug=debug): return (True, board)
+        elif action == "heal":
+            if board.heal((row, col), debug=debug): return (True, board)
+        elif action == "bite":
+            if board.bite((row, col)): return (True, board)        
+            
 
         return (False, None)
 

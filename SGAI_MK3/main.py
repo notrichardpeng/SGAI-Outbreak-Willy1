@@ -55,7 +55,8 @@ frame = 0
 mcts = MCTS()
 
 try:
-    mcts = pickle.load(open("mcts.p", "rb"))
+    with open("mcts.pickle", "rb") as f:
+        mcts = pickle.load(f)
 except:
     pass
 
@@ -173,7 +174,8 @@ while running:
         print(board)
 
         if board.num_zombies() == 0:
-            pickle.dump(mcts, open("mcts.p", "wb"))
+            with open("mcts.pickle", "wb") as f:
+                pickle.dump(mcts, f)
             print("Humans Win")
             board.clean_board()
             board.populate()            
@@ -188,7 +190,8 @@ while running:
         print(board)
 
         if board.num_humans() == 0:
-            pickle.dump(mcts, open("mcts.p", "wb"))
+            with open("mcts.pickle", "wb") as f:
+                pickle.dump(mcts, f)
             print("Zombies Win")            
             board.clean_board()
             board.populate()              
