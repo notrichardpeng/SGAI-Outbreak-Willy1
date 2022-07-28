@@ -78,10 +78,7 @@ class MCTS():
                     node.is_fully_expanded = True                                
 
                 # return newly created node
-                return new_node
-        
-        # debugging
-        print('Should not get here!!!')
+                return new_node                
     
     # simulate the game via making random moves until reach end of the game
     def rollout(self, board):

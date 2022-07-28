@@ -5,7 +5,6 @@ from copy import deepcopy
 
 VACCINE_DURATION = 5
 MOVE_ACTIONS = ["move_up", "move_down", "move_left", "move_right"]
-UTIL_ACTIONS = ["heal", "kill"]
 ROWS = 6
 COLUMNS = 6
 BORDER = 150                    # Number of pixels to offset grid to the top-left side
@@ -64,7 +63,7 @@ class Board:
             and coordinates[1] < self.columns
             and coordinates[1] >= 0 )     
 
-    def isAdjacentTo(self, coord, is_zombie: bool, debug=False):        
+    def isAdjacentTo(self, coord, is_zombie):        
         vals = [
             (coord[0], coord[1] + 1),
             (coord[0], coord[1] - 1),
@@ -126,13 +125,13 @@ class Board:
             self.states[coords[0]][coords[1]] = Person(True)
         return True
 
-    def heal(self, coords, debug=False):                
+    def heal(self, coords):                
         if self.states[coords[0]][coords[1]] is None:            
             return (False, None)
         
         if self.states[coords[0]][coords[1]].isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
-            if not self.isAdjacentTo(coords, False, debug=debug):                                
+            if not self.isAdjacentTo(coords, False):                                
                 return (False, None)
             # Was the zombie already half-cured?
             if self.states[coords[0]][coords[1]].halfCured == False and (self.states[coords[0]][coords[1]].isInHospital(coords) == False or self.hasHospital == False):
@@ -151,13 +150,12 @@ class Board:
             return (True, "vaccine")
 
 
-    def kill(self, coords, debug=False):        
+    def kill(self, coords):        
         # Ensures we cannot kill empty spaces or humans, only zombies        
         if self.states[coords[0]][coords[1]] is None or not self.states[coords[0]][coords[1]].isZombie:            
             return False
         # If not adjacent to a human, then we cannot kill the zombie
-        if not self.isAdjacentTo(coords, False):
-            if debug: print("adj problem")
+        if not self.isAdjacentTo(coords, False):            
             return False
         
         self.states[coords[0]][coords[1]] = None
@@ -353,7 +351,7 @@ class Board:
                             self.states[r][c].isVaccinated = False
                             self.states[r][c].wasVaccinated = True
 
-    def make_move(self, action, row, col, debug=False):
+    def make_move(self, action, row, col):
         board = Board(self)
 
         if action == "move_up":
@@ -365,9 +363,9 @@ class Board:
         elif action == "move_right":
             if board.moveRight((row, col)): return (True, board)
         elif action == "kill":                
-            if board.kill((row, col), debug=debug): return (True, board)
+            if board.kill((row, col)): return (True, board)
         elif action == "heal":
-            if board.heal((row, col), debug=debug)[0]: return (True, board)
+            if board.heal((row, col))[0]: return (True, board)
         elif action == "bite":
             if board.bite((row, col)): return (True, board)        
             
