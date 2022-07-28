@@ -236,7 +236,6 @@ while running:
         st = rd.randint(0, len(GameBoard.States) - 1)
         state = GameBoard.QTable[st]
         randomization = False
-        moveIndex = 0
 
         # Chooses random action - exploration
         if r < gamma:            
@@ -249,26 +248,35 @@ while running:
                 action_to_take = ACTION_SPACE[action_to_take_id]
                 b = GameBoard.QTable[st][action_to_take_id]
                 posmoves = GameBoard.get_possible_moves(action_to_take, "Government")
+                curcoords = GameBoard.toCoord(st)
                 coordtuple = []
                 coordlist = []
+                healnotkill = False
                 if action_to_take == "moveup":
-                    coordtuple = GameBoard.moveUpCoords
+                    coordtuple = GameBoard.moveUpCoords(curcoords)
                 elif action_to_take == "movedown":
-                    coordtuple = GameBoard.moveDownCoords
+                    coordtuple = GameBoard.moveDownCoords(curcoords)
                 elif action_to_take == "moveleft":
-                    coordtuple = GameBoard.moveLeftCoords
+                    coordtuple = GameBoard.moveLeftCoords(curcoords)
                 elif action_to_take == "moveright":
-                    coordtuple = GameBoard.moveRightCoords
+                    coordtuple = GameBoard.moveRightCoords(curcoords)
                 elif action_to_take == "heal":
-                    coordlist = GameBoard.healCoords
+                    coordlist = GameBoard.healCoords(curcoords)
+                    healnotkill = True
                 elif action_to_take == "kill":
-                    coordlist = GameBoard.killCoords
+                    coordlist = GameBoard.killCoords(curcoords)
+                   #print(coordlist[2] in posmoves)
                 #print(coordlist[0])
-                if (not GameBoard.States[st].person is None) and (not GameBoard.States[st].person.isZombie) and (not bool(coordlist) or coordtuple in posmoves) and (not bool(coordlist) or (coordlist[0] in posmoves or coordlist[1] in posmoves or coordlist[2] in posmoves or coordlist[3] in posmoves or coordlist[4] in posmoves)):
-                    break
+                
+                if(not GameBoard.States[st].person is None) and (not GameBoard.States[st].person.isZombie):
+                    if healnotkill:
+                        if (not bool(coordtuple) or coordtuple in posmoves) and (not bool(coordlist) or (coordlist[0] in posmoves or coordlist[1] in posmoves or coordlist[2] in posmoves or coordlist[3] in posmoves or coordlist[4] in posmoves)):
+                            break
+                        elif (not bool(coordtuple) or coordtuple in posmoves) and (not bool(coordlist) or (coordlist[0] in posmoves or coordlist[1] in posmoves or coordlist[2] in posmoves or coordlist[3] in posmoves)):
+                            break
                 else:
-                    reward = -1000
-                    GameBoard.QTable[st][action_to_take_id] = GameBoard.QTable[st][action_to_take_id] + alpha * ((reward) - GameBoard.QTable[st][action_to_take_id])
+                    reward = 0
+                    GameBoard.QTable[st][action_to_take_id] = GameBoard.QTable[st][action_to_take_id] + alpha * (reward) - GameBoard.QTable[st][action_to_take_id]
 
         else:
             biggest = None
@@ -311,7 +319,7 @@ while running:
         reward = GameBoard.act(old_state, action_to_take)
         ns = reward[1] #what state (0-35)
         if GameBoard.num_zombies() == 1 or GameBoard.num_zombies == 0:
-            reward[0] = 10000
+            reward[0] = 1000
         #UPDATE 
         statecor = GameBoard.toCoord(ns)
         print("AI's action coord: " + str(statecor))
