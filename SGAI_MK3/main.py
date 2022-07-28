@@ -179,8 +179,7 @@ while running:
             print("Humans Win")
             board.clean_board()
             board.populate()            
-            print("\n\n\n")
-            break
+            print("\n\n\n")            
 
         # Zombies turn        
         board = board.zombie_move()
@@ -195,7 +194,7 @@ while running:
             print("Zombies Win")            
             board.clean_board()
             board.populate()              
-            print("\n\n\n")                    
+            print("\n\n\n")                
 
         """
         for event in P:
