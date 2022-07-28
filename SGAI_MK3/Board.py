@@ -179,7 +179,7 @@ class Board:
         return coords        
 
     def clean_board(self):
-        self.states = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
+        self.states = [[None for _ in range(self.columns)] for _ in range(self.rows)]
 
     def populate(self):
         total_human = rd.randint(7, 11)

@@ -12,7 +12,7 @@ import queue, threading
 from queue import Queue
 
 # Constants
-AI_PLAY_WAITTIME_MS = 5000
+AI_PLAY_WAITTIME_MS = 300
 def montecarloFunc(gb, queue):
     best_move_next_board = mcts.search(gb)
     queue.put(best_move_next_board)
@@ -215,8 +215,7 @@ while running:
         pygame.display.update()
 
     # AI Algorithm        
-    else:        
-        #pygame.time.wait(AI_PLAY_WAITTIME_MS)
+    else:                
         if var == 0:
             queue = queue.Queue()
         else:
@@ -241,6 +240,8 @@ while running:
             GameBoard.populate()            
             print("\n\n\n")
             break
+
+        pygame.time.wait(AI_PLAY_WAITTIME_MS)
 
         # Zombies turn        
         GameBoard = GameBoard.zombie_move()
