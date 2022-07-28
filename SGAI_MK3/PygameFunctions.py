@@ -52,6 +52,7 @@ def run(GameBoard, hasHospital, heal_button, kill_button):
     build_grid(GameBoard, hasHospital) # Draw the grid
     display_buttons(heal_button, kill_button)
     display_people(GameBoard)
+    print("run")
     return pygame.event.get()
 
 def display_buttons(heal_button, kill_button):

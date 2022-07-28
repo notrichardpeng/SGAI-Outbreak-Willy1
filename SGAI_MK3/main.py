@@ -79,25 +79,7 @@ kill_button = "button"
 heal_button = "button"
 while running:
     P = PF.run(GameBoard, hospital, heal_button, kill_button)
-    if self_play:
-        # Computer turn
-        if playerMoved:      
-            pygame.display.update()      
-            playerMoved = False
-            take_action = []
-                        
-            temp = GameBoard.zombie_move()
-            if len(temp) > 1:
-                while frame < 11:
-                    PF.zombie_bite(frame)
-                    pygame.display.update()                            
-                    clock.tick(8)
-                    frame += 1
-                frame = 0
-            GameBoard = temp[0]
-            GameBoard.update()
-            PF.run(GameBoard, hospital, heal_button, kill_button)
-                     
+    if self_play:    
         # Event a 
         for event in P:
             if HealButton.collidepoint(pygame.mouse.get_pos()):
@@ -213,8 +195,24 @@ while running:
                         frame += 1
                     frame = 0
                 take_action = []
+            PF.run(GameBoard, hospital, heal_button, kill_button)
         pygame.display.update()        
-
+            # Computer turn
+        if playerMoved:      
+            pygame.display.update()      
+            playerMoved = False
+            take_action = []
+                        
+            temp = GameBoard.zombie_move()
+            if len(temp) > 1:
+                while frame < 11:
+                    PF.zombie_bite(frame)
+                    pygame.display.update()                            
+                    clock.tick(8)
+                    frame += 1
+                frame = 0
+            GameBoard = temp[0]
+            GameBoard.update_effects()
     # AI Algorithm        
     else:                
         if var == 0:
@@ -244,7 +242,7 @@ while running:
         pygame.time.wait(AI_PLAY_WAITTIME_MS)
 
         # Zombies turn        
-        GameBoard = GameBoard.zombie_move()
+        GameBoard = GameBoard.zombie_move()[0]
         GameBoard.update_effects()
         pygame.display.update() 
         
