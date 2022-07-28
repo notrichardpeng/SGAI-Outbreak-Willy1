@@ -67,10 +67,10 @@ class MCTS():
             encoded = str(state)
             if encoded not in node.children:
                 # create a new node
-                new_node = TreeNode(state, node)
-                
                 if encoded not in self.tree.keys():
-                    self.tree[encoded] = new_node
+                    self.tree[encoded] = TreeNode(state, node)                    
+                new_node = self.tree[encoded]
+                
                 node.children[encoded] = new_node
                 
                 # case when node is fully expanded

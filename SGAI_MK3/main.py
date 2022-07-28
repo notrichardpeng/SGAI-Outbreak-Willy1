@@ -222,7 +222,7 @@ while running:
                 pickle.dump(mcts, f)
             print("Humans Win")
             GameBoard.clean_board()
-            GameBoard.populate()            
+            GameBoard.populate()  
             print("\n\n\n")
             break
 
