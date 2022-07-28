@@ -56,10 +56,10 @@ class Board:
         reward = self.States[oldstate].evaluate(givenAction, self)
         # Invalid move rewards
         if givenAction == "bite":
-            return [-1000, oldstate]
+            return [0, oldstate]
         if f[0] == False: 
             if f[1] == None:
-                reward = -1000
+                reward = 0
             else:
                 reward = 0
             return [reward, oldstate]
@@ -209,9 +209,20 @@ class Board:
     def moveRightCoords(self, coords):
         return (coords[0] + 1, coords[1])
     def killCoords(self, coords):
-        return [(coords[0] + 1, coords[1]), (coords[0] - 1, coords[1]), (coords[0], coords[1] + 1), (coords[0], coords[1]-1)]
+        list = []
+        list.append((coords[0] + 1, coords[1]))
+        list.append((coords[0] - 1, coords[1]))
+        list.append((coords[0], coords[1] + 1))
+        list.append((coords[0], coords[1] - 1))
+        return list
     def healCoords(self, coords):
-        return [(coords[0], coords[1]), (coords[0] + 1, coords[1]), (coords[0] - 1, coords[1]), (coords[0], coords[1] + 1), (coords[0], coords[1]-1)]
+        list = []
+        list.append((coords[0] + 1, coords[1]))
+        list.append((coords[0] - 1, coords[1]))
+        list.append((coords[0], coords[1] + 1))
+        list.append((coords[0], coords[1] - 1))
+        list.append((coords[0], coords[1]))
+        return list
     def QGreedyat(self, state_id):
         biggest = self.QTable[state_id][0] * self.Player_Role
         ind = 0
