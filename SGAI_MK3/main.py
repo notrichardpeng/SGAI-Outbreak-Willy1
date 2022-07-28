@@ -100,12 +100,10 @@ while running:
                     x, y = pygame.mouse.get_pos()                               
                     action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile
                     if action != None:
-                        print(action)
                         if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
                             if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
                                 take_action.append(action)
                         else:                                                   # Otherwise, add selected tile as destination
-                            print(action)
                             take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
@@ -146,7 +144,6 @@ while running:
                     result = GameBoard.moveLeft(take_action[0])
                 elif directionToMove == "moveRight":
                     result = GameBoard.moveRight(take_action[0])
-                print(result)
                 if result != False:
                     playerMoved = True
                 take_action = []
@@ -199,12 +196,12 @@ while running:
 
         # Computer turn
         if playerMoved:
-            pygame.display.update()
             playerMoved = False
             take_action = []
                         
-            GameBoard.zombie_random_move()            
+            GameBoard = GameBoard.zombie_move()            
             GameBoard.update()
+            pygame.display.update()
 
     # AI Algorithm        
     else:        
