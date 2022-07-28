@@ -79,6 +79,7 @@ kill_button = "button"
 heal_button = "button"
 while running:
     P = PF.run(GameBoard, hospital, heal_button, kill_button)
+    pygame.display.update()
     if self_play:    
         # Event a 
         for event in P:
