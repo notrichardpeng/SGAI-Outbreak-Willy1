@@ -9,7 +9,7 @@ ROWS = 6
 COLUMNS = 6
 BORDER = 150                    # Number of pixels to offset grid to the top-left side
 CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
-ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "kill"]
+ACTION_SPACE = ["moveUp", "moveDown", "moveLeft", "moveRight", "heal", "bite", "kill"]
 SELF_PLAY = True
 AI_PLAY_WAITTIME_MS = 50
 
@@ -230,7 +230,7 @@ while running:
 
     # AI Algorithm        
     else:             
-        pygame.time.wait(AI_PLAY_WAITTIME_MS)        
+        #pygame.time.wait(AI_PLAY_WAITTIME_MS)        
         i = 0
         r = rd.uniform(0.0, 1.0)
         st = rd.randint(0, len(GameBoard.States) - 1)
@@ -240,11 +240,35 @@ while running:
         # Chooses random action - exploration
         if r < gamma:            
             randomization = True
-            while GameBoard.States[st].person is None:
+            while True:
                 st = rd.randint(0, len(GameBoard.States) - 1)
                 state = GameBoard.QTable[st]                    
+                # Chooses best action - exploitation
+                action_to_take_id = GameBoard.choose_action(st, -1)
+                action_to_take = ACTION_SPACE[action_to_take_id]
+                b = GameBoard.QTable[st][action_to_take_id]
+                posmoves = GameBoard.get_possible_moves(action_to_take, "Government")
+                coordtuple = []
+                coordlist = []
+                if action_to_take == "moveup":
+                    coordtuple = GameBoard.moveUpCoords
+                elif action_to_take == "movedown":
+                    coordtuple = GameBoard.moveDownCoords
+                elif action_to_take == "moveleft":
+                    coordtuple = GameBoard.moveLeftCoords
+                elif action_to_take == "moveright":
+                    coordtuple = GameBoard.moveRightCoords
+                elif action_to_take == "heal":
+                    coordlist = GameBoard.healCoords
+                elif action_to_take == "kill":
+                    coordlist = GameBoard.killCoords
+                #print(coordlist[0])
+                if (not GameBoard.States[st].person is None) and (not GameBoard.States[st].person.isZombie) and (not bool(coordlist) or coordtuple in posmoves) and (not bool(coordlist) or (coordlist[0] in posmoves or coordlist[1] in posmoves or coordlist[2] in posmoves or coordlist[3] in posmoves or coordlist[4] in posmoves)):
+                    break
+                else:
+                    reward = -1000
+                    GameBoard.QTable[st][action_to_take_id] = GameBoard.QTable[st][action_to_take_id] + alpha * (reward) - GameBoard.QTable[st][action_to_take_id]
 
-        # Chooses best action - exploitation
         else:
             biggest = None
             for x in range(len(GameBoard.States)):
@@ -253,20 +277,25 @@ while running:
                 if biggest is None:
                     biggest = exp
                     i = x
-                elif biggest < exp:
+                elif biggest < exp and player_role == "Government":
                     biggest = exp
                     i = x
             state = GameBoard.QTable[i]
-            
-        b = -1000
-        j = 0
-        ind = 0
-        for v in state:
-            if v >= b:
-                b = v
-                ind = j
-            j += 1
-        action_to_take = ACTION_SPACE[ind] #actual action e.g. cure bite etc
+            b = GameBoard.QTable[i][0]
+            j = 0
+            ind = 0
+            for v in state:
+                if j == 5:
+                    continue
+                elif v >= b and player_role == "Government":
+                    b = v
+                    ind = j
+                elif v < b and player_role != "Government":
+                    b = v
+                    ind = j
+                j += 1
+            action_to_take = ACTION_SPACE[ind] #actual action e.g. cure bite etc
+            b = GameBoard.QTable[i][j]
         
         print("AI's current action: " + str(action_to_take))        
         old_qval = b #updates old q-val
@@ -303,8 +332,7 @@ while running:
         if (ns > 35 or ns < 0):
             GameBoard.population = 0
             GameBoard.populate()
-            for row in range(35):
-                print(GameBoard.QTable[row])
+            print(GameBoard.QTable)
             print("Game ended due to invalid move")
             print("\n\n\n\n\n\n")
         else:
@@ -321,8 +349,7 @@ while running:
                 # reset people
                 GameBoard.clean_board()
                 GameBoard.populate() 
-                for row in range(35):
-                    print(GameBoard.QTable[row])
+                print(GameBoard.QTable)
                 print("\n\n\n\n\n\n")
 
             # Zombies turn
@@ -336,8 +363,7 @@ while running:
                 # reset people
                 GameBoard.clean_board()
                 GameBoard.populate()
-                for row in range(35):
-                    print(GameBoard.QTable[row])
+                print(GameBoard.QTable)
                 print("\n\n\n\n\n\n")   
 
             for event in P:

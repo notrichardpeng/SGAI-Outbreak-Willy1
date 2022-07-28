@@ -20,7 +20,7 @@ class Board:
         self.base_score = 1000
         for s in range(dimensions[0] * dimensions[1]):
             self.States.append(State(None, s))
-            self.QTable.append([rd.uniform(-100, 100)] * 6)
+            self.QTable.append([rd.uniform(-100, 100)] * 7)
 
     def num_zombies(self):
         r = 0
@@ -191,19 +191,27 @@ class Board:
     def moveUp(self, coords):
         new_coords = (coords[0], coords[1] - 1)
         return self.move(coords, new_coords)
-
+    def moveUpCoords(self, coords):
+        return (coords[0], coords[1]-1)
     def moveDown(self, coords):
         new_coords = (coords[0], coords[1] + 1)
         return self.move(coords, new_coords)
-
+    def moveDownCoords(self, coords):
+        return (coords[0], coords[1] + 1)
     def moveLeft(self, coords):
         new_coords = (coords[0] - 1, coords[1])
         return self.move(coords, new_coords)
-
+    def moveLeftCoords(self, coords):
+        return (coords[0] - 1, coords[1])
     def moveRight(self, coords):
         new_coords = (coords[0] + 1, coords[1])
         return self.move(coords, new_coords)
-
+    def moveRightCoords(self, coords):
+        return (coords[0] + 1, coords[1])
+    def killCoords(self, coords):
+        return [(coords[0] + 1, coords[1]), (coords[0] - 1, coords[1]), (coords[0], coords[1] + 1), (coords[0], coords[1]-1)]
+    def healCoords(self, coords):
+        return [(coords[0], coords[1]), (coords[0] + 1, coords[1]), (coords[0] - 1, coords[1]), (coords[0], coords[1] + 1), (coords[0], coords[1]-1)]
     def QGreedyat(self, state_id):
         biggest = self.QTable[state_id][0] * self.Player_Role
         ind = 0
@@ -223,7 +231,9 @@ class Board:
             return self.QGreedyat(state_id)
         else:
             if self.Player_Role == 1:  # Player is Govt
-                d = rd.randint(0, 4)
+                d = rd.randint(0, 6)
+                while d == 5:
+                    d = rd.randint(0,6)
             else:
                 d = rd.randint(0, 5)
                 while d != 4:
