@@ -213,6 +213,8 @@ class Board:
     # Zombie AI logic
     def zombie_move(self):
         # First check if any zombie can bite
+
+        list_return = []
         possible_bite = []        
         vaccine_bite = []
         for r in range(self.rows):
@@ -232,6 +234,7 @@ class Board:
             coord = rd.choice(possible_bite)
             board.bite(coord)
             print("Zombie: Bite " + str(coord))
+            list_return.append("bite")
         else:            
             # No zombies can bite, move the zombie that is nearest to a person.
             # Get all coordinates
@@ -294,8 +297,8 @@ class Board:
                 else:
                     if diff_x > 0: board.moveRight(selected_zombie)
                     else: board.moveLeft(selected_zombie)
-            
-        return board
+        list_return = [board] + list_return    
+        return list_return
 
     # Dumb Zombie AI
     def zombie_random_move(self):
