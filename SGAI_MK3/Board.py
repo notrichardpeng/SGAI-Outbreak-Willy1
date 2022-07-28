@@ -143,27 +143,29 @@ class Board:
 
     def heal(self, coords, debug=False):                
         if self.states[coords[0]][coords[1]] is None:            
-            return False
+            return (False, None)
         
         if self.states[coords[0]][coords[1]].isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
             if not self.isAdjacentTo(coords, False, debug=debug):                
                 #if debug: print("adj problem")
-                return False
+                return (False, None)
             # Was the zombie already half-cured?
             if self.states[coords[0]][coords[1]].halfCured == False and (self.states[coords[0]][coords[1]].isInHospital(coords) == False or self.hasHospital == False):
                 self.states[coords[0]][coords[1]].halfCured = True
-                self.states[coords[0]][coords[1]].isStunned = True                
+                self.states[coords[0]][coords[1]].isStunned = True
+                return (True, "half" )               
             elif (self.states[coords[0]][coords[1]].halfCured == True or (self.states[coords[0]][coords[1]].isInHospital(coords) == True and self.hasHospital == True)):
                 self.states[coords[0]][coords[1]] = Person(False)                
-                self.states[coords[0]][coords[1]].wasCured = True                              
+                self.states[coords[0]][coords[1]].wasCured = True   
+                return (True, "full")                           
         else:
             # If the person is already vaccinated, don't make the player lose a turn
             if self.states[coords[0]][coords[1]].isVaccinated:
                 return False            
             self.states[coords[0]][coords[1]].isVaccinated = True
-            
-        return True
+            return (True, "vaccine")
+
 
     def kill(self, coords, debug=False):        
         # Ensures we cannot kill empty spaces or humans, only zombies        
@@ -381,7 +383,7 @@ class Board:
         elif action == "kill":                
             if board.kill((row, col), debug=debug): return (True, board)
         elif action == "heal":
-            if board.heal((row, col), debug=debug): return (True, board)
+            if board.heal((row, col), debug=debug)[0]: return (True, board)
         elif action == "bite":
             if board.bite((row, col)): return (True, board)        
             
