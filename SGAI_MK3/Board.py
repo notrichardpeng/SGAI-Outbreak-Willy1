@@ -78,22 +78,7 @@ class Board:
                 and not self.states[c[0]][c[1]].isStunned
                 and self.states[c[0]][c[1]].isZombie == is_zombie                
             ):
-                return True
-            
-            if debug:
-                print(c)
-                if self.isValidCoordinate(c):                    
-                    print("valid")
-                    if self.states[c[0]][c[1]] is not None:
-                        print("not none")
-                        if not self.states[c[0]][c[1]].isStunned:
-                            print("not stunned")
-                            if self.states[c[0]][c[1]].isZombie == is_zombie:
-                                print("look for")
-                        print(str(self.states[c[0]][c[1]].isZombie) + " vs. " + str(is_zombie))
-
-
-
+                return True                        
         return False
 
     def move(self, from_coords, new_coords):        
@@ -147,8 +132,7 @@ class Board:
         
         if self.states[coords[0]][coords[1]].isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
-            if not self.isAdjacentTo(coords, False, debug=debug):                
-                #if debug: print("adj problem")
+            if not self.isAdjacentTo(coords, False, debug=debug):                                
                 return (False, None)
             # Was the zombie already half-cured?
             if self.states[coords[0]][coords[1]].halfCured == False and (self.states[coords[0]][coords[1]].isInHospital(coords) == False or self.hasHospital == False):
@@ -412,25 +396,7 @@ class Board:
                 if self.states[row][col] is not None:
                     result = self.make_move("heal", row, col)
                     if result[0]: 
-                        new_states.append(result[1])                       
-
-        if len(new_states) == 0:
-            print("HUMAN???????????????????")
-            print(self)
-
-            for row in range(self.rows):
-                for col in range(self.columns):
-                    if self.states[row][col] is not None and self.states[row][col].isZombie:                        
-                        result = self.make_move("kill", row, col, debug=True)
-                        if result[0]:                             
-                            new_states.append(result[1])                        
-
-            for row in range(self.rows):
-                for col in range(self.columns):
-                    if self.states[row][col] is not None:                        
-                        result = self.make_move("heal", row, col, debug=True)
-                        if result[0]:                            
-                            new_states.append(result[1])  
+                        new_states.append(result[1])                               
 
         return new_states
 
@@ -449,10 +415,8 @@ class Board:
                 if self.states[row][col] is not None and not self.states[row][col].isZombie:
                     result = self.make_move("bite", row, col)
                     if result[0]: new_states.append(result[1])
-        
-        if len(new_states) == 0: print("ZOMBIE???????????????????")
+                
         return new_states
-
 
     def generate_states(self):
         if self.player_turn == 1:

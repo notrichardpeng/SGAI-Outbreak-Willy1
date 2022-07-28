@@ -99,16 +99,15 @@ while running:
                 if len(take_action) < 2:                                        # Checks if list is less than 2
                     x, y = pygame.mouse.get_pos()                               
                     action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile
-                    if action != None:
-                        print(action)
+                    if action != None:                        
                         if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
                             if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
                                 take_action.append(action)
-                        else:                                                   # Otherwise, add selected tile as destination
-                            print(action)
+                        else:                                                   # Otherwise, add selected tile as destination                            
                             take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
+
         # Display the current action
         PF.screen.blit(
             font.render("Your move is currently:", True, PF.WHITE),
@@ -131,7 +130,7 @@ while running:
         # Draws selection of game piece
         if len(take_action) == 1:
             if not isinstance(take_action[0], str):
-                PF.select(take_action[0])
+                PF.select(take_action[0])        
 
         # Action handling
         if len(take_action) == 2:
@@ -145,8 +144,7 @@ while running:
                 elif directionToMove == "moveLeft":
                     result = GameBoard.moveLeft(take_action[0])
                 elif directionToMove == "moveRight":
-                    result = GameBoard.moveRight(take_action[0])
-                print(result)
+                    result = GameBoard.moveRight(take_action[0])                
                 if result != False:
                     playerMoved = True
                 take_action = []
@@ -159,24 +157,21 @@ while running:
                         # Half heal animation
                         while frame < 12:
                             PF.half_heal_animation(frame)
-                            pygame.display.update()
-                            # clock.tick(12) sets frames per second to 12
+                            pygame.display.update()                            
                             clock.tick(12)
                             frame += 1
                         frame = 0
                     elif result[1] == "full":
                         while frame < 16:
                             PF.full_heal_animation(frame)
-                            pygame.display.update()
-                            # clock.tick(12) sets frames per second to 12
+                            pygame.display.update()                            
                             clock.tick(8)
                             frame += 1
                         frame = 0
                     elif result[1] == "vaccine": 
                         while frame < 6:
                             PF.vaccine_animation(frame)
-                            pygame.display.update()
-                            # clock.tick(12) sets frames per second to 12
+                            pygame.display.update()                            
                             clock.tick(8)
                             frame += 1
                         frame = 0
@@ -198,13 +193,13 @@ while running:
                 take_action = []
 
         # Computer turn
-        if playerMoved:
-            pygame.display.update()
+        if playerMoved:      
+            pygame.display.update()      
             playerMoved = False
             take_action = []
                         
-            GameBoard.zombie_random_move()            
-            GameBoard.update()
+            GameBoard = GameBoard.zombie_move()
+            GameBoard.update()            
 
     # AI Algorithm        
     else:        
@@ -213,7 +208,7 @@ while running:
         best_move_next_board = mcts.search(GameBoard)
         GameBoard = best_move_next_board.board        
 
-        print(" Human (AI): ")
+        print("Human (AI):")
         print(GameBoard)
 
         if GameBoard.num_zombies() == 0:
@@ -229,7 +224,7 @@ while running:
         GameBoard = GameBoard.zombie_move()
         GameBoard.update()
         
-        print(" Zombie: ")
+        print("Zombie:")
         print(GameBoard)
 
         if GameBoard.num_humans() == 0:
