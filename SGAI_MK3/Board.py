@@ -2,25 +2,16 @@ import random as rd
 from Person import Person
 from copy import deepcopy
 
-VACCINE_DURATION = 5
-MOVE_ACTIONS = ["move_up", "move_down", "move_left", "move_right"]
-ROWS = 6
-COLUMNS = 6
-BORDER = 150                    # Number of pixels to offset grid to the top-left side
-CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
-
 class Board:
     def __init__(self, hospital=True, board=None):
         if board is not None:
             self.__dict__ = deepcopy(board.__dict__)
             self.player_turn *= -1
         else:
-            self.rows = ROWS
-            self.columns = COLUMNS
-            self.display_border = BORDER
-            self.display_cell_dimensions = CELL_DIMENSIONS
+            self.rows = 6
+            self.columns = 6                        
             self.hasHospital = hospital
-            self.states = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
+            self.states = [[None for _ in range(6)] for _ in range(6)]
             self.player_turn = 1  # 1 is government, -1 is zombie
             self.populate()
 
@@ -262,7 +253,7 @@ class Board:
                     count = 10
                     while len(bored_zombies) > 0 and not has_moved and count > 0:                    
                         zombie = rd.choice(bored_zombies)
-                        action = rd.choice(MOVE_ACTIONS)                    
+                        action = rd.choice(["move_up", "move_down", "move_left", "move_right"])                    
                         if action == "moveUp":
                             has_moved = board.moveUp(zombie)
                         elif action == "moveDown":
@@ -320,7 +311,7 @@ class Board:
         while not has_moved and cnt > 0:
             r = rd.randint(0, 5)
             if r < 4: 
-                action = MOVE_ACTIONS[r]
+                action = ["move_up", "move_down", "move_left", "move_right"][r]
             else: 
                 action = "bite"
             
@@ -347,7 +338,7 @@ class Board:
                     if self.states[r][c].isStunned: self.states[r][c].isStunned = False                
                     if self.states[r][c].isVaccinated:
                         self.states[r][c].turnsVaccinated += 1
-                        if self.states[r][c].turnsVaccinated >= VACCINE_DURATION:
+                        if self.states[r][c].turnsVaccinated >= 5: # Vaccine Duration = 5 turns
                             self.states[r][c].turnsVaccinated = 0
                             self.states[r][c].isVaccinated = False
                             self.states[r][c].wasVaccinated = True
@@ -376,7 +367,7 @@ class Board:
     def gov_gen_states(self):
         new_states = []
 
-        for action in MOVE_ACTIONS:
+        for action in ["move_up", "move_down", "move_left", "move_right"]:
             for row in range(self.rows):
                 for col in range(self.columns):
                     if self.states[row][col] is not None and not self.states[row][col].isZombie:
@@ -402,7 +393,7 @@ class Board:
     def zombie_gen_states(self):
         new_states = []
 
-        for action in MOVE_ACTIONS:
+        for action in ["move_up", "move_down", "move_left", "move_right"]:
             for row in range(self.rows):
                 for col in range(self.columns):
                     if self.states[row][col] is not None and self.states[row][col].isZombie:
