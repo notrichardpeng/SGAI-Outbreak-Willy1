@@ -96,15 +96,18 @@ class Board:
     def moveUp(self, coords):
         new_coords = (coords[0], coords[1] - 1)
         return self.move(coords, new_coords)
-
+    def moveUpCoords(self, coords):
+        return (coords[0], coords[1]-1)
     def moveDown(self, coords):
         new_coords = (coords[0], coords[1] + 1)
         return self.move(coords, new_coords)
-
+    def moveDownCoords(self, coords):
+        return (coords[0], coords[1] + 1)
     def moveLeft(self, coords):
         new_coords = (coords[0] - 1, coords[1])
         return self.move(coords, new_coords)
-
+    def moveLeftCoords(self, coords):
+        return (coords[0] - 1, coords[1])
     def moveRight(self, coords):
         new_coords = (coords[0] + 1, coords[1])
         return self.move(coords, new_coords)   
