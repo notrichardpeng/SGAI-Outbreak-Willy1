@@ -23,10 +23,4 @@ class Person:
         if coords[0] < 3 and coords[1] < 3:
             return True
         else:
-            return False
-
-    def __str__(self) -> str:
-        return f"Person who is a zombie? {self.isZombie}"
-
-    def __repr__(self) -> str:
-        return str(self)
+            return False    
