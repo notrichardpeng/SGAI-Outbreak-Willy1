@@ -2,6 +2,7 @@ import pygame
 from Board import Board
 #import PygameFunctions as PF
 import random as rd 
+import pickle
 
 from MCTS import *
 
@@ -52,6 +53,12 @@ board = Board()
 frame = 0
 
 mcts = MCTS()
+
+try:
+    mcts = pickle.load(open("mcts.p", "rb"))
+except:
+    pass
+
 while running:
     #P = PF.run(board, hospital)
     if self_play:        
@@ -166,10 +173,12 @@ while running:
         print(board)
 
         if board.num_zombies() == 0:
+            pickle.dump(mcts, open("mcts.p", "wb"))
             print("Humans Win")
             board.clean_board()
             board.populate()            
             print("\n\n\n")
+            break
 
         # Zombies turn        
         board = board.zombie_move()
@@ -179,6 +188,7 @@ while running:
         print(board)
 
         if board.num_humans() == 0:
+            pickle.dump(mcts, open("mcts.p", "wb"))
             print("Zombies Win")            
             board.clean_board()
             board.populate()              
@@ -193,3 +203,5 @@ while running:
         # Update the display
         pygame.display.update()                
         """
+
+

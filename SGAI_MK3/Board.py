@@ -6,8 +6,8 @@ from copy import deepcopy
 VACCINE_DURATION = 5
 MOVE_ACTIONS = ["move_up", "move_down", "move_left", "move_right"]
 UTIL_ACTIONS = ["heal", "kill"]
-ROWS = 4
-COLUMNS = 4
+ROWS = 6
+COLUMNS = 6
 BORDER = 150                    # Number of pixels to offset grid to the top-left side
 CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
 HAS_HOSPITAL = True
