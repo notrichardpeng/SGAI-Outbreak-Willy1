@@ -102,24 +102,22 @@ def display_people(GameBoard):
     """
     Draw the people (government, vaccinated, and zombies) on the grid.
     """
-    #for r in range(GameBoard.rows):
-        #for c in range(GameBoard.columns):
-
-    for x in range(len(GameBoard.states)):
-        if GameBoard.states[x].person != None:
-            p = GameBoard.states[x].person
-            char = "Assets/" + image_assets[0]
-            if p.isVaccinated:
-                char = "Assets/" + image_assets[1]
-            elif p.isZombie and p.halfCured == False:
-                char = "Assets/" + image_assets[2]
-            elif p.isZombie and p.halfCured:
-                char = "Assets/" + image_assets[3]
-            coords = (
-                int(x % GameBoard.rows) * GameBoard.display_cell_dimensions[0] + GameBoard.display_border + 10,
-                int(x / GameBoard.columns) * GameBoard.display_cell_dimensions[1] + GameBoard.display_border + 10,
-            )
-            display_image(screen, char, (80, 80), coords)
+    for r in range(GameBoard.rows):
+        for c in range(GameBoard.columns):
+            if GameBoard.states[r][c] is not None:
+                p = GameBoard.states[r][c]
+                char = "Assets/" + image_assets[0]
+                if p.isVaccinated:
+                    char = "Assets/" + image_assets[1]
+                elif p.isZombie and p.halfCured == False:
+                    char = "Assets/" + image_assets[2]
+                elif p.isZombie and p.halfCured:
+                    char = "Assets/" + image_assets[3]
+                coords = (
+                    r * GameBoard.display_cell_dimensions[0] + GameBoard.display_border + 10,
+                    c * GameBoard.display_cell_dimensions[1] + GameBoard.display_border + 10,
+                )
+                display_image(screen, char, (80, 80), coords)
 
 def display_win_screen():
     screen.fill(BACKGROUND)

@@ -25,18 +25,13 @@ class MCTS():
     def search(self, initial_state):
         # create root node
         self.root = TreeNode(initial_state, None)
-
-        # walk through 1000 iterations
-        for _ in range(1000):            
+        
+        for _ in range(10):
             node = self.select(self.root)                        
             score = self.rollout(node.board)                        
             self.backpropagate(node, score)
-
-        # pick up the best move in the current position
-        try:
-            return self.get_best_move(self.root, 0)        
-        except Exception as e:
-            print(e)
+                
+        return self.get_best_move(self.root, 0)        
     
     # select most promising node
     def select(self, node):
@@ -71,8 +66,8 @@ class MCTS():
                 
                 # case when node is fully expanded
                 if len(next_states) == len(node.children):
-                    node.is_fully_expanded = True
-                
+                    node.is_fully_expanded = True                                
+
                 # return newly created node
                 return new_node
         
@@ -81,13 +76,10 @@ class MCTS():
     
     # simulate the game via making random moves until reach end of the game
     def rollout(self, board):
-        # make random moves for both sides until terminal state of the game is reached
-        cnt = 1000
-        while (board.num_humans() > 0 or board.num_zombies > 0) and cnt > 0:
-            board = random.choice(board.generate_states())
-            cnt -= 1
-
-        if cnt == 0: return 0
+        # make random moves for both sides until terminal state of the game is reached        
+        while board.num_humans() > 0 and board.num_zombies() > 0:
+            board = random.choice(board.generate_states())            
+        
         if board.num_humans() == 0: return -1
         if board.num_zombies() == 0: return 1
                 
@@ -113,7 +105,7 @@ class MCTS():
         for child_node in node.children.values():                        
             
             # get move score using UCT formula
-            move_score = node.player_turn * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))
+            move_score = node.board.player_turn * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))
             
             if move_score > best_score:
                 best_score = move_score

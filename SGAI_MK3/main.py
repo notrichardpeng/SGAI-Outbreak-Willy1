@@ -1,6 +1,6 @@
 import pygame
 from Board import Board
-import PygameFunctions as PF
+#import PygameFunctions as PF
 import random as rd 
 
 from MCTS import *
@@ -12,11 +12,11 @@ AI_PLAY_WAITTIME_MS = 5000
 running = True
 take_action = []
 playerMoved = False
-font = pygame.font.SysFont("Comic Sans", 20)
+#font = pygame.font.SysFont("Comic Sans", 20)
 self_play = False
-hospital = False
+hospital = True
 
-
+"""
 # Option menu
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
 HospitalOnButton = pygame.Rect(700, 250, 100, 100)
@@ -42,19 +42,18 @@ while proceed == False:
                 hover = False
         elif event.type == pygame.QUIT:
             pygame.quit()
+"""
 
 #Create the game board
 board = Board()
 
 # Self play variables
-
-clock = pygame.time.Clock()
+#clock = pygame.time.Clock()
 frame = 0
 
 mcts = MCTS()
-
 while running:
-    P = PF.run(board, hospital)
+    #P = PF.run(board, hospital)
     if self_play:        
         # Event a
         for event in P:
@@ -158,29 +157,39 @@ while running:
 
     # AI Algorithm        
     else:        
-        pygame.time.wait(AI_PLAY_WAITTIME_MS)
+        #pygame.time.wait(AI_PLAY_WAITTIME_MS)
 
         best_move_next_board = mcts.search(board)
-        board = best_move_next_board.board
+        board = best_move_next_board.board        
+
+        print(" Human (AI): ")
+        print(board)
 
         if board.num_zombies() == 0:
             print("Humans Win")
             board.clean_board()
             board.populate()            
+            print("\n\n\n")
 
         # Zombies turn        
         board = board.zombie_move()
         board.update()
         
+        print(" Zombie: ")
+        print(board)
+
         if board.num_humans() == 0:
             print("Zombies Win")            
             board.clean_board()
             board.populate()              
+            print("\n\n\n")                    
 
+        """
         for event in P:
             if event.type == pygame.QUIT:
                 running = False
                 break 
-
+        
         # Update the display
         pygame.display.update()                
+        """
