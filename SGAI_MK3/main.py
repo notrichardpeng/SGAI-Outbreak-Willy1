@@ -14,7 +14,6 @@ AI_PLAY_WAITTIME_MS = 5000
 running = True
 take_action = []
 playerMoved = False
-font = pygame.font.SysFont("Comic Sans", 20)
 self_play = False
 hospital = False
 
@@ -47,7 +46,7 @@ while proceed == False:
         elif event.type == pygame.QUIT:
             pygame.quit()
 #Create the game board
-GameBoard = Board()
+GameBoard = Board(hospital=hospital)
 
 # Self play variables
 clock = pygame.time.Clock()
@@ -110,10 +109,10 @@ while running:
 
         # Display the current action
         PF.screen.blit(
-            font.render("Your move is currently:", True, PF.WHITE),
+            pygame.font.SysFont("Comic Sans", 20).render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
-        PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
+        PF.screen.blit(pygame.font.SysFont("Comic Sans", 20).render(f"{take_action}", True, PF.WHITE), (800, 450))
 
         # Deselects or overrides action button
         if len(take_action) == 2:

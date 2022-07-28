@@ -1,6 +1,5 @@
 import random as rd
 from Person import Person
-
 from copy import deepcopy
 
 VACCINE_DURATION = 5
@@ -9,10 +8,9 @@ ROWS = 6
 COLUMNS = 6
 BORDER = 150                    # Number of pixels to offset grid to the top-left side
 CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
-HAS_HOSPITAL = True
 
 class Board:
-    def __init__(self, board=None):
+    def __init__(self, hospital=True, board=None):
         if board is not None:
             self.__dict__ = deepcopy(board.__dict__)
             self.player_turn *= -1
@@ -21,7 +19,7 @@ class Board:
             self.columns = COLUMNS
             self.display_border = BORDER
             self.display_cell_dimensions = CELL_DIMENSIONS
-            self.hasHospital = HAS_HOSPITAL
+            self.hasHospital = hospital
             self.states = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
             self.player_turn = 1  # 1 is government, -1 is zombie
             self.populate()
@@ -226,7 +224,7 @@ class Board:
                     if not p.isVaccinated: possible_bite.append((r, c))
                     else: vaccine_bite.append((r, c))
 
-        board = Board(self)
+        board = Board(board=self)
 
         if len(possible_bite) > 0:
             coord = rd.choice(possible_bite)
@@ -318,7 +316,7 @@ class Board:
         cnt = 30
         has_moved = False
 
-        board = Board(self)
+        board = Board(board=self)
         while not has_moved and cnt > 0:
             r = rd.randint(0, 5)
             if r < 4: 
@@ -355,7 +353,7 @@ class Board:
                             self.states[r][c].wasVaccinated = True
 
     def make_move(self, action, row, col):
-        board = Board(self)
+        board = Board(board=self)
 
         if action == "move_up":
             if board.moveUp((row, col)): return (True, board)        
