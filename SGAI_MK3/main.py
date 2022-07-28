@@ -1,3 +1,4 @@
+from numpy import isin
 import pygame
 from Board import Board
 #import PygameFunctions as PF
@@ -77,7 +78,6 @@ HealButton = heal_img.get_rect(topleft=(800, 200))
 
 kill_button = "button"
 heal_button = "button"
-
 while running:
     P = PF.run(GameBoard, hospital, heal_button, kill_button)
     if self_play:        
