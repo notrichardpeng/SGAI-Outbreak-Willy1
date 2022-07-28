@@ -236,6 +236,7 @@ while running:
         st = rd.randint(0, len(GameBoard.States) - 1)
         state = GameBoard.QTable[st]
         randomization = False
+        moveIndex = 0
 
         # Chooses random action - exploration
         if r < gamma:            
@@ -295,6 +296,7 @@ while running:
                     ind = j
                 j += 1
             action_to_take = ACTION_SPACE[ind] #actual action e.g. cure bite etc
+            moveIndex = ind
             b = GameBoard.QTable[i][j]
         
         print("AI's current action: " + str(action_to_take))        
@@ -340,7 +342,7 @@ while running:
             NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
             
             #Update QTable
-            GameBoard.QTable[old_state][ind] = GameBoard.QTable[old_state][ind] + alpha * (reward[0] + gamma * NS - GameBoard.QTable[old_state][ind]) 
+            GameBoard.QTable[old_state][moveIndex] = GameBoard.QTable[old_state][moveIndex] + alpha * (reward[0] + gamma * NS - GameBoard.QTable[old_state][moveIndex]) 
             #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS - GameBoard.QTable[i])
 
             if GameBoard.num_zombies() == 0:
