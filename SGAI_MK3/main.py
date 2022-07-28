@@ -6,17 +6,24 @@ import random as rd
 import pickle
 import PygameFunctions as PF
 from MCTS import *
+from threading import Thread
+from time import sleep, perf_counter
+import queue, threading
+from queue import Queue
 
 # Constants
 AI_PLAY_WAITTIME_MS = 5000
+def montecarloFunc(gb, queue):
+    best_move_next_board = mcts.search(gb)
+    queue.put(best_move_next_board)
 
 # Initialize variables
 running = True
 take_action = []
 playerMoved = False
-font = pygame.font.SysFont("Comic Sans", 20)
 self_play = False
 hospital = False
+var = 0
 
 # Option menu
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
@@ -47,7 +54,7 @@ while proceed == False:
         elif event.type == pygame.QUIT:
             pygame.quit()
 #Create the game board
-GameBoard = Board()
+GameBoard = Board(hospital=hospital)
 
 # Self play variables
 clock = pygame.time.Clock()
@@ -99,21 +106,22 @@ while running:
                 if len(take_action) < 2:                                        # Checks if list is less than 2
                     x, y = pygame.mouse.get_pos()                               
                     action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile
-                    if action != None:                        
+                    if action != None:
+                        print(action)
                         if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
                             if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
                                 take_action.append(action)
-                        else:                                                   # Otherwise, add selected tile as destination                            
+                        else:                                                   # Otherwise, add selected tile as destination
+                            print(action)
                             take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
-
         # Display the current action
         PF.screen.blit(
-            font.render("Your move is currently:", True, PF.WHITE),
+            pygame.font.SysFont("Comic Sans", 20).render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
-        PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
+        PF.screen.blit(pygame.font.SysFont("Comic Sans", 20).render(f"{take_action}", True, PF.WHITE), (800, 450))
 
         # Deselects or overrides action button
         if len(take_action) == 2:
@@ -130,7 +138,7 @@ while running:
         # Draws selection of game piece
         if len(take_action) == 1:
             if not isinstance(take_action[0], str):
-                PF.select(take_action[0])        
+                PF.select(take_action[0])
 
         # Action handling
         if len(take_action) == 2:
@@ -144,7 +152,8 @@ while running:
                 elif directionToMove == "moveLeft":
                     result = GameBoard.moveLeft(take_action[0])
                 elif directionToMove == "moveRight":
-                    result = GameBoard.moveRight(take_action[0])                
+                    result = GameBoard.moveRight(take_action[0])
+                print(result)
                 if result != False:
                     playerMoved = True
                 take_action = []
@@ -157,21 +166,24 @@ while running:
                         # Half heal animation
                         while frame < 12:
                             PF.half_heal_animation(frame)
-                            pygame.display.update()                            
+                            pygame.display.update()
+                            # clock.tick(12) sets frames per second to 12
                             clock.tick(12)
                             frame += 1
                         frame = 0
                     elif result[1] == "full":
                         while frame < 16:
                             PF.full_heal_animation(frame)
-                            pygame.display.update()                            
+                            pygame.display.update()
+                            # clock.tick(12) sets frames per second to 12
                             clock.tick(8)
                             frame += 1
                         frame = 0
                     elif result[1] == "vaccine": 
                         while frame < 6:
                             PF.vaccine_animation(frame)
-                            pygame.display.update()                            
+                            pygame.display.update()
+                            # clock.tick(12) sets frames per second to 12
                             clock.tick(8)
                             frame += 1
                         frame = 0
@@ -193,22 +205,32 @@ while running:
                 take_action = []
 
         # Computer turn
-        if playerMoved:      
-            pygame.display.update()      
+        if playerMoved:
+            pygame.display.update()
             playerMoved = False
             take_action = []
                         
-            GameBoard = GameBoard.zombie_move()
-            GameBoard.update()            
+            GameBoard.zombie_random_move()            
+            GameBoard.update()
+        pygame.display.update()
 
     # AI Algorithm        
     else:        
         #pygame.time.wait(AI_PLAY_WAITTIME_MS)
-
-        best_move_next_board = mcts.search(GameBoard)
-        GameBoard = best_move_next_board.board        
-
-        print("Human (AI):")
+        if var == 0:
+            queue = queue.Queue()
+        else:
+            with queue.mutex:
+                queue.queue.clear()
+        var+=1
+        new_thread = threading.Thread(target=montecarloFunc, args=(GameBoard, queue))
+        new_thread.start()
+        new_thread.join()
+        GameBoard = queue.get().board     
+        #print(GameBoard)
+        GameBoard.update()
+        pygame.display.update() 
+        print(" Human (AI): ")
         print(GameBoard)
 
         if GameBoard.num_zombies() == 0:
@@ -216,15 +238,16 @@ while running:
                 pickle.dump(mcts, f)
             print("Humans Win")
             GameBoard.clean_board()
-            GameBoard.populate()  
+            GameBoard.populate()            
             print("\n\n\n")
             break
 
         # Zombies turn        
         GameBoard = GameBoard.zombie_move()
         GameBoard.update()
+        pygame.display.update() 
         
-        print("Zombie:")
+        print(" Zombie: ")
         print(GameBoard)
 
         if GameBoard.num_humans() == 0:
@@ -233,8 +256,17 @@ while running:
             print("Zombies Win")            
             GameBoard.clean_board()
             GameBoard.populate()              
-            print("\n\n\n")       
+            print("\n\n\n")                    
 
-    pygame.display.update()
+        """
+        for event in P:
+            if event.type == pygame.QUIT:
+                running = False
+                break 
+        
+        # Update the display
+        """
+        #pygame.display.update()                
+        
 
 
