@@ -267,7 +267,7 @@ while running:
                     break
                 else:
                     reward = -1000
-                    GameBoard.QTable[st][action_to_take_id] = GameBoard.QTable[st][action_to_take_id] + alpha * (reward) - GameBoard.QTable[st][action_to_take_id]
+                    GameBoard.QTable[st][action_to_take_id] = GameBoard.QTable[st][action_to_take_id] + alpha * ((reward) - GameBoard.QTable[st][action_to_take_id])
 
         else:
             biggest = None
@@ -340,9 +340,8 @@ while running:
             NS = GameBoard.QTable[ns][NewStateAct[0]] #state, action_index
             
             #Update QTable
-            GameBoard.QTable[old_state][NewStateAct[0]] = GameBoard.QTable[old_state][NewStateAct[0]] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[old_state][NewStateAct[0]]            
-
-            #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS) - GameBoard.QTable[i]
+            GameBoard.QTable[old_state][ind] = GameBoard.QTable[old_state][ind] + alpha * (reward[0] + gamma * NS - GameBoard.QTable[old_state][ind]) 
+            #GameBoard.QTable[i] = GameBoard.QTable[i] + alpha * (reward[0] + gamma * NS - GameBoard.QTable[i])
 
             if GameBoard.num_zombies() == 0:
                 print("Humans Win!")            
