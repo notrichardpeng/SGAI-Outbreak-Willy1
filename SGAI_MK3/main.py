@@ -163,24 +163,21 @@ while running:
                         # Half heal animation
                         while frame < 12:
                             PF.half_heal_animation(frame)
-                            pygame.display.update()
-                            # clock.tick(12) sets frames per second to 12
+                            pygame.display.update()                            
                             clock.tick(12)
                             frame += 1
                         frame = 0
                     elif result[1] == "full":
                         while frame < 16:
                             PF.full_heal_animation(frame)
-                            pygame.display.update()
-                            # clock.tick(12) sets frames per second to 12
+                            pygame.display.update()                            
                             clock.tick(8)
                             frame += 1
                         frame = 0
                     elif result[1] == "vaccine": 
                         while frame < 6:
                             PF.vaccine_animation(frame)
-                            pygame.display.update()
-                            # clock.tick(12) sets frames per second to 12
+                            pygame.display.update()                            
                             clock.tick(8)
                             frame += 1
                         frame = 0
@@ -190,12 +187,10 @@ while running:
                 result = GameBoard.kill(take_action[1])
                 if result != False:
                     playerMoved = True
-                    kill_button = "button"                                  # turns kill button back to normal
-                    # Plays kill animation
+                    kill_button = "button"                                  # turns kill button back to normal                    
                     while frame < 9:
                         PF.kill_animation(frame)
-                        pygame.display.update()
-                        # clock.tick(8) sets frames per second to 8
+                        pygame.display.update()                        
                         clock.tick(8)
                         frame += 1
                     frame = 0
@@ -206,9 +201,9 @@ while running:
             pygame.display.update()
             playerMoved = False
             take_action = []
-                        
-            GameBoard.zombie_random_move()            
-            GameBoard.update()
+
+            GameBoard = GameBoard.zombie_move()            
+            GameBoard.update_effects()
         pygame.display.update()
 
     # AI Algorithm        
@@ -223,9 +218,8 @@ while running:
         new_thread.start()
         new_thread.join()
         GameBoard = queue.get().board     
-
-        GameBoard.update()
-        pygame.display.update() 
+        
+        pygame.display.update()
         print("Human (AI):")
         print(GameBoard)
 
@@ -242,7 +236,7 @@ while running:
 
         # Zombies turn        
         GameBoard = GameBoard.zombie_move()
-        GameBoard.update()
+        GameBoard.update_effects()
         pygame.display.update() 
         
         print("Zombie:")

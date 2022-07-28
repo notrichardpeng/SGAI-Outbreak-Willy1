@@ -330,7 +330,7 @@ class Board:
 
             cnt -= 1
 
-    def update(self):        
+    def update_effects(self):        
         # Update effects of vaccination and stun
         for r in range(self.rows):
             for c in range(self.columns):
