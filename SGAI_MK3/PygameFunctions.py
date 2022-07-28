@@ -102,9 +102,12 @@ def display_people(GameBoard):
     """
     Draw the people (government, vaccinated, and zombies) on the grid.
     """
-    for x in range(len(GameBoard.States)):
-        if GameBoard.States[x].person != None:
-            p = GameBoard.States[x].person
+    #for r in range(GameBoard.rows):
+        #for c in range(GameBoard.columns):
+
+    for x in range(len(GameBoard.states)):
+        if GameBoard.states[x].person != None:
+            p = GameBoard.states[x].person
             char = "Assets/" + image_assets[0]
             if p.isVaccinated:
                 char = "Assets/" + image_assets[1]

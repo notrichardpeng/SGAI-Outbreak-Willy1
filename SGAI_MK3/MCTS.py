@@ -8,7 +8,7 @@ class TreeNode():
         self.board = board
         
         # init is node terminal flag
-        if self.board.is_win() or self.board.is_draw():            
+        if self.board.num_humans() == 0 or self.board.num_zombies() == 0:
             self.is_terminal = True                
         else:            
             self.is_terminal = False

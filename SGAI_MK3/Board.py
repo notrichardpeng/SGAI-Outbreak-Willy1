@@ -1,22 +1,32 @@
 import random as rd
-import State
-import Person
+from Person import Person
+
+from copy import deepcopy
 
 VACCINE_DURATION = 5
 MOVE_ACTIONS = ["moveUp", "moveDown", "moveLeft", "moveRight"]
+ROWS = 6
+COLUMNS = 6
+BORDER = 150                    # Number of pixels to offset grid to the top-left side
+CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
+HAS_HOSPITAL = True
 
 class Board:
-    def __init__(self, dimensions, border, cell_dimensions, h):
-        self.rows = dimensions[0]
-        self.columns = dimensions[1]
-        self.display_border = border
-        self.display_cell_dimensions = cell_dimensions        
-        self.hasHospital = h        
-        self.States = [[None for _ in range(dimensions[1])] for _ in range(dimensions[0])]
-
+    def __init__(self, board=None):
+        if board is not None:
+            self.__dict__ = deepcopy(board.__dict__)
+        else:
+            self.rows = ROWS
+            self.columns = COLUMNS
+            self.display_border = BORDER
+            self.display_cell_dimensions = CELL_DIMENSIONS
+            self.hasHospital = HAS_HOSPITAL
+            self.states = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
+            self.populate()
+    
     def num_humans(self):
         ret = 0
-        for row in self.States:
+        for row in self.states:
             for person in row:
                 if person is not None and not person.isZombie:
                     ret += 1
@@ -24,30 +34,19 @@ class Board:
 
     def num_zombies(self):
         ret = 0
-        for row in States:
+        for row in self.states:
             for person in row:
                 if person is not None and person.isZombie:
                     ret += 1
         return ret                
 
-    def toCoord(self, i):
-        return (int(i % self.columns), int(i / self.rows))
-
-    def toIndex(self, coordinates):
-        return int(coordinates[1] * self.columns) + int(coordinates[0])
-
     def isValidCoordinate(self, coordinates):
         return (
-            coordinates[1] < self.rows
-            and coordinates[1] >= 0
-            and coordinates[0] < self.columns
+            coordinates[0] < self.rows
             and coordinates[0] >= 0
+            and coordinates[1] < self.columns
+            and coordinates[1] >= 0
         )
-
-    def clone(self, L: list):
-        NB = Board((self.rows, self.columns), self.display_border, self.display_cell_dimensions, self.Player_Role, self.hasHospital)
-        NB.States = L.copy()
-        return NB
 
     def isAdjacentTo(self, coord, is_zombie: bool) -> bool:
         ret = False
@@ -60,9 +59,9 @@ class Board:
         for coord in vals:
             if (
                 self.isValidCoordinate(coord)
-                and self.States[self.toIndex(coord)].person is not None
-                and not self.States[self.toIndex(coord)].person.isStunned
-                and self.States[self.toIndex(coord)].person.isZombie == is_zombie
+                and self.states[self.toIndex(coord)].person is not None
+                and not self.states[self.toIndex(coord)].person.isStunned
+                and self.states[self.toIndex(coord)].person.isZombie == is_zombie
             ):
                 ret = True
                 break
@@ -85,9 +84,9 @@ class Board:
         destination_idx = self.toIndex(new_coords)                
         
         # Check if the destination is currently occupied
-        if self.States[destination_idx].person is None:
-            self.States[destination_idx].person = self.States[start_idx].person
-            self.States[start_idx].person = None
+        if self.states[destination_idx].person is None:
+            self.states[destination_idx].person = self.states[start_idx].person
+            self.states[start_idx].person = None
             return [True, destination_idx]
         return [False, destination_idx]
 
@@ -109,10 +108,10 @@ class Board:
 
     def bite(self, coords):
         i = self.toIndex(coords)
-        if self.States[i] is None:
+        if self.states[i] is None:
             return False
         chance = 100
-        p = self.States[i].person
+        p = self.states[i].person
         if p.isVaccinated:
             chance = 0
         elif p.wasVaccinated != p.wasCured:
@@ -121,7 +120,7 @@ class Board:
             chance = 50
         r = rd.randint(0, 100)
         if r < chance:            
-            self.States[i].person = Person(True)
+            self.states[i].person = Person(True)
         return [True, i]
 
     def heal(self, coords):
@@ -131,9 +130,9 @@ class Board:
         if a person is vaccined, then return [True, index]
         """
         i = self.toIndex(coords)
-        if self.States[i].person is None:
+        if self.states[i].person is None:
             return [False, None]
-        p = self.States[i].person        
+        p = self.states[i].person        
         action_type = ""
         if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
@@ -160,24 +159,24 @@ class Board:
     def kill(self, coords):
         i = self.toIndex(coords)
         # Ensures we cannot kill empty spaces or humans, only zombies
-        if self.States[i].person is None or self.States[i].person.isZombie == False:
+        if self.states[i].person is None or self.states[i].person.isZombie == False:
             return [False, None]
         # If not adjacent to a human, then we cannot kill the zombie
         if not self.isAdjacentTo(self.toCoord(i), False):
             print("Invalid Moves! Can only kill zombies adjacent to humans.")
             return [False, None]  
-        p = self.States[i].person
+        p = self.states[i].person
         newP = p.clone()
         # Gets rid of zombie
         if newP.isZombie:
             newP = None
-        self.States[i].person = newP
+        self.states[i].person = newP
         return [True, i]
 
     def get_possible_human_targets(self):
         coords = []
         i = 0
-        for state in self.States:
+        for state in self.states:
             c = self.toCoord(i)
             if (
                 state.person is not None 
@@ -191,7 +190,7 @@ class Board:
     def get_possible_zombies_to_move(self):
         coords = []
         i = 0
-        for state in self.States:
+        for state in self.states:
             c = self.toCoord(i)
             if (state.person is not None 
                 and state.person.isZombie 
@@ -205,19 +204,19 @@ class Board:
     def populate(self):
         total_human = rd.randint(7, 11)
         for _ in range(total_human):
-            r = rd.randint(0, self.rows)
-            c = rd.randint(0, self.columns)
-            while self.States[r][c] is not None:
-                r = rd.randint(0, self.rows)
-                c = rd.randint(0, self.columns)
+            r = rd.randint(0, self.rows-1)
+            c = rd.randint(0, self.columns-1)
+            while self.states[r][c] is not None:
+                r = rd.randint(0, self.rows-1)
+                c = rd.randint(0, self.columns-1)
             self.states[r][c] = Person(False)
         
         for _ in range(4):
-            r = rd.randint(0, self.rows)
-            c = rd.randint(0, self.columns)
-            while self.States[r][c] is not None:
-                r = rd.randint(0, self.rows)
-                c = rd.randint(0, self.columns)
+            r = rd.randint(0, self.rows-1)
+            c = rd.randint(0, self.columns-1)
+            while self.states[r][c] is not None:
+                r = rd.randint(0, self.rows-1)
+                c = rd.randint(0, self.columns-1)
             self.states[r][c] = Person(True)
 
     #Zombie AI logic
@@ -225,7 +224,7 @@ class Board:
         # First check if any zombie can bite
         possible_bite = []
         i = 0
-        for state in self.States:
+        for state in self.states:
             if (
                 state is not None 
                 and not state.person.isZombie
@@ -259,8 +258,8 @@ class Board:
             if selected_zombie == (-1, -1): 
                 bored_zombies = [] # Zombies not adjacent to a person
                 busy_zombies = []  # Zombies adjacent to a person
-                for i in range(len(self.States)):
-                    state = self.States[i]
+                for i in range(len(self.states)):
+                    state = self.states[i]
                     if state.person is not None and state.person.isZombie and not state.person.isStunned:
                         c = self.toCoord(i)
                         if not self.isAdjacentTo(c, False):
@@ -309,7 +308,7 @@ class Board:
         if self.base_score > 100: self.base_score -= 25 # Winning the game quicker means higher score
 
         # Update effects of vaccination and stun
-        for state in self.States:
+        for state in self.states:
             if state.person is not None:
                 if state.person.isStunned: state.person.isStunned = False                
                 if state.person.isVaccinated:
