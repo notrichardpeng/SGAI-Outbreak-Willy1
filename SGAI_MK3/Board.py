@@ -16,6 +16,7 @@ class Board:
     def __init__(self, board=None):
         if board is not None:
             self.__dict__ = deepcopy(board.__dict__)
+            self.player_turn *= -1
         else:
             self.rows = ROWS
             self.columns = COLUMNS
@@ -23,7 +24,21 @@ class Board:
             self.display_cell_dimensions = CELL_DIMENSIONS
             self.hasHospital = HAS_HOSPITAL
             self.states = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
+            self.player_turn = 1  # 1 is government, -1 is zombie
             self.populate()
+
+    def __str__(self):
+        ret = ""
+        for row in self.rows:
+            for p in row:
+                if p is None: ret += "."
+                elif p.isZombie:
+                    if p.halfCured: ret += "h"
+                    else: ret += "z"
+                else:
+                    if p.isVaccinated: ret += "v"
+                    else: ret += "p"
+        return ret
     
     def num_humans(self):
         ret = 0
@@ -139,7 +154,7 @@ class Board:
         else:
             # If the person is already vaccinated, don't make the player lose a turn
             if p.isVaccinated:
-                return [False]
+                return False
             p.isVaccinated = True                        
             
         return True
@@ -202,20 +217,21 @@ class Board:
                 c = rd.randint(0, self.columns-1)
             self.states[r][c] = Person(True)
 
-    #Zombie AI logic
+    # Zombie AI logic TODO: Fix skipping turns
     def zombie_move(self):
         # First check if any zombie can bite
-        possible_bite = []
-        i = 0
-        for state in self.states:
-            if (
-                state is not None 
-                and not state.person.isZombie
-                and not state.person.isVaccinated 
-                and self.isAdjacentTo(self.toCoord(i), True)
-            ):
-                possible_bite.append(self.toCoord(i))
-            i += 1
+        possible_bite = []        
+        vaccine_bite = []
+        for r in range(self.rows):
+            for c in range(self.columns):
+                p = self.states[r][c]            
+                if (
+                    p is not None 
+                    and not p.isZombie
+                    and self.isAdjacentTo((r, c), True)
+                ):
+                    if not p.isVaccinated: possible_bite.append((r, c))
+                    else: vaccine_bite.append((r, c))
 
         if len(possible_bite) > 0:
             coord = rd.choice(possible_bite)

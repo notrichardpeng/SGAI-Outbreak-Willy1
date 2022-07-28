@@ -27,21 +27,16 @@ class MCTS():
         self.root = TreeNode(initial_state, None)
 
         # walk through 1000 iterations
-        for _ in range(1000):
-            # select a node (selection phase)
-            node = self.select(self.root)
-            
-            # score current node (simulation phase)
-            score = self.rollout(node.board)
-            
-            # backpropagate results
+        for _ in range(1000):            
+            node = self.select(self.root)                        
+            score = self.rollout(node.board)                        
             self.backpropagate(node, score)
-        
+
         # pick up the best move in the current position
         try:
             return self.get_best_move(self.root, 0)        
-        except:
-            pass
+        except Exception as e:
+            print(e)
     
     # select most promising node
     def select(self, node):
@@ -62,20 +57,20 @@ class MCTS():
     # expand node
     def expand(self, node):
         # generate legal states (moves) for the given node
-        states = node.board.generate_states()
+        next_states = node.board.generate_states()
         
         # loop over generated states (moves)
-        for state in states:
+        for state in next_states:
             # make sure that current state (move) is not present in child nodes
-            if str(state.position) not in node.children:
+            if str(state) not in node.children:
                 # create a new node
                 new_node = TreeNode(state, node)
                 
                 # add child node to parent's node children list (dict)
-                node.children[str(state.position)] = new_node
+                node.children[str(state)] = new_node
                 
                 # case when node is fully expanded
-                if len(states) == len(node.children):
+                if len(next_states) == len(node.children):
                     node.is_fully_expanded = True
                 
                 # return newly created node
@@ -87,20 +82,14 @@ class MCTS():
     # simulate the game via making random moves until reach end of the game
     def rollout(self, board):
         # make random moves for both sides until terminal state of the game is reached
-        while not board.is_win():
-            # try to make a move
-            try:
-                # make the on board
-                board = random.choice(board.generate_states())
-                
-            # no moves available
-            except:
-                # return a draw score
-                return 0
-        
-        # return score from the player "x" perspective
-        if board.player_2 == 'x': return 1
-        elif board.player_2 == 'o': return -1
+        cnt = 1000
+        while (board.num_humans() > 0 or board.num_zombies > 0) and cnt > 0:
+            board = random.choice(board.generate_states())
+            cnt -= 1
+
+        if cnt == 0: return 0
+        if board.num_humans() == 0: return -1
+        if board.num_zombies() == 0: return 1
                 
     # backpropagate the number of visits and score up to the root node
     def backpropagate(self, node, score):
@@ -116,26 +105,19 @@ class MCTS():
             node = node.parent
     
     # select the best node basing on UCB1 formula
-    def get_best_move(self, node, exploration_constant):
-        # define best score & best moves
+    def get_best_move(self, node, exploration_constant):        
         best_score = float('-inf')
         best_moves = []
         
         # loop over child nodes
-        for child_node in node.children.values():
-            # define current player
-            if child_node.board.player_2 == 'x': current_player = 1
-            elif child_node.board.player_2 == 'o': current_player = -1
+        for child_node in node.children.values():                        
             
             # get move score using UCT formula
-            move_score = current_player * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))                                        
-
-            # better move has been found
+            move_score = node.player_turn * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))
+            
             if move_score > best_score:
                 best_score = move_score
-                best_moves = [child_node]
-            
-            # found as good move as already available
+                best_moves = [child_node]                        
             elif move_score == best_score:
                 best_moves.append(child_node)
             

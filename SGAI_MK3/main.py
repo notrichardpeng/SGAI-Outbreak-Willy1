@@ -4,7 +4,6 @@ import PygameFunctions as PF
 import random as rd 
 
 # Constants
-SELF_PLAY = True
 AI_PLAY_WAITTIME_MS = 300
 
 # Initialize variables
@@ -43,7 +42,7 @@ while proceed == False:
             pygame.quit()
 
 #Create the game board
-GameBoard = Board()
+board = Board()
 
 # Self play variables
 
@@ -51,7 +50,7 @@ clock = pygame.time.Clock()
 frame = 0
 
 while running:
-    P = PF.run(GameBoard, hospital)
+    P = PF.run(board, hospital)
     if self_play:        
         # Event a
         for event in P:
@@ -155,16 +154,14 @@ while running:
 
     # AI Algorithm        
     else:        
-        pygame.time.wait(AI_PLAY_WAITTIME_MS)        
-        i = 0
-        r = rd.uniform(0.0, 1.0)
-        st = rd.randint(0, len(GameBoard.states) - 1)        
-        randomization = False                                   
+        pygame.time.wait(AI_PLAY_WAITTIME_MS)                        
 
-        # Zombies turn
-        take_action = []        
-        GameBoard.zombie_move()
-        GameBoard.update()
+
+
+        # Zombies turn        
+        board.zombie_move()
+
+        board.update()
         
         if GameBoard.num_humans() == 0:
             print("Zombies Win")
@@ -177,9 +174,6 @@ while running:
             if event.type == pygame.QUIT:
                 running = False
                 break 
-                
-        # Update the display
-        pygame.display.update()
-        epochs_ran += 1
 
-        print("\n\n\n\n\n\n")
+        # Update the display
+        pygame.display.update()                
