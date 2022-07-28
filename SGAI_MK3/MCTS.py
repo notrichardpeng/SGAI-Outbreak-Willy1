@@ -21,10 +21,17 @@ class TreeNode():
 
 # MCTS class definition
 class MCTS():
+
+    def __init__(self):
+        self.tree = {}
+
     # search for the best move in the current position
     def search(self, initial_state):
-        # create root node
-        self.root = TreeNode(initial_state, None)
+        # create root node        
+        encoded = str(initial_state)        
+        if encoded not in self.tree.keys():
+            self.tree[encoded] = TreeNode(initial_state, None)
+        self.root = self.tree[encoded]
         
         for _ in range(10):
             node = self.select(self.root)                        
@@ -57,12 +64,14 @@ class MCTS():
         # loop over generated states (moves)
         for state in next_states:
             # make sure that current state (move) is not present in child nodes
-            if str(state) not in node.children:
+            encoded = str(state)
+            if encoded not in node.children:
                 # create a new node
                 new_node = TreeNode(state, node)
                 
-                # add child node to parent's node children list (dict)
-                node.children[str(state)] = new_node
+                if encoded not in self.tree.keys():
+                    self.tree[encoded] = new_node
+                node.children[encoded] = new_node
                 
                 # case when node is fully expanded
                 if len(next_states) == len(node.children):
