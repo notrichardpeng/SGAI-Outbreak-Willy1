@@ -236,7 +236,7 @@ while running:
         st = rd.randint(0, len(GameBoard.States) - 1)
         state = GameBoard.QTable[st]
         randomization = False
-
+        moveIndex = 0
         # Chooses random action - exploration
         if r < gamma:            
             randomization = True
