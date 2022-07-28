@@ -106,13 +106,11 @@ while running:
                 if len(take_action) < 2:                                        # Checks if list is less than 2
                     x, y = pygame.mouse.get_pos()                               
                     action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile
-                    if action != None:
-                        print(action)
+                    if action != None:                        
                         if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
                             if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
                                 take_action.append(action)
-                        else:                                                   # Otherwise, add selected tile as destination
-                            print(action)
+                        else:                                                   # Otherwise, add selected tile as destination                            
                             take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
@@ -152,8 +150,7 @@ while running:
                 elif directionToMove == "moveLeft":
                     result = GameBoard.moveLeft(take_action[0])
                 elif directionToMove == "moveRight":
-                    result = GameBoard.moveRight(take_action[0])
-                print(result)
+                    result = GameBoard.moveRight(take_action[0])                
                 if result != False:
                     playerMoved = True
                 take_action = []
@@ -226,10 +223,10 @@ while running:
         new_thread.start()
         new_thread.join()
         GameBoard = queue.get().board     
-        #print(GameBoard)
+
         GameBoard.update()
         pygame.display.update() 
-        print(" Human (AI): ")
+        print("Human (AI):")
         print(GameBoard)
 
         if GameBoard.num_zombies() == 0:
@@ -248,7 +245,7 @@ while running:
         GameBoard.update()
         pygame.display.update() 
         
-        print(" Zombie: ")
+        print("Zombie:")
         print(GameBoard)
 
         if GameBoard.num_humans() == 0:
@@ -259,15 +256,12 @@ while running:
             GameBoard.populate()              
             print("\n\n\n")                    
 
-        """
+        
         for event in P:
             if event.type == pygame.QUIT:
                 running = False
-                break 
-        
-        # Update the display
-        """
-        #pygame.display.update()                
+                break                         
+        pygame.display.update()                
         
 
 
