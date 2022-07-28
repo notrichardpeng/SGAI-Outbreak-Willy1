@@ -6,17 +6,24 @@ import random as rd
 import pickle
 import PygameFunctions as PF
 from MCTS import *
+from threading import Thread
+from time import sleep, perf_counter
+import queue, threading
+from queue import Queue
 
 # Constants
-AI_PLAY_WAITTIME_MS = 5000
+AI_PLAY_WAITTIME_MS = 300
+def montecarloFunc(gb, queue):
+    best_move_next_board = mcts.search(gb)
+    queue.put(best_move_next_board)
 
 # Initialize variables
 running = True
 take_action = []
 playerMoved = False
-font = pygame.font.SysFont("Comic Sans", 20)
 self_play = False
 hospital = False
+var = 0
 
 # Option menu
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
@@ -47,7 +54,7 @@ while proceed == False:
         elif event.type == pygame.QUIT:
             pygame.quit()
 #Create the game board
-GameBoard = Board()
+GameBoard = Board(hospital=hospital)
 
 # Self play variables
 clock = pygame.time.Clock()
@@ -125,13 +132,12 @@ while running:
                             take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
-
         # Display the current action
         PF.screen.blit(
-            font.render("Your move is currently:", True, PF.WHITE),
+            pygame.font.SysFont("Comic Sans", 20).render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
-        PF.screen.blit(font.render(f"{take_action}", True, PF.WHITE), (800, 450))
+        PF.screen.blit(pygame.font.SysFont("Comic Sans", 20).render(f"{take_action}", True, PF.WHITE), (800, 450))
 
         # Deselects or overrides action button
         if len(take_action) == 2:
@@ -148,7 +154,7 @@ while running:
         # Draws selection of game piece
         if len(take_action) == 1:
             if not isinstance(take_action[0], str):
-                PF.select(take_action[0])        
+                PF.select(take_action[0])
 
         # Action handling
         if len(take_action) == 2:
@@ -199,12 +205,10 @@ while running:
                 result = GameBoard.kill(take_action[1])
                 if result != False:
                     playerMoved = True
-                    kill_button = "button"                                  # turns kill button back to normal
-                    # Plays kill animation
+                    kill_button = "button"                                  # turns kill button back to normal                    
                     while frame < 9:
                         PF.kill_animation(frame)
-                        pygame.display.update()
-                        # clock.tick(8) sets frames per second to 8
+                        pygame.display.update()                        
                         clock.tick(8)
                         frame += 1
                     frame = 0
@@ -212,12 +216,19 @@ while running:
         pygame.display.update()        
 
     # AI Algorithm        
-    else:        
-        #pygame.time.wait(AI_PLAY_WAITTIME_MS)
-
-        best_move_next_board = mcts.search(GameBoard)
-        GameBoard = best_move_next_board.board        
-
+    else:                
+        if var == 0:
+            queue = queue.Queue()
+        else:
+            with queue.mutex:
+                queue.queue.clear()
+        var+=1
+        new_thread = threading.Thread(target=montecarloFunc, args=(GameBoard, queue))
+        new_thread.start()
+        new_thread.join()
+        GameBoard = queue.get().board     
+        
+        pygame.display.update()
         print("Human (AI):")
         print(GameBoard)
 
@@ -226,13 +237,16 @@ while running:
                 pickle.dump(mcts, f)
             print("Humans Win")
             GameBoard.clean_board()
-            GameBoard.populate()  
+            GameBoard.populate()            
             print("\n\n\n")
             break
 
+        pygame.time.wait(AI_PLAY_WAITTIME_MS)
+
         # Zombies turn        
-        GameBoard = GameBoard.zombie_move()[0]
-        GameBoard.update()
+        GameBoard = GameBoard.zombie_move()
+        GameBoard.update_effects()
+        pygame.display.update() 
         
         print("Zombie:")
         print(GameBoard)
@@ -243,8 +257,14 @@ while running:
             print("Zombies Win")            
             GameBoard.clean_board()
             GameBoard.populate()              
-            print("\n\n\n")       
+            print("\n\n\n")                    
 
-    pygame.display.update()
+        
+        for event in P:
+            if event.type == pygame.QUIT:
+                running = False
+                break                         
+        pygame.display.update()                
+        
 
 

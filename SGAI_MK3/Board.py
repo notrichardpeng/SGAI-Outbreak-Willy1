@@ -1,28 +1,17 @@
 import random as rd
 from Person import Person
-
 from copy import deepcopy
 
-VACCINE_DURATION = 5
-MOVE_ACTIONS = ["move_up", "move_down", "move_left", "move_right"]
-ROWS = 6
-COLUMNS = 6
-BORDER = 150                    # Number of pixels to offset grid to the top-left side
-CELL_DIMENSIONS = (100,100)     # Number of pixels (x,y) for each cell
-HAS_HOSPITAL = True
-
 class Board:
-    def __init__(self, board=None):
+    def __init__(self, hospital=True, board=None):
         if board is not None:
             self.__dict__ = deepcopy(board.__dict__)
             self.player_turn *= -1
         else:
-            self.rows = ROWS
-            self.columns = COLUMNS
-            self.display_border = BORDER
-            self.display_cell_dimensions = CELL_DIMENSIONS
-            self.hasHospital = HAS_HOSPITAL
-            self.states = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
+            self.rows = 6
+            self.columns = 6                        
+            self.hasHospital = hospital
+            self.states = [[None for _ in range(6)] for _ in range(6)]
             self.player_turn = 1  # 1 is government, -1 is zombie
             self.populate()
 
@@ -190,7 +179,7 @@ class Board:
         return coords        
 
     def clean_board(self):
-        self.states = [[None for _ in range(COLUMNS)] for _ in range(ROWS)]
+        self.states = [[None for _ in range(self.columns)] for _ in range(self.rows)]
 
     def populate(self):
         total_human = rd.randint(7, 11)
@@ -228,7 +217,7 @@ class Board:
                     if not p.isVaccinated: possible_bite.append((r, c))
                     else: vaccine_bite.append((r, c))
 
-        board = Board(self)
+        board = Board(board=self)
 
         if len(possible_bite) > 0:
             coord = rd.choice(possible_bite)
@@ -267,7 +256,7 @@ class Board:
                     count = 10
                     while len(bored_zombies) > 0 and not has_moved and count > 0:                    
                         zombie = rd.choice(bored_zombies)
-                        action = rd.choice(MOVE_ACTIONS)                    
+                        action = rd.choice(["move_up", "move_down", "move_left", "move_right"])                    
                         if action == "moveUp":
                             has_moved = board.moveUp(zombie)
                         elif action == "moveDown":
@@ -321,11 +310,11 @@ class Board:
         cnt = 30
         has_moved = False
 
-        board = Board(self)
+        board = Board(board=self)
         while not has_moved and cnt > 0:
             r = rd.randint(0, 5)
             if r < 4: 
-                action = MOVE_ACTIONS[r]
+                action = ["move_up", "move_down", "move_left", "move_right"][r]
             else: 
                 action = "bite"
             
@@ -344,7 +333,7 @@ class Board:
 
             cnt -= 1
 
-    def update(self):        
+    def update_effects(self):        
         # Update effects of vaccination and stun
         for r in range(self.rows):
             for c in range(self.columns):
@@ -352,13 +341,13 @@ class Board:
                     if self.states[r][c].isStunned: self.states[r][c].isStunned = False                
                     if self.states[r][c].isVaccinated:
                         self.states[r][c].turnsVaccinated += 1
-                        if self.states[r][c].turnsVaccinated >= VACCINE_DURATION:
+                        if self.states[r][c].turnsVaccinated >= 5: # Vaccine Duration = 5 turns
                             self.states[r][c].turnsVaccinated = 0
                             self.states[r][c].isVaccinated = False
                             self.states[r][c].wasVaccinated = True
 
     def make_move(self, action, row, col):
-        board = Board(self)
+        board = Board(board=self)
 
         if action == "move_up":
             if board.moveUp((row, col)): return (True, board)        
@@ -381,7 +370,7 @@ class Board:
     def gov_gen_states(self):
         new_states = []
 
-        for action in MOVE_ACTIONS:
+        for action in ["move_up", "move_down", "move_left", "move_right"]:
             for row in range(self.rows):
                 for col in range(self.columns):
                     if self.states[row][col] is not None and not self.states[row][col].isZombie:
@@ -407,7 +396,7 @@ class Board:
     def zombie_gen_states(self):
         new_states = []
 
-        for action in MOVE_ACTIONS:
+        for action in ["move_up", "move_down", "move_left", "move_right"]:
             for row in range(self.rows):
                 for col in range(self.columns):
                     if self.states[row][col] is not None and self.states[row][col].isZombie:
