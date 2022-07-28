@@ -116,12 +116,12 @@ class Board:
         new_coords = (coords[0] + 1, coords[1])
         return self.move(coords, new_coords)   
 
-    def bite(self, coords):
-        i = self.toIndex(coords)
-        if self.states[i] is None:
+    def bite(self, coords):        
+        p = self.states[r][c]
+        if p is None:
             return False
+
         chance = 100
-        p = self.states[i].person
         if p.isVaccinated:
             chance = 0
         elif p.wasVaccinated != p.wasCured:
@@ -130,8 +130,8 @@ class Board:
             chance = 50
         r = rd.randint(0, 100)
         if r < chance:            
-            self.states[i].person = Person(True)
-        return [True, i]
+            p = Person(True)
+        return True
 
     def heal(self, coords):                
         if self.states[coords[0]][coords[1]] is None:
@@ -299,10 +299,6 @@ class Board:
             
         return board
 
-        
-
-
-
     # Dumb Zombie AI
     def zombie_random_move(self):
         possible_move_coords = []
@@ -351,17 +347,18 @@ class Board:
         if self.base_score > 100: self.base_score -= 25 # Winning the game quicker means higher score
 
         # Update effects of vaccination and stun
-        for state in self.states:
-            if state.person is not None:
-                if state.person.isStunned: state.person.isStunned = False                
-                if state.person.isVaccinated:
-                    state.person.turnsVaccinated += 1
-                    if state.person.turnsVaccinated >= VACCINE_DURATION:
-                        state.person.turnsVaccinated = 0
-                        state.person.isVaccinated = False
-                        state.person.wasVaccinated = True
+        for row in self.states:
+            for p in row:
+                if p is not None:
+                    if p.isStunned: p.isStunned = False                
+                    if p.isVaccinated:
+                        p.turnsVaccinated += 1
+                        if p.turnsVaccinated >= VACCINE_DURATION:
+                            p.turnsVaccinated = 0
+                            p.isVaccinated = False
+                            p.wasVaccinated = True
 
-    def government_make_move(self, action, row, col):
+    def make_move(self, action, row, col):
         board = Board(self)
 
         match action:
@@ -377,30 +374,57 @@ class Board:
                 if board.kill((row, col)): return (True, board)
             case "heal":
                 if board.heal((row, col)): return (True, board)
+            case "bite":
+                if board.bite((row, col)): return (True, board)
 
         return (False, None)
 
-
-    def generate_states(self):
+    def gov_gen_states(self):
         new_states = []
 
         for action in MOVE_ACTIONS:
             for row in range(self.rows):
                 for col in range(self.columns):
                     if self.states[row][col] is not None and not self.states[row][col].isZombie:
-                        result = self.government_make_move(action, row, col)
+                        result = self.make_move(action, row, col)
                         if result[0]: new_states.append(result[1])
 
         for row in range(self.rows):
             for col in range(self.columns):
                 if self.states[row][col] is not None and self.states[row][col].isZombie:
-                    result = self.government_make_move("kill", row, col)
+                    result = self.make_move("kill", row, col)
                     if result[0]: new_states.append(result[1])
 
         for row in range(self.rows):
             for col in range(self.columns):
                 if self.states[row][col] is not None and not self.states[row][col].isVaccinated:
-                    result = self.government_make_move("heal", row, col)
+                    result = self.make_move("heal", row, col)
                     if result[0]: new_states.append(result[1])
         
         return new_states
+
+    def zombie_gen_states(self):
+        new_states = []
+
+        for action in MOVE_ACTIONS:
+            for row in range(self.rows):
+                for col in range(self.columns):
+                    if self.states[row][col] is not None and self.states[row][col].isZombie:
+                        result = self.make_move(action, row, col)
+                        if result[0]: new_states.append(result[1])
+
+        for row in range(self.rows):
+            for col in range(self.columns):
+                if self.states[row][col] is not None and not self.states[row][col].isZombie:
+                    result = self.make_move("bite", row, col)
+                    if result[0]: new_states.append(result[1])
+        
+        return new_states
+
+
+    def generate_states(self):
+        if self.player_turn == 1:
+            return self.gov_gen_states()
+        else:
+            return self.zombie_gen_states()
+        
