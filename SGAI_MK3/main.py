@@ -1,4 +1,4 @@
-from numpy import isin
+import numpy as np
 import pygame
 from Board import Board
 #import PygameFunctions as PF
