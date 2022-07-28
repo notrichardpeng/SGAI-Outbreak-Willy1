@@ -111,11 +111,11 @@ class MCTS():
         for child_node in node.children.values():                        
             
             # get move score using UCT formula
-            move_score = node.board.player_turn * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits / child_node.visits))
+            move_score = node.board.player_turn * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(max(1, node.visits / child_node.visits)))
             
             if move_score > best_score:
                 best_score = move_score
-                best_moves = [child_node]                        
+                best_moves = [child_node]
             elif move_score == best_score:
                 best_moves.append(child_node)
             
