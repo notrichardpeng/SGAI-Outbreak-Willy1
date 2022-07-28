@@ -4,7 +4,8 @@ from Person import Person
 from copy import deepcopy
 
 VACCINE_DURATION = 5
-MOVE_ACTIONS = ["moveUp", "moveDown", "moveLeft", "moveRight"]
+MOVE_ACTIONS = ["move_up", "move_down", "move_left", "move_right"]
+UTIL_ACTIONS = ["heal", "kill"]
 ROWS = 6
 COLUMNS = 6
 BORDER = 150                    # Number of pixels to offset grid to the top-left side
@@ -45,11 +46,9 @@ class Board:
             coordinates[0] < self.rows
             and coordinates[0] >= 0
             and coordinates[1] < self.columns
-            and coordinates[1] >= 0
-        )
+            and coordinates[1] >= 0 )     
 
-    def isAdjacentTo(self, coord, is_zombie: bool) -> bool:
-        ret = False
+    def isAdjacentTo(self, coord, is_zombie: bool):        
         vals = [
             (coord[0], coord[1] + 1),
             (coord[0], coord[1] - 1),
@@ -59,14 +58,13 @@ class Board:
         for coord in vals:
             if (
                 self.isValidCoordinate(coord)
-                and self.states[self.toIndex(coord)].person is not None
-                and not self.states[self.toIndex(coord)].person.isStunned
-                and self.states[self.toIndex(coord)].person.isZombie == is_zombie
+                and self.states[coord[0]][coord[1]] is not None
+                and not self.states[coord[0]][coord[1]].isStunned
+                and self.states[coord[0]][coord[1]].isZombie == is_zombie
             ):
-                ret = True
-                break
+                return True
 
-        return ret
+        return False
 
     def move(self, from_coords, new_coords):
         """
@@ -77,18 +75,15 @@ class Board:
         """
         # Check if the new coordinates are valid
         if not self.isValidCoordinate(new_coords):
-            return [False, self.toIndex(from_coords)]
-        
-        # Get the start and destination index (1D)
-        start_idx = self.toIndex(from_coords)
-        destination_idx = self.toIndex(new_coords)                
+            return False
         
         # Check if the destination is currently occupied
-        if self.states[destination_idx].person is None:
-            self.states[destination_idx].person = self.states[start_idx].person
-            self.states[start_idx].person = None
-            return [True, destination_idx]
-        return [False, destination_idx]
+        if self.states[new_coords[0]][new_coords[1]] is None:
+            self.states[new_coords[0]][new_coords[1]] = deepcopy(self.states[from_coords[0]][from_coords[1]])
+            del self.states[from_coords[0]][from_coords[1]]
+            return True
+
+        return False        
 
     def moveUp(self, coords):
         new_coords = (coords[0], coords[1] - 1)
@@ -123,55 +118,43 @@ class Board:
             self.states[i].person = Person(True)
         return [True, i]
 
-    def heal(self, coords):
-        """
-        Heals the person at the stated coordinates
-        If no person is selected, then return [False, None]
-        if a person is vaccined, then return [True, index]
-        """
-        i = self.toIndex(coords)
-        if self.states[i].person is None:
-            return [False, None]
-        p = self.states[i].person        
-        action_type = ""
+    def heal(self, coords):                
+        if self.states[coords[0]][coords[1]] is None:
+            return False
+
+        p = self.states[coords[0]][coords[1]]
+
         if p.isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
-            if not self.isAdjacentTo(self.toCoord(i), False):     
+            if not self.isAdjacentTo(coords, False):
                 print("Invalid Move! Can only heal zombies adjacent to humans.")           
-                return [False, None]
+                return False
             # Was the zombie already half-cured?
             if p.halfCured == False and (p.isInHospital(coords) == False or self.hasHospital == False):
                 p.halfCured = True
-                p.isStunned = True
-                action_type = "half"
+                p.isStunned = True                
             elif (p.halfCured == True or (p.isInHospital(coords) == True and self.hasHospital == True)):
                 p.isZombie = False
-                p.wasCured = True
-                action_type = "full"                
-        elif p.isZombie == False:
+                p.wasCured = True                              
+        else:
             # If the person is already vaccinated, don't make the player lose a turn
             if p.isVaccinated:
-                return [False, None]
-            p.isVaccinated = True   
-            action_type = "vaccine"         
-        return [True, i, action_type]
+                return [False]
+            p.isVaccinated = True                        
+            
+        return True
 
-    def kill(self, coords):
-        i = self.toIndex(coords)
+    def kill(self, coords):        
         # Ensures we cannot kill empty spaces or humans, only zombies
-        if self.states[i].person is None or self.states[i].person.isZombie == False:
-            return [False, None]
+        if self.states[coords[0]][[coords[1]]] is None or self.states[coords[0]][[coords[1]]].person.isZombie == False:
+            return False
         # If not adjacent to a human, then we cannot kill the zombie
-        if not self.isAdjacentTo(self.toCoord(i), False):
+        if not self.isAdjacentTo(coords, False):
             print("Invalid Moves! Can only kill zombies adjacent to humans.")
-            return [False, None]  
-        p = self.states[i].person
-        newP = p.clone()
-        # Gets rid of zombie
-        if newP.isZombie:
-            newP = None
-        self.states[i].person = newP
-        return [True, i]
+            return False
+        
+        del self.states[coords[0]][coords[1]]
+        return True
 
     def get_possible_human_targets(self):
         coords = []
@@ -317,3 +300,47 @@ class Board:
                         state.person.turnsVaccinated = 0
                         state.person.isVaccinated = False
                         state.person.wasVaccinated = True
+
+    def make_move(self, action, row, col):
+        board = Board(self)
+
+        match action:
+            case "move_up":
+                if board.moveUp((row, col)): return (True, board)
+            case "move_down":
+                if board.moveDown((row, col)): return (True, board)
+            case "move_left":
+                if board.moveLeft((row, col)): return (True, board)
+            case "move_right":
+                if board.moveRight((row, col)): return (True, board)
+            case "kill":
+                if board.kill((row, col)): return (True, board)
+            case "heal":
+                if board.heal((row, col)): return (True, board)
+
+        return (False, None)
+
+
+    def generate_states(self):
+        new_states = []
+
+        for action in MOVE_ACTIONS:
+            for row in range(self.rows):
+                for col in range(self.columns):
+                    if self.states[row][col] is not None and not self.states[row][col].isZombie:
+                        result = self.make_move(action, row, col)
+                        if result[0]: new_states.append(result[1])
+
+        for row in range(self.rows):
+            for col in range(self.columns):
+                if self.states[row][col] is not None and self.states[row][col].isZombie:
+                    result = self.make_move("kill", row, col)
+                    if result[0]: new_states.append(result[1])
+
+        for row in range(self.rows):
+            for col in range(self.columns):
+                if self.states[row][col] is not None and not self.states[row][col].isVaccinated:
+                    result = self.make_move("heal", row, col)
+                    if result[0]: new_states.append(result[1])
+        
+        return new_states

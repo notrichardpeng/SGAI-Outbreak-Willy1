@@ -27,11 +27,11 @@ class MCTS():
         self.root = TreeNode(initial_state, None)
 
         # walk through 1000 iterations
-        for iteration in range(1000):
+        for _ in range(1000):
             # select a node (selection phase)
             node = self.select(self.root)
             
-            # scrore current node (simulation phase)
+            # score current node (simulation phase)
             score = self.rollout(node.board)
             
             # backpropagate results
@@ -39,8 +39,7 @@ class MCTS():
         
         # pick up the best move in the current position
         try:
-            return self.get_best_move(self.root, 0)
-        
+            return self.get_best_move(self.root, 0)        
         except:
             pass
     
