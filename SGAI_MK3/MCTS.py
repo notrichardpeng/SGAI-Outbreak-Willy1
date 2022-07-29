@@ -8,7 +8,7 @@ class TreeNode():
         self.board = board
         
         # init is node terminal flag
-        if self.board.num_humans() == 0 or self.board.num_zombies() == 0:
+        if self.board.num_humans == 0 or self.board.num_zombies == 0:
             self.is_terminal = True                
         else:            
             self.is_terminal = False
@@ -18,6 +18,12 @@ class TreeNode():
         self.visits = 0                
         self.score = 0                
         self.children = []
+
+    def __str__(self):
+        ret = ""
+        for x in [self.visits, self.is_fully_expanded, self.is_terminal, self.score]:
+            ret += str(x) + " "
+        return ret        
 
 # MCTS class definition
 class MCTS():
@@ -32,7 +38,7 @@ class MCTS():
         if encoded not in self.tree.keys():
             self.tree[encoded] = TreeNode(initial_state, None)        
         
-        for _ in range(100):
+        for _ in range(1):
             node = self.select(self.tree[encoded])
             score = self.rollout(node.board)
             self.backpropagate(node, score)
@@ -77,10 +83,10 @@ class MCTS():
     # simulate the game via making random moves until reach end of the game
     def rollout(self, board):
         # make random moves for both sides until terminal state of the game is reached        
-        while board.num_humans() > 0 and board.num_zombies() > 0:
+        while board.num_humans > 0 and board.num_zombies > 0:
             board = random.choice(board.generate_states())            
         
-        return board.num_humans() - board.num_zombies()        
+        return board.num_humans - board.num_zombies        
                 
     # backpropagate the number of visits and score up to the root node
     def backpropagate(self, node, score):

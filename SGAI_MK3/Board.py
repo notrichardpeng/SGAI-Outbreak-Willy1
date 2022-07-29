@@ -12,8 +12,15 @@ class Board:
             self.rows = 6
             self.columns = 6                        
             self.hasHospital = hospital
-            self.states = [[None for _ in range(6)] for _ in range(6)]
             self.player_turn = 1  # 1 is government, -1 is zombie
+            self.states = np.ndarray((self.rows, self.columns), dtype=Person)
+            self.num_humans = 0
+            self.num_zombies = 4
+
+            for r in range(self.rows):
+                for c in range(self.columns):
+                    self.states[r][c] = None
+            
             self.populate()
 
     def __str__(self):
@@ -28,23 +35,7 @@ class Board:
                     if p.isVaccinated: ret += "v"
                     else: ret += "p"
             ret += "\n"
-        return ret
-    
-    def num_humans(self):
-        ret = 0
-        for row in self.states:
-            for person in row:
-                if person is not None and not person.isZombie:
-                    ret += 1
-        return ret
-
-    def num_zombies(self):
-        ret = 0
-        for row in self.states:
-            for person in row:
-                if person is not None and person.isZombie:
-                    ret += 1
-        return ret                
+        return ret                      
 
     def isValidCoordinate(self, coordinates):
         return (
@@ -116,6 +107,8 @@ class Board:
         r = rd.randint(0, 100)
         if r < chance:            
             self.states[coords[0]][coords[1]] = Person(True)
+            self.num_humans -= 1
+            self.num_zombies += 1
         return True
 
     def heal(self, coords):                
@@ -133,7 +126,9 @@ class Board:
                 return (True, "half" )               
             elif (self.states[coords[0]][coords[1]].halfCured == True or (self.states[coords[0]][coords[1]].isInHospital(coords) == True and self.hasHospital == True)):
                 self.states[coords[0]][coords[1]] = Person(False)                
-                self.states[coords[0]][coords[1]].wasCured = True   
+                self.states[coords[0]][coords[1]].wasCured = True
+                self.num_zombies -= 1
+                self.num_humans += 1
                 return (True, "full")                           
         else:
             # If the person is already vaccinated, don't make the player lose a turn
@@ -152,6 +147,7 @@ class Board:
             return False
         
         self.states[coords[0]][coords[1]] = None
+        self.num_zombies -= 1
         return True
 
     def get_possible_human_targets(self):
@@ -183,8 +179,8 @@ class Board:
         self.states = [[None for _ in range(self.columns)] for _ in range(self.rows)]
 
     def populate(self):
-        total_human = rd.randint(7, 11)
-        for _ in range(total_human):
+        self.num_humans = rd.randint(7, 11)
+        for _ in range(self.num_humans):
             r = rd.randint(0, self.rows-1)
             c = rd.randint(0, self.columns-1)
             while self.states[r][c] is not None:
@@ -192,13 +188,13 @@ class Board:
                 c = rd.randint(0, self.columns-1)
             self.states[r][c] = Person(False)
         
-        for _ in range(4):
+        for _ in range(self.num_zombies):
             r = rd.randint(0, self.rows-1)
             c = rd.randint(0, self.columns-1)
             while self.states[r][c] is not None:
                 r = rd.randint(0, self.rows-1)
                 c = rd.randint(0, self.columns-1)
-            self.states[r][c] = Person(True)
+            self.states[r][c] = Person(True)                
 
     # Zombie AI logic
     def zombie_move(self):
