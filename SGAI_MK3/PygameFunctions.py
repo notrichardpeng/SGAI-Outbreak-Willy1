@@ -1,11 +1,14 @@
 import pygame
 
 BACKGROUND = "#b0b0b0"
+BACKGROUND1 = "#63666A"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (176, 176, 176)
 HOSPITAL_COLOR = (191, 209, 255)
 LINE_WIDTH = 5
+DISPLAY_BORDER = 150
+DISPLAY_CELL_DIMENSIONS = (100,100)
 
 image_assets = [
     "person_normal.png",
@@ -24,6 +27,8 @@ person_dimensions = (20, 60)
 pygame.display.set_caption("Outbreak!")
 screen.fill(BACKGROUND)
 
+board = None  
+
 def get_action(GameBoard, pixel_x, pixel_y):
     """
     Get the action that the click represents.
@@ -34,23 +39,24 @@ def get_action(GameBoard, pixel_x, pixel_y):
     # Check if the user clicked on the "heal" icon, return "heal" if so
 
     # Get the grid (x,y) where the user clicked
-    if pixel_x > GameBoard.display_border and pixel_y > GameBoard.display_border:   # Clicking to the top or left of the border will result in a grid value of 0, which is valid
-        board_x = int((pixel_x - GameBoard.display_border) / GameBoard.display_cell_dimensions[0])
-        board_y = int((pixel_y - GameBoard.display_border) / GameBoard.display_cell_dimensions[1])
+    if pixel_x > DISPLAY_BORDER and pixel_y > DISPLAY_BORDER:   # Clicking to the top or left of the border will result in a grid value of 0, which is valid
+        board_x = int((pixel_x - DISPLAY_BORDER) / DISPLAY_CELL_DIMENSIONS[0])
+        board_y = int((pixel_y - DISPLAY_BORDER) / DISPLAY_CELL_DIMENSIONS[1])
         # Return the grid position if it is a valid position on the board
         if (board_x >= 0 and board_x < GameBoard.columns and board_y >= 0 and board_y < GameBoard.rows):
-            return (board_x, board_y)
+            return (board_y, board_x)
     return None
 
 def run(GameBoard, hasHospital, heal_button, kill_button):
     """
     Draw the screen and return any events.
     """
+
+    if GameBoard is None: return
     screen.fill(BACKGROUND)
     build_grid(GameBoard, hasHospital) # Draw the grid
     display_buttons(heal_button, kill_button)
-    display_people(GameBoard)
-    return pygame.event.get()
+    display_people(GameBoard)            
 
 def display_buttons(heal_button, kill_button):
     display_image(screen, "Assets/kill_" + kill_button + ".png", (), (800, 50))         # draws specified kill button asset
@@ -72,27 +78,27 @@ def build_grid(GameBoard, hasHospital):
     """
     Draw the grid on the screen.
     """
-    grid_width = GameBoard.columns * GameBoard.display_cell_dimensions[0]
-    grid_height = GameBoard.rows * GameBoard.display_cell_dimensions[1]
-    pygame.draw.rect(screen, BLACK, [GameBoard.display_border - LINE_WIDTH, GameBoard.display_border - LINE_WIDTH, LINE_WIDTH, grid_height + (2 * LINE_WIDTH)])  # left
-    pygame.draw.rect(screen, BLACK, [GameBoard.display_border + grid_width, GameBoard.display_border - LINE_WIDTH, LINE_WIDTH, grid_height + (2 * LINE_WIDTH)])  # right
-    pygame.draw.rect(screen, BLACK, [GameBoard.display_border - LINE_WIDTH, GameBoard.display_border + grid_height, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])  # bottom
-    pygame.draw.rect(screen, BLACK, [GameBoard.display_border - LINE_WIDTH, GameBoard.display_border - LINE_WIDTH, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])   # top
-    pygame.draw.rect(screen, CELL_COLOR, [GameBoard.display_border, GameBoard.display_border, grid_width, grid_height]) # Fill the inside wioth the cell color
+    grid_width = GameBoard.columns * DISPLAY_CELL_DIMENSIONS[0]
+    grid_height = GameBoard.rows * DISPLAY_CELL_DIMENSIONS[1]
+    pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER - LINE_WIDTH, DISPLAY_BORDER - LINE_WIDTH, LINE_WIDTH, grid_height + (2 * LINE_WIDTH)])  # left
+    pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER + grid_width, DISPLAY_BORDER - LINE_WIDTH, LINE_WIDTH, grid_height + (2 * LINE_WIDTH)])  # right
+    pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER - LINE_WIDTH, DISPLAY_BORDER + grid_height, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])  # bottom
+    pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER - LINE_WIDTH, DISPLAY_BORDER - LINE_WIDTH, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])   # top
+    pygame.draw.rect(screen, CELL_COLOR, [DISPLAY_BORDER, DISPLAY_BORDER, grid_width, grid_height]) # Fill the inside wioth the cell color
     
     if hasHospital == True:
         pygame.draw.rect(screen, HOSPITAL_COLOR, [150, 150, 300, 300])
 
     # Draw the vertical lines
-    i = GameBoard.display_border + GameBoard.display_cell_dimensions[0]
-    while i < GameBoard.display_border + grid_width:
-        pygame.draw.rect(screen, BLACK, [i, GameBoard.display_border, LINE_WIDTH, grid_height])
-        i += GameBoard.display_cell_dimensions[0]
+    i = DISPLAY_BORDER + DISPLAY_CELL_DIMENSIONS[0]
+    while i < DISPLAY_BORDER + grid_width:
+        pygame.draw.rect(screen, BLACK, [i, DISPLAY_BORDER, LINE_WIDTH, grid_height])
+        i += DISPLAY_CELL_DIMENSIONS[0]
     # Draw the horizontal lines
-    i = GameBoard.display_border + GameBoard.display_cell_dimensions[1]
-    while i < GameBoard.display_border + grid_height:
-        pygame.draw.rect(screen, BLACK, [GameBoard.display_border, i, grid_width, LINE_WIDTH])
-        i += GameBoard.display_cell_dimensions[1]
+    i = DISPLAY_BORDER + DISPLAY_CELL_DIMENSIONS[1]
+    while i < DISPLAY_BORDER + grid_height:
+        pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER, i, grid_width, LINE_WIDTH])
+        i += DISPLAY_CELL_DIMENSIONS[1]
 
 def display_people(GameBoard):
     """
@@ -110,8 +116,8 @@ def display_people(GameBoard):
                 elif p.isZombie and p.halfCured:
                     char = "Assets/" + image_assets[3]
                 coords = (
-                    r * GameBoard.display_cell_dimensions[0] + GameBoard.display_border + 10,
-                    c * GameBoard.display_cell_dimensions[1] + GameBoard.display_border + 10,
+                    c * DISPLAY_CELL_DIMENSIONS[1] + DISPLAY_BORDER + 10,
+                    r * DISPLAY_CELL_DIMENSIONS[0] + DISPLAY_BORDER + 10,
                 )
                 display_image(screen, char, (80, 80), coords)
 
@@ -142,6 +148,18 @@ def display_lose_screen(num_zombies):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return
+def display_start_screen(starthover):
+    screen.fill(BACKGROUND1)
+    my_font = pygame.font.Font("Assets/Minecraft.ttf", 100)
+    text_image = my_font.render("Outbreak", True, WHITE)
+    screen.blit(
+         text_image, (375, 100),
+    )
+    if starthover == "start":
+        display_image(screen, "Assets/start_img_2.png", (300, 100), (455, 500))
+    else:
+        display_image(screen, "Assets/start_img.png", (300, 100), (455, 500))
+    pygame.display.update()
 
 def display_options_screen(self_play, hospital, hover):
     screen.fill(BACKGROUND)
@@ -157,6 +175,9 @@ def display_options_screen(self_play, hospital, hover):
     )
     screen.blit(
         pygame.font.SysFont("Calibri", 24).render("Proceed to game...", True, WHITE), (975, 600),
+    )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 24).render("Show Stats", True, WHITE), (500, 450),
     )
 
     if hover == "proceed":
@@ -177,11 +198,15 @@ def display_options_screen(self_play, hospital, hover):
             display_image(screen, "Assets/checked_box.png", (100, 100), (350, 250))
         else:
             display_image(screen, "Assets/unchecked_box.png", (100, 100), (350, 250))
+    
+    # Show Stats button
+    display_image(screen, "Assets/DefaultButton.png", (100, 100), (500, 500))
+    
     pygame.display.update()
 
 def select(coord):
-    left = coord[0] * 100 + 150
-    top = coord[1] * 100 + 150
+    left = coord[1] * 100 + 150
+    top = coord[0] * 100 + 150
     color = (232, 232, 232)
     # Drawing Rectangle
     pygame.draw.rect(screen, color, pygame.Rect(left, top, 100 + LINE_WIDTH, 100 + LINE_WIDTH),  LINE_WIDTH+3)
@@ -215,12 +240,20 @@ def vaccine_animation(frame):
     display_image(screen, "Assets/vaccine/sprite_" + str(frame) + ".png", (200, 200), (428, 350))    
     display_image(screen, "Assets/heal2_human/sprite_0" + str(frame) + ".png", (200, 200), (572, 350))
 
+def zombie_bite(frame):
+    image = str(frame)
+    if frame < 10:
+        image = "0" + str(frame)
+    # Draws background first and then draws the specified frame. The animations have the same number of frames and are already made to be synched up
+    display_image(screen, "Assets/zombie_bite_background.png", (), (0,0))
+    display_image(screen, "Assets/zombie_bite/sprite_" + image + ".png", (250, 200), (500, 350))
+
 def direction(coord1, coord2):
-    if coord2[1] > coord1[1]:
-        return "moveDown"
-    elif coord2[1] < coord1[1]:
+    if coord2[0] > coord1[0]:
         return "moveUp"
-    elif coord2[0] > coord1[0]:
-        return "moveRight"
     elif coord2[0] < coord1[0]:
+        return "moveDown"
+    elif coord2[1] > coord1[1]:
+        return "moveRight"
+    elif coord2[1] < coord1[1]:
         return "moveLeft"
