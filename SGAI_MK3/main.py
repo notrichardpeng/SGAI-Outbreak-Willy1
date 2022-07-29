@@ -238,10 +238,10 @@ while running:
                     frame = 0
                 take_action = []
 
-        if GameBoard.num_humans() == 0:
-            PF.display_lose_screen(GameBoard.num_zombies())
-        if GameBoard.num_zombies() == 0:
-            PF.display_win_screen(GameBoard.num_humans())
+        if GameBoard.num_humans == 0:
+            PF.display_lose_screen(GameBoard.num_zombies)
+        if GameBoard.num_zombies == 0:
+            PF.display_win_screen(GameBoard.num_humans)
 
         # Computer turn
         if playerMoved:
@@ -280,7 +280,7 @@ while running:
                 print("\n\n\n")
                 break
             
-            pygame.time.wait(AI_PLAY_WAITTIME_MS)
+            #pygame.time.wait(AI_PLAY_WAITTIME_MS)
             GameBoard.zombie_random_move()
             GameBoard.update_effects()
             print("Zombie:")
