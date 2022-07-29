@@ -72,6 +72,7 @@ GameBoard = Board(hospital=hospital)
 ai_running = False
 
 # Self play variables
+clock = pygame.time.Clock()
 frame = 0
 
 # Buttons
