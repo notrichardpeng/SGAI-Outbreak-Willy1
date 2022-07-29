@@ -5,7 +5,9 @@ import pickle
 import threading
 import PygameFunctions as PF
 from Stats import Stats
-from mcts import mcts
+from mcts import mcts #pip install mcts
+#ctr-p
+#>select interpreter
 
 # Constants
 AI_PLAY_WAITTIME_MS = 300
