@@ -105,7 +105,7 @@ def monte_carlo():
     elif action.act == "heal":
         GameBoard.auto_heal(action.row, action.col)
     elif action.act == "bite":
-        print("?????? why zombie???")
+        raise "?????? why zombie???"
 
     print("Human (AI):")
     print(GameBoard)
@@ -115,8 +115,7 @@ def monte_carlo():
 
 while running:        
     PF.run(GameBoard, hospital, heal_button, kill_button)
-    if self_play:        
-        # Event a 
+    if self_play:                
         for event in pygame.event.get():
             if HealButton.collidepoint(pygame.mouse.get_pos()):
                 if event.type == pygame.MOUSEBUTTONUP:                          # If heal button is let go of, select heal and update heal button image to selected
@@ -180,18 +179,18 @@ while running:
                 result = None
                 directionToMove = PF.direction(take_action[0], take_action[1])
                 if directionToMove == "moveUp":
-                    result = GameBoard.moveUp(take_action[0])
+                    result = GameBoard.moveUp(take_action[0][0], take_action[0][1])
                 elif directionToMove == "moveDown":
-                    result = GameBoard.moveDown(take_action[0])                                 
+                    result = GameBoard.moveDown(take_action[0][0], take_action[0][1])              
                 elif directionToMove == "moveLeft":
-                    result = GameBoard.moveLeft(take_action[0])
+                    result = GameBoard.moveLeft(take_action[0][0], take_action[0][1])
                 elif directionToMove == "moveRight":
-                    result = GameBoard.moveRight(take_action[0])                
+                    result = GameBoard.moveRight(take_action[0][0], take_action[0][1])
                 if result != False:
                     playerMoved = True
                 take_action = []
             elif take_action[0] == "heal":
-                result = GameBoard.heal(take_action[1])
+                result = GameBoard.heal(take_action[1][0], take_action[1][1])
                 if result[0] != False:
                     playerMoved = True
                     heal_button = "button"
@@ -220,7 +219,7 @@ while running:
                 take_action = []
             elif take_action[0] == "kill":
                 kill_button = "button"
-                result = GameBoard.kill(take_action[1])
+                result = GameBoard.kill(take_action[1][0], take_action[1][1])
                 if result != False:
                     playerMoved = True
                     kill_button = "button"                                  # turns kill button back to normal                    
@@ -231,7 +230,7 @@ while running:
                         frame += 1
                     frame = 0
                 take_action = []
-            PF.run(GameBoard, hospital, heal_button, kill_button)
+
         pygame.display.update()        
             # Computer turn
         if playerMoved:      

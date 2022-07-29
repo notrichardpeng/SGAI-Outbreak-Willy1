@@ -253,7 +253,7 @@ class Board:
                 if (
                     self.states[r][c] is not None 
                     and not self.states[r][c].isZombie
-                    and not self.isAdjacentTo((r, c), True)
+                    and not self.isAdjacentTo(r, c, True)
                 ):                    
                     coords.append((r, c))            
         return coords
@@ -266,9 +266,9 @@ class Board:
                     self.states[r][c] is not None 
                     and self.states[r][c].isZombie 
                     and not self.states[r][c].isStunned 
-                    and not self.isAdjacentTo((r, c), False)
+                    and not self.isAdjacentTo(r, c, False)
                 ):
-                    coords.append((r, c))            
+                    coords.append((r, c))    
         return coords        
 
     def clean_board(self):
@@ -354,7 +354,7 @@ class Board:
                 if (
                     p is not None 
                     and not p.isZombie
-                    and self.isAdjacentTo((r, c), True)
+                    and self.isAdjacentTo(r, c, True)
                 ):
                     if not p.isVaccinated: possible_bite.append((r, c))
                     else: vaccine_bite.append((r, c))
@@ -363,7 +363,7 @@ class Board:
 
         if len(possible_bite) > 0:
             coord = rd.choice(possible_bite)
-            board.bite(coord)
+            board.bite(coord[0], coord[1])
             print("Zombie: Bite " + str(coord))
             list_return.append("bite")
         else:            
@@ -389,7 +389,7 @@ class Board:
                     for c in range(board.columns):                                
                         state = board.states[r][c]
                         if state is not None and state.isZombie and not state.isStunned:                            
-                            if not board.isAdjacentTo((r, c), False):
+                            if not board.isAdjacentTo(r, c, False):
                                 bored_zombies.append((r, c))
 
                 if len(bored_zombies) > 0:                    
@@ -400,13 +400,13 @@ class Board:
                         zombie = rd.choice(bored_zombies)
                         action = rd.choice(["move_up", "move_down", "move_left", "move_right"])
                         if action == "moveUp":
-                            has_moved = board.moveUp(zombie)
+                            has_moved = board.moveUp(zombie[0], zombie[1])
                         elif action == "moveDown":
-                            has_moved = board.moveDown(zombie)
+                            has_moved = board.moveDown(zombie[0], zombie[1])
                         elif action == "moveLeft":
-                            has_moved = board.moveLeft(zombie)
+                            has_moved = board.moveLeft(zombie[0], zombie[1])
                         elif action == "moveRight":
-                            has_moved = board.moveRight(zombie)
+                            has_moved = board.moveRight(zombie[0], zombie[1])
 
                         # If we tried so many times and there's still not a valid move, there probably just isn't any,
                         # perhaps because all the zombies are surrounded by vaccinated humans. In that case, we don't
@@ -416,18 +416,18 @@ class Board:
                     print("Zombie: Random Move")
 
             else: 
-                diff_x = selected_human[0] - selected_zombie[0]
-                diff_y = selected_human[1] - selected_zombie[1]
+                diff_y = selected_human[0] - selected_zombie[0]
+                diff_x = selected_human[1] - selected_zombie[1]
                 
                 print("Zombie: Move " + str(selected_zombie))
 
                 # Top Left corner is (0, 0)
                 if abs(diff_y) > abs(diff_x):
-                    if diff_y > 0: board.moveDown(selected_zombie)
-                    else: board.moveUp(selected_zombie)
+                    if diff_y > 0: board.moveDown(selected_zombie[0], selected_zombie[1])
+                    else: board.moveUp(selected_zombie[0], selected_zombie[1])
                 else:
-                    if diff_x > 0: board.moveRight(selected_zombie)
-                    else: board.moveLeft(selected_zombie)
+                    if diff_x > 0: board.moveRight(selected_zombie[0], selected_zombie[1])
+                    else: board.moveLeft(selected_zombie[0], selected_zombie[1])
         list_return = [board] + list_return    
         return list_return    
 
