@@ -27,7 +27,8 @@ playerMoved = False
 self_play = False
 hospital = False
 var = 0
-
+pygame.mixer.pre_init(44100, -16, 1, 512)
+pygame.mixer.init()
 #Start menu
 StartButton = pygame.Rect(455, 500, 300, 100)
 procstart = False
@@ -287,7 +288,7 @@ while running:
 
             pygame.display.update() 
 
-            if GameBoard.num_humans() == 0:
+            if GameBoard.num_humans == 0:
                 with open("mcts.pickle", "wb") as f:
                     pickle.dump(mcts, f)
                 print("Zombies Win")
