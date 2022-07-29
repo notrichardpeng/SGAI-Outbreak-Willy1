@@ -1,7 +1,9 @@
 import random as rd
 import numpy as np
-from Person import Person
 from copy import deepcopy
+
+from DataCollector import DataCollector
+from Person import Person
 
 MOVE_ACTIONS = ["move_up", "move_down", "move_left", "move_right"]
 MOVE_COORDS = [(1, 0), (-1, 0), (0, -1), (0, 1)]
@@ -95,7 +97,7 @@ class Board:
     def takeAction(self, action):
         new_board = deepcopy(self)
         if new_board.current_player == -1:
-            new_board.update_effects()
+            new_board.update_effects(simulation=True)
         new_board.current_player *= -1
         
         if action.act == "move_up":
@@ -201,11 +203,12 @@ class Board:
             chance = 75
         elif self.states[row][col].wasVaccinated and self.states[row][col].wasCured:
             chance = 50
-        r = rd.randint(0, 100)
+        r = rd.randint(0, 99)
         if r < chance:            
             self.states[row][col] = Person(True)
             self.num_humans -= 1
             self.num_zombies += 1
+            DataCollector.humans_infected += 1
         return True
 
     def heal(self, row, col):                
@@ -225,13 +228,17 @@ class Board:
                 self.states[row][col] = Person(False)                
                 self.states[row][col].wasCured = True
                 self.num_zombies -= 1
-                self.num_humans += 1
+                self.num_humans += 1                
+                DataCollector.zombies_cured += 1
+                if self.hasHospital and self.is_in_hospital(row, col):
+                    DataCollector.zombies_cured_in_hospital += 1
                 return (True, "full")                           
         else:
             # If the person is already vaccinated, don't make the player lose a turn
             if self.states[row][col].isVaccinated:
                 return (False, None)            
             self.states[row][col].isVaccinated = True
+            DataCollector.humans_vaccinated += 1
             return (True, "vaccine")
 
     def kill(self, row, col):        
@@ -244,6 +251,7 @@ class Board:
         
         self.states[row][col] = None
         self.num_zombies -= 1
+        DataCollector.zombies_killed += 1
         return True
 
     def get_possible_human_targets(self):
@@ -436,7 +444,7 @@ class Board:
         self.current_player *= -1
         return False    
 
-    def update_effects(self):        
+    def update_effects(self, simulation=False):        
         # Update effects of vaccination and stun
         for r in range(self.rows):
             for c in range(self.columns):
@@ -448,4 +456,7 @@ class Board:
                             self.states[r][c].turnsVaccinated = 0
                             self.states[r][c].isVaccinated = False
                             self.states[r][c].wasVaccinated = True        
+        
+        if not simulation:
+            DataCollector.turns_taken += 1
         

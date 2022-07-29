@@ -1,13 +1,14 @@
 import numpy as np
 import pygame
-from Board import Board
 import random as rd 
-import pickle
 import threading
-import PygameFunctions as PF
-from Stats import Stats
 from mcts import mcts #pip install mcts
+
+import PygameFunctions as PF
 import Tutorial as T
+from DataCollector import DataCollector
+from Board import Board
+from Stats import Stats
 #ctr-p
 #>select interpreter
 
@@ -121,8 +122,12 @@ def monte_carlo():
 
     GameBoard.current_player *= -1    
     ai_running = False
+
 score = 0
 move = 0
+
+DataCollector.reset_data()
+
 while running:        
     PF.run(GameBoard, hospital, heal_button, kill_button)
     if self_play:                
@@ -249,16 +254,19 @@ while running:
             move += 1
         if GameBoard.num_humans == 0:
             PF.display_lose_screen(GameBoard.num_zombies)
+            DataCollector.save_player_data()
             #print(score)
             if event.type == pygame.QUIT:
                 running = False
         if GameBoard.num_zombies == 0:
             times = 1000 - (move*50)
             bonus = GameBoard.num_humans*100
+            DataCollector.humans_remaining = GameBoard.num_humans
+            DataCollector.save_player_data()
             PF.display_win_screen(GameBoard.num_humans, score, times, bonus)
             #print(score)
             if event.type == pygame.QUIT:
-                running = False
+                running = False            
 
         # Computer turn
         if playerMoved:
