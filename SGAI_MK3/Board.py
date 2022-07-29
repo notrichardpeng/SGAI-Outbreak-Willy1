@@ -6,12 +6,24 @@ from copy import deepcopy
 MOVE_ACTIONS = ["move_up", "move_down", "move_left", "move_right"]
 MOVE_COORDS = [(1, 0), (-1, 0), (0, -1), (0, 1)]
 
+# CONSISTENT COORDINATE SYSTEM, (rows, columns) so "move_up" increases row
+# Dont think of this as (x, y), it's (rows, columns)
+
 class Action:
     def __init__(self, player, act, row, col):
         self.player = player
         self.act = act
         self.row = row
         self.col = col
+
+    def __eq__(self, other):
+        return self.player == other.player and self.act == other.act and self.row == other.row and self.col == other.col
+    
+    def __hash__(self):
+        return hash((self.player, self.act, self.row, self.col))
+
+    def __str__(self):
+        return self.act + " " + str((self.row, self.col))
 
 class Board:
     def __init__(self, hospital=True, board=None):
@@ -27,7 +39,6 @@ class Board:
             for c in range(self.columns):
                 self.states[r][c] = None            
         self.populate()        
-                        
 
     def isValidCoordinate(self, row, col):
         return (
@@ -39,7 +50,7 @@ class Board:
     def isAdjacentTo(self, row, col, is_zombie):
         for i in range(4):            
             if (
-                self.isValidCoordinate(row, col)
+                self.isValidCoordinate(row+MOVE_COORDS[i][0], col+MOVE_COORDS[i][1])
                 and self.states[row+MOVE_COORDS[i][0]][col+MOVE_COORDS[i][1]] is not None
                 and not self.states[row+MOVE_COORDS[i][0]][col+MOVE_COORDS[i][1]].isStunned
                 and self.states[row+MOVE_COORDS[i][0]][col+MOVE_COORDS[i][1]].isZombie == is_zombie
@@ -57,7 +68,7 @@ class Board:
         for i in range(4):
             for index, val in np.ndenumerate(self.states):
                 if val is not None and val.isZombie == is_zombie:                    
-                    if self.coord_is_valid(index[0]+MOVE_COORDS[i][0], index[1]+MOVE_COORDS[i][1]):
+                    if self.isValidCoordinate(index[0]+MOVE_COORDS[i][0], index[1]+MOVE_COORDS[i][1]):
                         ret.append(Action(self.current_player, MOVE_ACTIONS[i], index[0], index[1]))        
 
         if self.player_turn == 1:
@@ -96,11 +107,19 @@ class Board:
         elif action.act == "move_right":
             new_board.moveRight(action.row, action.col)
         elif action.act == "kill":
-            new_board.kill(action.row, action.col)
+            new_board.auto_kill(action.row, action.col)
         elif action.act == "heal":
-            new_board.heal(action.row, action.col)
+            new_board.auto_heal(action.row, action.col)
         elif action.act == "bite":
-            new_board.bite(action.row, action.col)
+            new_board.auto_bite(action.row, action.col)
+
+        return new_board
+
+    def isTerminal(self):
+        return self.num_humans == 0 or self.num_zombies == 0
+
+    def getReward(self):
+        return self.num_humans - self.num_zombies
 
     def __str__(self):
         ret = ""
@@ -134,60 +153,96 @@ class Board:
     def moveRight(self, row, col):        
         return self.move(row, col, row, col+1)
 
-    def bite(self, coords):                
-        if self.states[coords[0]][coords[1]] is None:
-            return False
+#############
 
+# Functions for AI that are quicker
+
+    def auto_bite(self, row, col):                         
         chance = 100
-        if self.states[coords[0]][coords[1]].isVaccinated:
+        if self.states[row][col].isVaccinated:
             chance = 0
-        elif self.states[coords[0]][coords[1]].wasVaccinated != self.states[coords[0]][coords[1]].wasCured:
+        elif self.states[row][col].wasVaccinated != self.states[row][col].wasCured:
             chance = 75
-        elif self.states[coords[0]][coords[1]].wasVaccinated and self.states[coords[0]][coords[1]].wasCured:
+        elif self.states[row][col].wasVaccinated and self.states[row][col].wasCured:
             chance = 50
         r = rd.randint(0, 100)
         if r < chance:            
-            self.states[coords[0]][coords[1]] = Person(True)
+            self.states[row][col] = Person(True)
+            self.num_humans -= 1
+            self.num_zombies += 1        
+
+    def auto_heal(self, row, col):                                
+        if self.states[row][col].isZombie:                                    
+            if self.states[row][col].halfCured == False and (self.states[row][col].isInHospital((row, col)) == False or self.hasHospital == False):
+                self.states[row][col].halfCured = True
+                self.states[row][col].isStunned = True                              
+            elif (self.states[row][col].halfCured == True or (self.states[row][col].isInHospital((row, col)) == True and self.hasHospital == True)):
+                self.states[row][col] = Person(False)                
+                self.states[row][col].wasCured = True
+                self.num_zombies -= 1
+                self.num_humans += 1                          
+        else:            
+            self.states[row][col].isVaccinated = True            
+
+    def auto_kill(self, row, col):                                
+        self.states[row][col] = None
+        self.num_zombies -= 1            
+
+#############
+
+    def bite(self, row, col):                
+        if self.states[row][col] is None:
+            return False
+
+        chance = 100
+        if self.states[row][col].isVaccinated:
+            chance = 0
+        elif self.states[row][col].wasVaccinated != self.states[row][col].wasCured:
+            chance = 75
+        elif self.states[row][col].wasVaccinated and self.states[row][col].wasCured:
+            chance = 50
+        r = rd.randint(0, 100)
+        if r < chance:            
+            self.states[row][col] = Person(True)
             self.num_humans -= 1
             self.num_zombies += 1
         return True
 
-    def heal(self, coords):                
-        if self.states[coords[0]][coords[1]] is None:            
+    def heal(self, row, col):                
+        if self.states[row][col] is None:            
             return (False, None)
         
-        if self.states[coords[0]][coords[1]].isZombie:
+        if self.states[row][col].isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
             if not self.isAdjacentTo(coords, False):                                
                 return (False, None)
             # Was the zombie already half-cured?
-            if self.states[coords[0]][coords[1]].halfCured == False and (self.states[coords[0]][coords[1]].isInHospital(coords) == False or self.hasHospital == False):
-                self.states[coords[0]][coords[1]].halfCured = True
-                self.states[coords[0]][coords[1]].isStunned = True
+            if self.states[row][col].halfCured == False and (self.states[row][col].isInHospital(coords) == False or self.hasHospital == False):
+                self.states[row][col].halfCured = True
+                self.states[row][col].isStunned = True
                 return (True, "half" )               
-            elif (self.states[coords[0]][coords[1]].halfCured == True or (self.states[coords[0]][coords[1]].isInHospital(coords) == True and self.hasHospital == True)):
-                self.states[coords[0]][coords[1]] = Person(False)                
-                self.states[coords[0]][coords[1]].wasCured = True
+            elif (self.states[row][col].halfCured == True or (self.states[row][col].isInHospital(coords) == True and self.hasHospital == True)):
+                self.states[row][col] = Person(False)                
+                self.states[row][col].wasCured = True
                 self.num_zombies -= 1
                 self.num_humans += 1
                 return (True, "full")                           
         else:
             # If the person is already vaccinated, don't make the player lose a turn
-            if self.states[coords[0]][coords[1]].isVaccinated:
+            if self.states[row][col].isVaccinated:
                 return (False, None)            
-            self.states[coords[0]][coords[1]].isVaccinated = True
+            self.states[row][col].isVaccinated = True
             return (True, "vaccine")
 
-
-    def kill(self, coords):        
+    def kill(self, row, col):        
         # Ensures we cannot kill empty spaces or humans, only zombies        
-        if self.states[coords[0]][coords[1]] is None or not self.states[coords[0]][coords[1]].isZombie:            
+        if self.states[row][col] is None or not self.states[row][col].isZombie:            
             return False
         # If not adjacent to a human, then we cannot kill the zombie
-        if not self.isAdjacentTo(coords, False):            
+        if not self.isAdjacentTo(row, col, False):            
             return False
         
-        self.states[coords[0]][coords[1]] = None
+        self.states[row][col] = None
         self.num_zombies -= 1
         return True
 
@@ -325,51 +380,7 @@ class Board:
                     if diff_x > 0: board.moveRight(selected_zombie)
                     else: board.moveLeft(selected_zombie)
         list_return = [board] + list_return    
-        return list_return
-
-    # Dumb Zombie AI
-    def zombie_random_move(self):
-        possible_move_coords = []
-        all_zombies = []
-        vulnerable_humans = []
-        
-        for r in range(self.rows):
-            for c in range(self.columns):
-                if self.states[r][c] is not None and self.states[r][c].isZombie:
-                    all_zombies.append((r, c))
-        
-        for r in range(self.rows):
-            for c in range(self.columns):
-                p = self.states[r][c]
-                if p is not None and not p.isZombie and not p.isVaccinated and self.isAdjacentTo((r, c), True):
-                    vulnerable_humans.append((r, c))            
-
-        action = "bite"
-        cnt = 30
-        has_moved = False
-
-        board = Board(board=self)
-        while not has_moved and cnt > 0:
-            r = rd.randint(0, 5)
-            if r < 4: 
-                action = ["move_up", "move_down", "move_left", "move_right"][r]
-            else: 
-                action = "bite"
-            
-            coord = rd.choice(all_zombies)
-            bite_coord = rd.choice(vulnerable_humans) if len(vulnerable_humans) > 0 else (-1, -1)
-            if action == "bite" and bite_coord != (-1, -1):
-                has_moved = self.bite(bite_coord)                
-            elif action == "moveUp":
-                has_moved = self.moveUp(coord)                
-            elif action == "moveDown":
-                has_moved = self.moveDown(coord)                
-            elif action == "moveLeft":
-                has_moved = self.moveLeft(coord)                
-            elif action == "moveRight":
-                has_moved = self.moveRight(coord)                
-
-            cnt -= 1
+        return list_return    
 
     def update_effects(self):        
         # Update effects of vaccination and stun

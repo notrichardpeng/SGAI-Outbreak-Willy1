@@ -21,7 +21,6 @@ hospital = False
 
 
 # Option menu
-"""
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
 HospitalOnButton = pygame.Rect(700, 250, 100, 100)
 ProceedButton = pygame.Rect(1050, 650, 100, 100)
@@ -54,7 +53,7 @@ while proceed == False:
                 hover = "self" 
         elif event.type == pygame.QUIT:
             pygame.quit()
-"""
+
 #Create the game board
 GameBoard = Board(hospital=hospital)
 ai_running = False
@@ -63,9 +62,6 @@ ai_ran = False
 # Self play variables
 frame = 0
 
-searcher = mcts(timeLimit=2000)
-
-"""
 # Buttons
 kill_img = pygame.image.load("Assets/kill_button.png").convert_alpha()
 KillButton = kill_img.get_rect(topleft=(800, 50))
@@ -75,14 +71,19 @@ HealButton = heal_img.get_rect(topleft=(800, 200))
 
 kill_button = "button"
 heal_button = "button"
-"""
+
+# Monte Carlo!
+searcher = mcts(timeLimit=3000)
+
 def monte_carlo():
-    global GameBoard, ai_running
-    GameBoard = mcts.search(GameBoard).board
+    global GameBoard, ai_running    
+    action = searcher.search(GameBoard)
+    print(action)
     ai_running = False    
- 
+
+
 while running:        
-    #PF.run(GameBoard, hospital, heal_button, kill_button)
+    PF.run(GameBoard, hospital, heal_button, kill_button)
     if self_play:        
         # Event a 
         for event in pygame.event.get():
@@ -218,14 +219,14 @@ while running:
             GameBoard = temp[0]
             GameBoard.update_effects()
     # AI Algorithm        
-    else:        
-        """
+    else:                
+        
         pygame.display.update() 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 break                
-        """
+        
         if not ai_running and not ai_ran:
             threading.Thread(target=monte_carlo).start()
             ai_running = True
@@ -263,5 +264,3 @@ while running:
                 print("\n\n\n")
                 break                                                                 
         
-
-
