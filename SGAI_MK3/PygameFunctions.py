@@ -115,9 +115,8 @@ def display_people(GameBoard):
                 elif p.isZombie and p.halfCured:
                     char = "Assets/" + image_assets[3]
                 coords = (
-                    c * DISPLAY_CELL_DIMENSIONS[1] + DISPLAY_BORDER + 10,
                     r * DISPLAY_CELL_DIMENSIONS[0] + DISPLAY_BORDER + 10,
-                    # Columns first because pygame coordinate system is different
+                    c * DISPLAY_CELL_DIMENSIONS[1] + DISPLAY_BORDER + 10,
                 )
                 display_image(screen, char, (80, 80), coords)
 
