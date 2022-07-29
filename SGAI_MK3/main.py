@@ -20,7 +20,7 @@ var = 0
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
 #Start menu
-StartButton = pygame.Rect(455, 500, 300, 100)
+StartButton = pygame.Rect(455, 600, 300, 100)
 procstart = False
 starthover = ""
 while procstart == False:
