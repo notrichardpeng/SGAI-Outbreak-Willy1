@@ -173,10 +173,10 @@ class Board:
 
     def auto_heal(self, row, col):                                
         if self.states[row][col].isZombie:                                    
-            if self.states[row][col].halfCured == False and (self.states[row][col].isInHospital((row, col)) == False or self.hasHospital == False):
+            if self.states[row][col].halfCured == False and (not self.hasHospital or not self.is_in_hospital(row, col)):
                 self.states[row][col].halfCured = True
                 self.states[row][col].isStunned = True                              
-            elif (self.states[row][col].halfCured == True or (self.states[row][col].isInHospital((row, col)) == True and self.hasHospital == True)):
+            elif (self.states[row][col].halfCured == True or (self.hasHospital and self.is_in_hospital(row, col))):
                 self.states[row][col] = Person(False)                
                 self.states[row][col].wasCured = True
                 self.num_zombies -= 1
