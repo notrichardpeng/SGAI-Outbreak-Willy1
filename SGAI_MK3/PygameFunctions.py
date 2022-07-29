@@ -155,10 +155,20 @@ def display_start_screen(starthover):
     screen.blit(
          text_image, (375, 100),
     )
+    image = pygame.image.load("Assets/person_normal_big.png")
+    screen.blit(image, (900,350))
+    image = pygame.image.load("Assets/person_zombie_big.png")
+    screen.blit(image, (700,350))
+    image = pygame.image.load("Assets/heal_press.png")
+    screen.blit(image, (500, 350))
+    image = pygame.image.load("Assets/person_normal_big.png")
+    screen.blit(image, (100,350))
+    image = pygame.image.load("Assets/person_zombie_big.png")
+    screen.blit(image, (300,350))
     if starthover == "start":
-        display_image(screen, "Assets/start_img_2.png", (300, 100), (455, 500))
+        display_image(screen, "Assets/start_img_2.png", (300, 100), (455, 600))
     else:
-        display_image(screen, "Assets/start_img.png", (300, 100), (455, 500))
+        display_image(screen, "Assets/start_img.png", (300, 100), (455, 600))
     pygame.display.update()
 
 def display_options_screen(self_play, hospital, hover):

@@ -6,7 +6,9 @@ import pickle
 import threading
 import PygameFunctions as PF
 from Stats import Stats
-from mcts import mcts
+from mcts import mcts #pip install mcts
+#ctr-p
+#>select interpreter
 
 # Constants
 AI_PLAY_WAITTIME_MS = 300
@@ -21,7 +23,7 @@ var = 0
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
 #Start menu
-StartButton = pygame.Rect(455, 500, 300, 100)
+StartButton = pygame.Rect(455, 600, 300, 100)
 procstart = False
 starthover = ""
 while procstart == False:
