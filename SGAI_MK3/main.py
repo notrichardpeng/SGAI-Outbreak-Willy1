@@ -254,7 +254,7 @@ while running:
             ai_ran = False
             print("Human (AI):")
             print(GameBoard)
-            if GameBoard.num_zombies() == 0:
+            if GameBoard.num_zombies == 0:
                 with open("mcts.pickle", "wb") as f:
                     pickle.dump(mcts, f)
                 print("Humans Win")
