@@ -95,7 +95,7 @@ kill_button = "button"
 heal_button = "button"
 
 # Monte Carlo!
-searcher = mcts(iterationLimit=300)
+searcher = mcts(timeLimit=3000)
 
 def monte_carlo():
     global GameBoard, ai_running    
