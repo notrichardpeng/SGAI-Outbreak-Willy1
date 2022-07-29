@@ -26,6 +26,8 @@ person_dimensions = (20, 60)
 pygame.display.set_caption("Outbreak!")
 screen.fill(BACKGROUND)
 
+board = None  
+
 def get_action(GameBoard, pixel_x, pixel_y):
     """
     Get the action that the click represents.
@@ -48,11 +50,12 @@ def run(GameBoard, hasHospital, heal_button, kill_button):
     """
     Draw the screen and return any events.
     """
+
+    if GameBoard is None: return
     screen.fill(BACKGROUND)
     build_grid(GameBoard, hasHospital) # Draw the grid
     display_buttons(heal_button, kill_button)
-    display_people(GameBoard)
-    return pygame.event.get()
+    display_people(GameBoard)            
 
 def display_buttons(heal_button, kill_button):
     display_image(screen, "Assets/kill_" + kill_button + ".png", (), (800, 50))         # draws specified kill button asset
@@ -112,8 +115,9 @@ def display_people(GameBoard):
                 elif p.isZombie and p.halfCured:
                     char = "Assets/" + image_assets[3]
                 coords = (
-                    r * DISPLAY_CELL_DIMENSIONS[0] + DISPLAY_BORDER + 10,
                     c * DISPLAY_CELL_DIMENSIONS[1] + DISPLAY_BORDER + 10,
+                    r * DISPLAY_CELL_DIMENSIONS[0] + DISPLAY_BORDER + 10,
+                    # Columns first because pygame coordinate system is different
                 )
                 display_image(screen, char, (80, 80), coords)
 

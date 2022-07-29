@@ -12,10 +12,12 @@ import queue, threading
 from queue import Queue
 
 # Constants
-AI_PLAY_WAITTIME_MS = 300
+AI_PLAY_WAITTIME_MS = 5000
 def montecarloFunc(gb, queue):
     best_move_next_board = mcts.search(gb)
     queue.put(best_move_next_board)
+
+global GameBoard, ai_running
 
 # Initialize variables
 running = True
@@ -24,6 +26,7 @@ playerMoved = False
 self_play = False
 hospital = False
 var = 0
+
 
 # Option menu
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
@@ -53,8 +56,11 @@ while proceed == False:
                 hover = "self" 
         elif event.type == pygame.QUIT:
             pygame.quit()
+
 #Create the game board
 GameBoard = Board(hospital=hospital)
+ai_running = False
+ai_ran = False
 
 # Self play variables
 clock = pygame.time.Clock()
@@ -77,11 +83,23 @@ HealButton = heal_img.get_rect(topleft=(800, 200))
 
 kill_button = "button"
 heal_button = "button"
-while running:
-    P = PF.run(GameBoard, hospital, heal_button, kill_button)
+
+
+#if not self_play:
+    #PF.run(GameBoard, hospital, heal_button, kill_button)
+    #PF.board = GameBoard
+    #threading.Thread(target=PF.AI_play_loop, args=(hospital, heal_button, kill_button)).start()    
+
+def monte_carlo():
+    global GameBoard, ai_running
+    GameBoard = mcts.search(GameBoard).board
+    ai_running = False    
+ 
+while running:        
+    PF.run(GameBoard, hospital, heal_button, kill_button)
     if self_play:        
         # Event a 
-        for event in P:
+        for event in pygame.event.get():
             if HealButton.collidepoint(pygame.mouse.get_pos()):
                 if event.type == pygame.MOUSEBUTTONUP:                          # If heal button is let go of, select heal and update heal button image to selected
                     take_action.append("heal")
@@ -207,55 +225,47 @@ while running:
         pygame.display.update()
 
     # AI Algorithm        
-    else:                
-        if var == 0:
-            queue = queue.Queue()
-        else:
-            with queue.mutex:
-                queue.queue.clear()
-        var+=1
-        new_thread = threading.Thread(target=montecarloFunc, args=(GameBoard, queue))
-        new_thread.start()
-        new_thread.join()
-        GameBoard = queue.get().board     
-        
-        pygame.display.update()
-        print("Human (AI):")
-        print(GameBoard)
-
-        if GameBoard.num_zombies() == 0:
-            with open("mcts.pickle", "wb") as f:
-                pickle.dump(mcts, f)
-            print("Humans Win")
-            GameBoard.clean_board()
-            GameBoard.populate()            
-            print("\n\n\n")
-            break
-
-        pygame.time.wait(AI_PLAY_WAITTIME_MS)
-
-        # Zombies turn        
-        GameBoard = GameBoard.zombie_move()
-        GameBoard.update_effects()
+    else:        
         pygame.display.update() 
-        
-        print("Zombie:")
-        print(GameBoard)
-
-        if GameBoard.num_humans() == 0:
-            with open("mcts.pickle", "wb") as f:
-                pickle.dump(mcts, f)
-            print("Zombies Win")            
-            GameBoard.clean_board()
-            GameBoard.populate()              
-            print("\n\n\n")                    
-
-        
-        for event in P:
+        for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                break                         
-        pygame.display.update()                
+                break                
+
+        if not ai_running and not ai_ran:
+            threading.Thread(target=monte_carlo).start()
+            ai_running = True
+            ai_ran = True
+
+        elif not ai_running and ai_ran:            
+            ai_ran = False
+            print("Human (AI):")
+            print(GameBoard)
+            if GameBoard.num_zombies() == 0:
+                with open("mcts.pickle", "wb") as f:
+                    pickle.dump(mcts, f)
+                print("Humans Win")
+                GameBoard.clean_board()
+                GameBoard.populate()            
+                print("\n\n\n")
+                break
+            
+            pygame.time.wait(AI_PLAY_WAITTIME_MS)
+            GameBoard = GameBoard.zombie_move()
+            GameBoard.update_effects()
+            print("Zombie:")
+            print(GameBoard)
+
+            pygame.display.update() 
+
+            if GameBoard.num_humans() == 0:
+                with open("mcts.pickle", "wb") as f:
+                    pickle.dump(mcts, f)
+                print("Zombies Win")            
+                GameBoard.clean_board()
+                GameBoard.populate()              
+                print("\n\n\n")
+                break                                                                 
         
 
 
