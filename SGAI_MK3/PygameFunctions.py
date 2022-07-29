@@ -6,6 +6,8 @@ WHITE = (255, 255, 255)
 CELL_COLOR = (176, 176, 176)
 HOSPITAL_COLOR = (191, 209, 255)
 LINE_WIDTH = 5
+DISPLAY_BORDER = 150
+DISPLAY_CELL_DIMENSIONS = (100,100)
 
 image_assets = [
     "person_normal.png",
@@ -34,9 +36,9 @@ def get_action(GameBoard, pixel_x, pixel_y):
     # Check if the user clicked on the "heal" icon, return "heal" if so
 
     # Get the grid (x,y) where the user clicked
-    if pixel_x > GameBoard.display_border and pixel_y > GameBoard.display_border:   # Clicking to the top or left of the border will result in a grid value of 0, which is valid
-        board_x = int((pixel_x - GameBoard.display_border) / GameBoard.display_cell_dimensions[0])
-        board_y = int((pixel_y - GameBoard.display_border) / GameBoard.display_cell_dimensions[1])
+    if pixel_x > DISPLAY_BORDER and pixel_y > DISPLAY_BORDER:   # Clicking to the top or left of the border will result in a grid value of 0, which is valid
+        board_x = int((pixel_x - DISPLAY_BORDER) / DISPLAY_CELL_DIMENSIONS[0])
+        board_y = int((pixel_y - DISPLAY_BORDER) / DISPLAY_CELL_DIMENSIONS[1])
         # Return the grid position if it is a valid position on the board
         if (board_x >= 0 and board_x < GameBoard.columns and board_y >= 0 and board_y < GameBoard.rows):
             return (board_x, board_y)
@@ -50,6 +52,7 @@ def run(GameBoard, hasHospital, heal_button, kill_button):
     build_grid(GameBoard, hasHospital) # Draw the grid
     display_buttons(heal_button, kill_button)
     display_people(GameBoard)
+
     return pygame.event.get()
 
 def display_buttons(heal_button, kill_button):
@@ -72,27 +75,27 @@ def build_grid(GameBoard, hasHospital):
     """
     Draw the grid on the screen.
     """
-    grid_width = GameBoard.columns * GameBoard.display_cell_dimensions[0]
-    grid_height = GameBoard.rows * GameBoard.display_cell_dimensions[1]
-    pygame.draw.rect(screen, BLACK, [GameBoard.display_border - LINE_WIDTH, GameBoard.display_border - LINE_WIDTH, LINE_WIDTH, grid_height + (2 * LINE_WIDTH)])  # left
-    pygame.draw.rect(screen, BLACK, [GameBoard.display_border + grid_width, GameBoard.display_border - LINE_WIDTH, LINE_WIDTH, grid_height + (2 * LINE_WIDTH)])  # right
-    pygame.draw.rect(screen, BLACK, [GameBoard.display_border - LINE_WIDTH, GameBoard.display_border + grid_height, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])  # bottom
-    pygame.draw.rect(screen, BLACK, [GameBoard.display_border - LINE_WIDTH, GameBoard.display_border - LINE_WIDTH, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])   # top
-    pygame.draw.rect(screen, CELL_COLOR, [GameBoard.display_border, GameBoard.display_border, grid_width, grid_height]) # Fill the inside wioth the cell color
+    grid_width = GameBoard.columns * DISPLAY_CELL_DIMENSIONS[0]
+    grid_height = GameBoard.rows * DISPLAY_CELL_DIMENSIONS[1]
+    pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER - LINE_WIDTH, DISPLAY_BORDER - LINE_WIDTH, LINE_WIDTH, grid_height + (2 * LINE_WIDTH)])  # left
+    pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER + grid_width, DISPLAY_BORDER - LINE_WIDTH, LINE_WIDTH, grid_height + (2 * LINE_WIDTH)])  # right
+    pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER - LINE_WIDTH, DISPLAY_BORDER + grid_height, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])  # bottom
+    pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER - LINE_WIDTH, DISPLAY_BORDER - LINE_WIDTH, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])   # top
+    pygame.draw.rect(screen, CELL_COLOR, [DISPLAY_BORDER, DISPLAY_BORDER, grid_width, grid_height]) # Fill the inside wioth the cell color
     
     if hasHospital == True:
         pygame.draw.rect(screen, HOSPITAL_COLOR, [150, 150, 300, 300])
 
     # Draw the vertical lines
-    i = GameBoard.display_border + GameBoard.display_cell_dimensions[0]
-    while i < GameBoard.display_border + grid_width:
-        pygame.draw.rect(screen, BLACK, [i, GameBoard.display_border, LINE_WIDTH, grid_height])
-        i += GameBoard.display_cell_dimensions[0]
+    i = DISPLAY_BORDER + DISPLAY_CELL_DIMENSIONS[0]
+    while i < DISPLAY_BORDER + grid_width:
+        pygame.draw.rect(screen, BLACK, [i, DISPLAY_BORDER, LINE_WIDTH, grid_height])
+        i += DISPLAY_CELL_DIMENSIONS[0]
     # Draw the horizontal lines
-    i = GameBoard.display_border + GameBoard.display_cell_dimensions[1]
-    while i < GameBoard.display_border + grid_height:
-        pygame.draw.rect(screen, BLACK, [GameBoard.display_border, i, grid_width, LINE_WIDTH])
-        i += GameBoard.display_cell_dimensions[1]
+    i = DISPLAY_BORDER + DISPLAY_CELL_DIMENSIONS[1]
+    while i < DISPLAY_BORDER + grid_height:
+        pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER, i, grid_width, LINE_WIDTH])
+        i += DISPLAY_CELL_DIMENSIONS[1]
 
 def display_people(GameBoard):
     """
@@ -110,8 +113,8 @@ def display_people(GameBoard):
                 elif p.isZombie and p.halfCured:
                     char = "Assets/" + image_assets[3]
                 coords = (
-                    r * GameBoard.display_cell_dimensions[0] + GameBoard.display_border + 10,
-                    c * GameBoard.display_cell_dimensions[1] + GameBoard.display_border + 10,
+                    r * DISPLAY_CELL_DIMENSIONS[0] + DISPLAY_BORDER + 10,
+                    c * DISPLAY_CELL_DIMENSIONS[1] + DISPLAY_BORDER + 10,
                 )
                 display_image(screen, char, (80, 80), coords)
 
@@ -220,6 +223,14 @@ def vaccine_animation(frame):
     display_image(screen, "Assets/heal2_background.png", (), (0, 200))
     display_image(screen, "Assets/vaccine/sprite_" + str(frame) + ".png", (200, 200), (428, 350))    
     display_image(screen, "Assets/heal2_human/sprite_0" + str(frame) + ".png", (200, 200), (572, 350))
+
+def zombie_bite(frame):
+    image = str(frame)
+    if frame < 10:
+        image = "0" + str(frame)
+    # Draws background first and then draws the specified frame. The animations have the same number of frames and are already made to be synched up
+    display_image(screen, "Assets/zombie_bite_background.png", (), (0,0))
+    display_image(screen, "Assets/zombie_bite/sprite_" + image + ".png", (250, 200), (500, 350))
 
 def direction(coord1, coord2):
     if coord2[1] > coord1[1]:

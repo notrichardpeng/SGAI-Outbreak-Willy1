@@ -13,7 +13,7 @@ from queue import Queue
 from Stats import Stats
 
 # Constants
-AI_PLAY_WAITTIME_MS = 5000
+AI_PLAY_WAITTIME_MS = 300
 def montecarloFunc(gb, queue):
     best_move_next_board = mcts.search(gb)
     queue.put(best_move_next_board)
@@ -85,7 +85,8 @@ kill_button = "button"
 heal_button = "button"
 while running:
     P = PF.run(GameBoard, hospital, heal_button, kill_button)
-    if self_play:        
+    pygame.display.update()
+    if self_play:    
         # Event a 
         for event in P:
             if HealButton.collidepoint(pygame.mouse.get_pos()):
@@ -112,13 +113,11 @@ while running:
                 if len(take_action) < 2:                                        # Checks if list is less than 2
                     x, y = pygame.mouse.get_pos()                               
                     action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile
-                    if action != None:
-                        print(action)
+                    if action != None:                        
                         if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
                             if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
                                 take_action.append(action)
-                        else:                                                   # Otherwise, add selected tile as destination
-                            print(action)
+                        else:                                                   # Otherwise, add selected tile as destination                            
                             take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
@@ -158,8 +157,7 @@ while running:
                 elif directionToMove == "moveLeft":
                     result = GameBoard.moveLeft(take_action[0])
                 elif directionToMove == "moveRight":
-                    result = GameBoard.moveRight(take_action[0])
-                print(result)
+                    result = GameBoard.moveRight(take_action[0])                
                 if result != False:
                     playerMoved = True
                 take_action = []
@@ -172,24 +170,21 @@ while running:
                         # Half heal animation
                         while frame < 12:
                             PF.half_heal_animation(frame)
-                            pygame.display.update()
-                            # clock.tick(12) sets frames per second to 12
+                            pygame.display.update()                            
                             clock.tick(12)
                             frame += 1
                         frame = 0
                     elif result[1] == "full":
                         while frame < 16:
                             PF.full_heal_animation(frame)
-                            pygame.display.update()
-                            # clock.tick(12) sets frames per second to 12
+                            pygame.display.update()                            
                             clock.tick(8)
                             frame += 1
                         frame = 0
                     elif result[1] == "vaccine": 
                         while frame < 6:
                             PF.vaccine_animation(frame)
-                            pygame.display.update()
-                            # clock.tick(12) sets frames per second to 12
+                            pygame.display.update()                            
                             clock.tick(8)
                             frame += 1
                         frame = 0
@@ -199,30 +194,34 @@ while running:
                 result = GameBoard.kill(take_action[1])
                 if result != False:
                     playerMoved = True
-                    kill_button = "button"                                  # turns kill button back to normal
-                    # Plays kill animation
+                    kill_button = "button"                                  # turns kill button back to normal                    
                     while frame < 9:
                         PF.kill_animation(frame)
-                        pygame.display.update()
-                        # clock.tick(8) sets frames per second to 8
+                        pygame.display.update()                        
                         clock.tick(8)
                         frame += 1
                     frame = 0
                 take_action = []
-
-        # Computer turn
-        if playerMoved:
-            pygame.display.update()
+            PF.run(GameBoard, hospital, heal_button, kill_button)
+        pygame.display.update()        
+            # Computer turn
+        if playerMoved:      
+            pygame.display.update()      
             playerMoved = False
             take_action = []
                         
-            GameBoard.zombie_random_move()            
-            GameBoard.update()
-        pygame.display.update()
-
+            temp = GameBoard.zombie_move()
+            if len(temp) > 1:
+                while frame < 11:
+                    PF.zombie_bite(frame)
+                    pygame.display.update()                            
+                    clock.tick(8)
+                    frame += 1
+                frame = 0
+            GameBoard = temp[0]
+            GameBoard.update_effects()
     # AI Algorithm        
-    else:        
-        #pygame.time.wait(AI_PLAY_WAITTIME_MS)
+    else:                
         if var == 0:
             queue = queue.Queue()
         else:
@@ -233,10 +232,9 @@ while running:
         new_thread.start()
         new_thread.join()
         GameBoard = queue.get().board     
-        #print(GameBoard)
-        GameBoard.update()
-        pygame.display.update() 
-        print(" Human (AI): ")
+        
+        pygame.display.update()
+        print("Human (AI):")
         print(GameBoard)
 
         if GameBoard.num_zombies() == 0:
@@ -248,12 +246,14 @@ while running:
             print("\n\n\n")
             break
 
+        pygame.time.wait(AI_PLAY_WAITTIME_MS)
+
         # Zombies turn        
-        GameBoard = GameBoard.zombie_move()
-        GameBoard.update()
+        GameBoard = GameBoard.zombie_move()[0]
+        GameBoard.update_effects()
         pygame.display.update() 
         
-        print(" Zombie: ")
+        print("Zombie:")
         print(GameBoard)
 
         if GameBoard.num_humans() == 0:
@@ -264,15 +264,12 @@ while running:
             GameBoard.populate()              
             print("\n\n\n")                    
 
-        """
+        
         for event in P:
             if event.type == pygame.QUIT:
                 running = False
-                break 
-        
-        # Update the display
-        """
-        #pygame.display.update()                
+                break                         
+        pygame.display.update()                
         
 
 
