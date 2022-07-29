@@ -33,8 +33,8 @@ class Board:
         self.hasHospital = hospital
         self.player_turn = 1  # 1 is government, -1 is zombie
         self.states = np.ndarray((self.rows, self.columns), dtype=Person)
-        self.num_humans = 0
-        self.num_zombies = 4
+        self.num_humans = rd.randint(7, 11)
+        self.num_zombies = rd.randint(5, 6)
         for r in range(self.rows):
             for c in range(self.columns):
                 self.states[r][c] = None            
@@ -277,8 +277,7 @@ class Board:
     def clean_board(self):
         self.states = [[None for _ in range(self.columns)] for _ in range(self.rows)]
 
-    def populate(self):
-        self.num_humans = rd.randint(7, 11)
+    def populate(self):        
         for _ in range(self.num_humans):
             r = rd.randint(0, self.rows-1)
             c = rd.randint(0, self.columns-1)

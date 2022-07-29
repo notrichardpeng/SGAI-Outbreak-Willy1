@@ -237,7 +237,7 @@ while running:
                 result = GameBoard.kill(take_action[1][0], take_action[1][1])
                 if result != False:
                     playerMoved = True
-                    kill_button = "button"                                  # turns kill button back to normal                    
+                    kill_button = "button"                                  # turns kill button back to normal
                     while frame < 9:
                         PF.kill_animation(frame)
                         pygame.display.update()                        
