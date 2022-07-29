@@ -163,6 +163,9 @@ def display_options_screen(self_play, hospital, hover):
     screen.blit(
         pygame.font.SysFont("Calibri", 24).render("Proceed to game...", True, WHITE), (975, 600),
     )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 24).render("Show Stats", True, WHITE), (500, 450),
+    )
 
     if hover == "proceed":
         display_image(screen, "Assets/checked_box.png", (100, 100), (1050, 650))
@@ -182,6 +185,10 @@ def display_options_screen(self_play, hospital, hover):
             display_image(screen, "Assets/checked_box.png", (100, 100), (350, 250))
         else:
             display_image(screen, "Assets/unchecked_box.png", (100, 100), (350, 250))
+    
+    # Show Stats button
+    display_image(screen, "Assets/DefaultButton.png", (100, 100), (500, 500))
+    
     pygame.display.update()
 
 def select(coord):

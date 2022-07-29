@@ -10,6 +10,7 @@ from threading import Thread
 from time import sleep, perf_counter
 import queue, threading
 from queue import Queue
+from Stats import Stats
 
 # Constants
 AI_PLAY_WAITTIME_MS = 5000
@@ -32,6 +33,7 @@ var = 0
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
 HospitalOnButton = pygame.Rect(700, 250, 100, 100)
 ProceedButton = pygame.Rect(1050, 650, 100, 100)
+StatsButton = pygame.Rect(500, 500, 100, 100)
 
 
 proceed = False
@@ -47,6 +49,10 @@ while proceed == False:
                 hospital = not hospital
             elif ProceedButton.collidepoint(pygame.mouse.get_pos()):
                 proceed = True
+            #Stats Button
+            elif StatsButton.collidepoint(pygame.mouse.get_pos()):
+                st = Stats()
+                st.rewardsChart()
         elif event.type == pygame.MOUSEMOTION:
             if ProceedButton.collidepoint(pygame.mouse.get_pos()):
                 hover = "proceed"
