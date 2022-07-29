@@ -9,11 +9,21 @@ class Stats:
         self.total_runs = 0
 
     def rewardsChart(self):
-        with open("mcts.pickle", "r") as f:
-            pickle.dump(self.mcts, f)
+        try:
+            with open("mcts.pickle", "rb") as f:
+                self.mcts = pickle.load(f)
+        except:
+            pass
 
-        x = np.array(["A", "B", "C", "D"])
-        y = np.array([3, 8, 1, 10])
+        x = []
+        y = []
+        for k in self.mcts.tree.keys():
+            node = self.mcts.tree[k]
+            x.append(node.score)
+            y.append(node.visits)
 
         plt.bar(x,y)
+        plt.title("Visits and Scores for MCTS")
+        plt.xlabel("scores")
+        plt.ylabel("visits")
         plt.show()
