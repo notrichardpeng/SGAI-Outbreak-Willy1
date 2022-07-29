@@ -1,22 +1,14 @@
-from numpy import isin
 import pygame
 from Board import Board
-#import PygameFunctions as PF
 import random as rd 
 import pickle
+import threading
 import PygameFunctions as PF
-from MCTS import *
-from threading import Thread
-from time import sleep, perf_counter
-import queue, threading
-from queue import Queue
 from Stats import Stats
+from mcts import mcts
 
 # Constants
 AI_PLAY_WAITTIME_MS = 5000
-def montecarloFunc(gb, queue):
-    best_move_next_board = mcts.search(gb)
-    queue.put(best_move_next_board)
 
 global GameBoard, ai_running
 
@@ -26,10 +18,10 @@ take_action = []
 playerMoved = False
 self_play = False
 hospital = False
-var = 0
 
 
 # Option menu
+"""
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
 HospitalOnButton = pygame.Rect(700, 250, 100, 100)
 ProceedButton = pygame.Rect(1050, 650, 100, 100)
@@ -62,24 +54,18 @@ while proceed == False:
                 hover = "self" 
         elif event.type == pygame.QUIT:
             pygame.quit()
-
+"""
 #Create the game board
 GameBoard = Board(hospital=hospital)
 ai_running = False
 ai_ran = False
 
 # Self play variables
-clock = pygame.time.Clock()
 frame = 0
 
-mcts = MCTS()
+searcher = mcts(timeLimit=2000)
 
-try:
-    with open("mcts.pickle", "rb") as f:
-        mcts = pickle.load(f)
-except:
-    pass
-
+"""
 # Buttons
 kill_img = pygame.image.load("Assets/kill_button.png").convert_alpha()
 KillButton = kill_img.get_rect(topleft=(800, 50))
@@ -89,20 +75,14 @@ HealButton = heal_img.get_rect(topleft=(800, 200))
 
 kill_button = "button"
 heal_button = "button"
-
-
-#if not self_play:
-    #PF.run(GameBoard, hospital, heal_button, kill_button)
-    #PF.board = GameBoard
-    #threading.Thread(target=PF.AI_play_loop, args=(hospital, heal_button, kill_button)).start()    
-
+"""
 def monte_carlo():
     global GameBoard, ai_running
     GameBoard = mcts.search(GameBoard).board
     ai_running = False    
  
 while running:        
-    PF.run(GameBoard, hospital, heal_button, kill_button)
+    #PF.run(GameBoard, hospital, heal_button, kill_button)
     if self_play:        
         # Event a 
         for event in pygame.event.get():
@@ -239,12 +219,13 @@ while running:
             GameBoard.update_effects()
     # AI Algorithm        
     else:        
+        """
         pygame.display.update() 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 break                
-
+        """
         if not ai_running and not ai_ran:
             threading.Thread(target=monte_carlo).start()
             ai_running = True
@@ -264,13 +245,13 @@ while running:
                 print("\n\n\n")
                 break
             
-            pygame.time.wait(AI_PLAY_WAITTIME_MS)
+            #pygame.time.wait(AI_PLAY_WAITTIME_MS)
             GameBoard = GameBoard.zombie_move()[0]
             GameBoard.update_effects()
             print("Zombie:")
             print(GameBoard)
 
-            pygame.display.update() 
+            #pygame.display.update() 
 
             if GameBoard.num_humans() == 0:
                 with open("mcts.pickle", "wb") as f:

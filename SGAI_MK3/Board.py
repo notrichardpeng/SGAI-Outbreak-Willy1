@@ -3,25 +3,104 @@ import numpy as np
 from Person import Person
 from copy import deepcopy
 
+MOVE_ACTIONS = ["move_up", "move_down", "move_left", "move_right"]
+MOVE_COORDS = [(1, 0), (-1, 0), (0, -1), (0, 1)]
+
+class Action:
+    def __init__(self, player, act, row, col):
+        self.player = player
+        self.act = act
+        self.row = row
+        self.col = col
+
 class Board:
     def __init__(self, hospital=True, board=None):
-        if board is not None:
-            self.__dict__ = deepcopy(board.__dict__)
-            self.player_turn *= -1
-        else:
-            self.rows = 6
-            self.columns = 6                        
-            self.hasHospital = hospital
-            self.player_turn = 1  # 1 is government, -1 is zombie
-            self.states = np.ndarray((self.rows, self.columns), dtype=Person)
-            self.num_humans = 0
-            self.num_zombies = 4
+        self.current_player = 1
+        self.rows = 6
+        self.columns = 6                        
+        self.hasHospital = hospital
+        self.player_turn = 1  # 1 is government, -1 is zombie
+        self.states = np.ndarray((self.rows, self.columns), dtype=Person)
+        self.num_humans = 0
+        self.num_zombies = 4
+        for r in range(self.rows):
+            for c in range(self.columns):
+                self.states[r][c] = None            
+        self.populate()        
+                        
 
-            for r in range(self.rows):
-                for c in range(self.columns):
-                    self.states[r][c] = None
-            
-            self.populate()
+    def isValidCoordinate(self, row, col):
+        return (
+            row < self.rows
+            and row >= 0
+            and col < self.columns
+            and col >= 0 )
+
+    def isAdjacentTo(self, row, col, is_zombie):
+        for i in range(4):            
+            if (
+                self.isValidCoordinate(row, col)
+                and self.states[row+MOVE_COORDS[i][0]][col+MOVE_COORDS[i][1]] is not None
+                and not self.states[row+MOVE_COORDS[i][0]][col+MOVE_COORDS[i][1]].isStunned
+                and self.states[row+MOVE_COORDS[i][0]][col+MOVE_COORDS[i][1]].isZombie == is_zombie
+            ):
+                return True                                            
+        return False
+
+    def getCurrentPlayer(self):
+        return self.current_player
+
+    def getPossibleActions(self):
+        ret = []
+
+        is_zombie = self.current_player != 1
+        for i in range(4):
+            for index, val in np.ndenumerate(self.states):
+                if val is not None and val.isZombie == is_zombie:                    
+                    if self.coord_is_valid(index[0]+MOVE_COORDS[i][0], index[1]+MOVE_COORDS[i][1]):
+                        ret.append(Action(self.current_player, MOVE_ACTIONS[i], index[0], index[1]))        
+
+        if self.player_turn == 1:
+            for row in range(self.rows):
+                for col in range(self.columns):
+                    if self.states[row][col] is not None and self.states[row][col].isZombie:
+                        if self.isAdjacentTo(row, col, False):                        
+                            ret.append(Action(self.current_player, "kill", row, col))
+
+            for row in range(self.rows):
+                for col in range(self.columns):
+                    if self.states[row][col] is not None and not self.states[row][col].isVaccinated:
+                        if self.isAdjacentTo(row, col, False):                      
+                            ret.append(Action(self.current_player, "heal", row, col))
+        else:
+            for row in range(self.rows):
+                for col in range(self.columns):
+                    if self.states[row][col] is not None and not self.states[row][col].isZombie:
+                        if self.isAdjacentTo(row, col, True):
+                            ret.append(Action(self.current_player, "bite", row, col))
+
+        return ret
+
+    def takeAction(self, action):
+        new_board = deepcopy(self)
+        if new_board.current_player == -1:
+            new_board.update_effects()
+        new_board.current_player *= -1
+        
+        if action.act == "move_up":
+            new_board.moveUp(action.row, action.col)
+        elif action.act == "move_down":
+            new_board.moveDown(action.row, action.col)
+        elif action.act == "move_left":
+            new_board.moveLeft(action.row, action.col)
+        elif action.act == "move_right":
+            new_board.moveRight(action.row, action.col)
+        elif action.act == "kill":
+            new_board.kill(action.row, action.col)
+        elif action.act == "heal":
+            new_board.heal(action.row, action.col)
+        elif action.act == "bite":
+            new_board.bite(action.row, action.col)
 
     def __str__(self):
         ret = ""
@@ -35,63 +114,25 @@ class Board:
                     if p.isVaccinated: ret += "v"
                     else: ret += "p"
             ret += "\n"
-        return ret                      
+        return ret                              
 
-    def isValidCoordinate(self, coordinates):
-        return (
-            coordinates[0] < self.rows
-            and coordinates[0] >= 0
-            and coordinates[1] < self.columns
-            and coordinates[1] >= 0 )     
-
-    def isAdjacentTo(self, coord, is_zombie):        
-        vals = [
-            (coord[0], coord[1] + 1),
-            (coord[0], coord[1] - 1),
-            (coord[0] + 1, coord[1]),
-            (coord[0] - 1, coord[1]),
-        ]
-        for c in vals:
-            if (
-                self.isValidCoordinate(c)
-                and self.states[c[0]][c[1]] is not None
-                and not self.states[c[0]][c[1]].isStunned
-                and self.states[c[0]][c[1]].isZombie == is_zombie                
-            ):
-                return True                        
-        return False
-
-    def move(self, from_coords, new_coords):        
-        # Check if the new coordinates are valid
-        if not self.isValidCoordinate(new_coords):
-            return False
-        
-        # Check if the destination is currently occupied
-        if self.states[new_coords[0]][new_coords[1]] is None:
-            self.states[new_coords[0]][new_coords[1]] = deepcopy(self.states[from_coords[0]][from_coords[1]])
-            self.states[from_coords[0]][from_coords[1]] = None
+    def move(self, row, col, nrow, ncol):                
+        if not self.isValidCoordinate(nrow, ncol):
+            return False                
+        if self.states[nrow][ncol] is None:
+            self.states[nrow][ncol] = deepcopy(self.states[row][col])
+            self.states[row][col] = None
             return True
-
         return False        
 
-    def moveUp(self, coords):
-        new_coords = (coords[0], coords[1] - 1)
-        return self.move(coords, new_coords)
-    def moveUpCoords(self, coords):
-        return (coords[0], coords[1]-1)
-    def moveDown(self, coords):
-        new_coords = (coords[0], coords[1] + 1)
-        return self.move(coords, new_coords)
-    def moveDownCoords(self, coords):
-        return (coords[0], coords[1] + 1)
-    def moveLeft(self, coords):
-        new_coords = (coords[0] - 1, coords[1])
-        return self.move(coords, new_coords)
-    def moveLeftCoords(self, coords):
-        return (coords[0] - 1, coords[1])
-    def moveRight(self, coords):
-        new_coords = (coords[0] + 1, coords[1])
-        return self.move(coords, new_coords)   
+    def moveUp(self, row, col):        
+        return self.move(row, col, row+1, col)    
+    def moveDown(self, row, col):        
+        return self.move(row, col, row-1, col)
+    def moveLeft(self, row, col):        
+        return self.move(row, col, row, col-1)    
+    def moveRight(self, row, col):        
+        return self.move(row, col, row, col+1)
 
     def bite(self, coords):                
         if self.states[coords[0]][coords[1]] is None:
@@ -253,7 +294,7 @@ class Board:
                     count = 10
                     while len(bored_zombies) > 0 and not has_moved and count > 0:                    
                         zombie = rd.choice(bored_zombies)
-                        action = rd.choice(["move_up", "move_down", "move_left", "move_right"])                    
+                        action = rd.choice(["move_up", "move_down", "move_left", "move_right"])
                         if action == "moveUp":
                             has_moved = board.moveUp(zombie)
                         elif action == "moveDown":
@@ -341,76 +382,5 @@ class Board:
                         if self.states[r][c].turnsVaccinated >= 5: # Vaccine Duration = 5 turns
                             self.states[r][c].turnsVaccinated = 0
                             self.states[r][c].isVaccinated = False
-                            self.states[r][c].wasVaccinated = True
-
-    def make_move(self, action, row, col):
-        board = Board(board=self)
-
-        if action == "move_up":
-            if board.moveUp((row, col)): return (True, board)        
-        elif action == "move_down":
-            if board.moveDown((row, col)): return (True, board)
-        elif action == "move_left":
-            if board.moveLeft((row, col)): return (True, board)
-        elif action == "move_right":
-            if board.moveRight((row, col)): return (True, board)
-        elif action == "kill":                
-            if board.kill((row, col)): return (True, board)
-        elif action == "heal":
-            if board.heal((row, col))[0]: return (True, board)
-        elif action == "bite":
-            if board.bite((row, col)): return (True, board)        
-            
-
-        return (False, None)
-
-    def gov_gen_states(self):
-        new_states = []
-
-        for action in ["move_up", "move_down", "move_left", "move_right"]:
-            for row in range(self.rows):
-                for col in range(self.columns):
-                    if self.states[row][col] is not None and not self.states[row][col].isZombie:
-                        result = self.make_move(action, row, col)
-                        if result[0]: new_states.append(result[1])
-
-        for row in range(self.rows):
-            for col in range(self.columns):
-                if self.states[row][col] is not None and self.states[row][col].isZombie:
-                    result = self.make_move("kill", row, col)
-                    if result[0]: 
-                        new_states.append(result[1])                        
-
-        for row in range(self.rows):
-            for col in range(self.columns):
-                if self.states[row][col] is not None:
-                    result = self.make_move("heal", row, col)
-                    if result[0]: 
-                        new_states.append(result[1])                               
-
-        return new_states
-
-    def zombie_gen_states(self):
-        new_states = []
-
-        for action in ["move_up", "move_down", "move_left", "move_right"]:
-            for row in range(self.rows):
-                for col in range(self.columns):
-                    if self.states[row][col] is not None and self.states[row][col].isZombie:
-                        result = self.make_move(action, row, col)
-                        if result[0]: new_states.append(result[1])
-
-        for row in range(self.rows):
-            for col in range(self.columns):
-                if self.states[row][col] is not None and not self.states[row][col].isZombie:
-                    result = self.make_move("bite", row, col)
-                    if result[0]: new_states.append(result[1])
-                
-        return new_states
-
-    def generate_states(self):
-        if self.player_turn == 1:
-            return self.gov_gen_states()
-        else:
-            return self.zombie_gen_states()
+                            self.states[r][c].wasVaccinated = True        
         
