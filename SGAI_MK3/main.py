@@ -264,7 +264,7 @@ while running:
                 break
             
             pygame.time.wait(AI_PLAY_WAITTIME_MS)
-            GameBoard = GameBoard.zombie_move()
+            GameBoard = GameBoard.zombie_move()[0]
             GameBoard.update_effects()
             print("Zombie:")
             print(GameBoard)
