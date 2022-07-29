@@ -300,7 +300,8 @@ class Board:
         move_zombies = []
         possible_bite = []
         vaccine_bite = []
-        
+        bite_animation = False
+
         for r in range(self.rows):
             for c in range(self.columns):
                 if self.states[r][c] is not None:
@@ -331,6 +332,7 @@ class Board:
             if action == "bite":
                 bite_coord = rd.choice(possible_bite) if len(possible_bite) > 0 else rd.choice(vaccine_bite)
                 has_moved = self.bite(bite_coord[0], bite_coord[1])
+                bite_animation = has_moved
             elif action == "move_up":
                 has_moved = self.moveUp(coord[0], coord[1])                
             elif action == "move_down":
@@ -343,12 +345,12 @@ class Board:
             cnt -= 1
 
         self.current_player *= -1
+        return bite_animation
 
     # Zombie AI logic
     def zombie_move(self):
         # First check if any zombie can bite
 
-        list_return = []
         possible_bite = []        
         vaccine_bite = []
         for r in range(self.rows):
@@ -366,7 +368,7 @@ class Board:
             coord = rd.choice(possible_bite)
             self.bite(coord[0], coord[1])
             print("Zombie: Bite " + str(coord))
-            list_return.append("bite")
+            return True
         else:            
             # No zombies can bite, move the zombie that is nearest to a person.
             # Get all coordinates
@@ -399,7 +401,7 @@ class Board:
                     count = 10
                     while len(bored_zombies) > 0 and not has_moved and count > 0:                    
                         zombie = rd.choice(bored_zombies)
-                        action = rd.choice(["move_up", "move_down", "move_left", "move_right"])
+                        action = rd.choice(MOVE_ACTIONS)
                         if action == "moveUp":
                             has_moved = self.moveUp(zombie[0], zombie[1])
                         elif action == "moveDown":
@@ -415,6 +417,8 @@ class Board:
                         count -= 1                 
                     
                     print("Zombie: Random Move")
+                #else:
+                    #return True # Bites a vaccinated person
 
             else: 
                 diff_y = selected_human[0] - selected_zombie[0]
@@ -424,14 +428,14 @@ class Board:
 
                 # Top Left corner is (0, 0)
                 if abs(diff_y) > abs(diff_x):
-                    if diff_y > 0: self.moveDown(selected_zombie[0], selected_zombie[1])
-                    else: self.moveUp(selected_zombie[0], selected_zombie[1])
+                    if diff_y > 0: self.moveUp(selected_zombie[0], selected_zombie[1])
+                    else: self.moveDown(selected_zombie[0], selected_zombie[1])
                 else:
                     if diff_x > 0: self.moveRight(selected_zombie[0], selected_zombie[1])
                     else: self.moveLeft(selected_zombie[0], selected_zombie[1])
         
         self.current_player *= -1
-        return list_return    
+        return False    
 
     def update_effects(self):        
         # Update effects of vaccination and stun

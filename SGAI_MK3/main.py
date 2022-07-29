@@ -248,8 +248,8 @@ while running:
             playerMoved = False
             take_action = []
                         
-            actions = GameBoard.zombie_move()
-            if len(actions) > 1:
+            play_bite_animation = GameBoard.zombie_move()
+            if play_bite_animation:
                 while frame < 11:
                     PF.zombie_bite(frame)
                     pygame.display.update()                            
