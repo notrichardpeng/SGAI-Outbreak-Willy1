@@ -118,6 +118,7 @@ def monte_carlo():
     GameBoard.current_player *= -1    
     ai_running = False
 score = 0
+move = 0
 while running:        
     PF.run(GameBoard, hospital, heal_button, kill_button)
     if self_play:                
@@ -241,15 +242,17 @@ while running:
                     frame = 0
                     score += 50
                 take_action = []
-
+            move += 1
         if GameBoard.num_humans == 0:
             PF.display_lose_screen(GameBoard.num_zombies)
-            print(score)
+            #print(score)
             if event.type == pygame.QUIT:
                 running = False
         if GameBoard.num_zombies == 0:
-            PF.display_win_screen(GameBoard.num_humans)
-            print(score)
+            times = 1000 - (move*50)
+            bonus = GameBoard.num_humans*100
+            PF.display_win_screen(GameBoard.num_humans, score, times, bonus)
+            #print(score)
             if event.type == pygame.QUIT:
                 running = False
 
@@ -269,6 +272,7 @@ while running:
                 frame = 0     
                 score += -50        
             GameBoard.update_effects()
+            move += 1
     # AI Algorithm        
     else:                
         

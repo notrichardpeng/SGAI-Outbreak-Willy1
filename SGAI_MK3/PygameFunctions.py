@@ -119,17 +119,33 @@ def display_people(GameBoard):
                 )
                 display_image(screen, char, (80, 80), coords)
 
-def display_win_screen(num_humans):
+def display_win_screen(num_humans, score, times, bonus):
     screen.fill(BACKGROUND)
     screen.blit(
         pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
         (300, 400),
     )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"Game score: {score}", True, WHITE),
+        (300, 500),
+    )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"Time score: {times}", True, WHITE),
+        (300, 550),
+    )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"Bonus score: {bonus}", True, WHITE),
+        (300, 600),
+    )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"Total score: {bonus+score+times}", True, WHITE),
+        (300, 700),
+    )
     pygame.display.update()
 
     # catch quit event
 
-def display_lose_screen(num_zombies):
+def display_lose_screen(num_zombies, score):
     screen.fill(BACKGROUND)
     screen.blit(
         pygame.font.SysFont("Calibri", 36).render(f"You lose! There were {num_zombies} zombies when the game ended", True, WHITE),
