@@ -220,6 +220,14 @@ def vaccine_animation(frame):
     display_image(screen, "Assets/vaccine/sprite_" + str(frame) + ".png", (200, 200), (428, 350))    
     display_image(screen, "Assets/heal2_human/sprite_0" + str(frame) + ".png", (200, 200), (572, 350))
 
+def zombie_bite(frame):
+    image = str(frame)
+    if frame < 10:
+        image = "0" + str(frame)
+    # Draws background first and then draws the specified frame. The animations have the same number of frames and are already made to be synched up
+    display_image(screen, "Assets/zombie_bite_background.png", (), (0,0))
+    display_image(screen, "Assets/zombie_bite/sprite_" + image + ".png", (250, 200), (500, 350))
+
 def direction(coord1, coord2):
     if coord2[1] > coord1[1]:
         return "moveDown"

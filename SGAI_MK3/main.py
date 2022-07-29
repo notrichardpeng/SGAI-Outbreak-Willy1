@@ -213,17 +213,24 @@ while running:
                         frame += 1
                     frame = 0
                 take_action = []
-
-        # Computer turn
-        if playerMoved:
-            pygame.display.update()
+            PF.run(GameBoard, hospital, heal_button, kill_button)
+        pygame.display.update()        
+            # Computer turn
+        if playerMoved:      
+            pygame.display.update()      
             playerMoved = False
             take_action = []
-
-            GameBoard = GameBoard.zombie_move()            
+                        
+            temp = GameBoard.zombie_move()
+            if len(temp) > 1:
+                while frame < 11:
+                    PF.zombie_bite(frame)
+                    pygame.display.update()                            
+                    clock.tick(8)
+                    frame += 1
+                frame = 0
+            GameBoard = temp[0]
             GameBoard.update_effects()
-        pygame.display.update()
-
     # AI Algorithm        
     else:        
         pygame.display.update() 
