@@ -1,24 +1,14 @@
-from numpy import isin
 import pygame
 from Board import Board
-#import PygameFunctions as PF
 import random as rd 
 import pickle
+import threading
 import PygameFunctions as PF
-from MCTS import *
-from threading import Thread
-from time import sleep, perf_counter
-import queue, threading
-from queue import Queue
 from Stats import Stats
+from mcts import mcts
 
 # Constants
-AI_PLAY_WAITTIME_MS = 5000
-def montecarloFunc(gb, queue):
-    best_move_next_board = mcts.search(gb)
-    queue.put(best_move_next_board)
-
-global GameBoard, ai_running
+AI_PLAY_WAITTIME_MS = 300
 
 # Initialize variables
 running = True
@@ -51,6 +41,7 @@ HospitalOnButton = pygame.Rect(700, 250, 100, 100)
 ProceedButton = pygame.Rect(1050, 650, 100, 100)
 StatsButton = pygame.Rect(500, 500, 100, 100)
 
+global GameBoard, ai_running
 
 proceed = False
 hover = ""
@@ -79,22 +70,12 @@ while proceed == False:
         elif event.type == pygame.QUIT:
             pygame.quit()
 
-#Create the game board
 GameBoard = Board(hospital=hospital)
 ai_running = False
-ai_ran = False
 
 # Self play variables
 clock = pygame.time.Clock()
 frame = 0
-
-mcts = MCTS()
-
-try:
-    with open("mcts.pickle", "rb") as f:
-        mcts = pickle.load(f)
-except:
-    pass
 
 # Buttons
 kill_img = pygame.image.load("Assets/kill_button.png").convert_alpha()
@@ -106,21 +87,37 @@ HealButton = heal_img.get_rect(topleft=(800, 200))
 kill_button = "button"
 heal_button = "button"
 
-
-#if not self_play:
-    #PF.run(GameBoard, hospital, heal_button, kill_button)
-    #PF.board = GameBoard
-    #threading.Thread(target=PF.AI_play_loop, args=(hospital, heal_button, kill_button)).start()    
+# Monte Carlo!
+searcher = mcts(timeLimit=1000)
 
 def monte_carlo():
-    global GameBoard, ai_running
-    GameBoard = mcts.search(GameBoard).board
-    ai_running = False    
- 
+    global GameBoard, ai_running    
+    action = searcher.search(GameBoard)
+    
+    if action.act == "move_up":
+        GameBoard.moveUp(action.row, action.col)
+    elif action.act == "move_down":
+        GameBoard.moveDown(action.row, action.col)
+    elif action.act == "move_left":
+        GameBoard.moveLeft(action.row, action.col)
+    elif action.act == "move_right":
+        GameBoard.moveRight(action.row, action.col)
+    elif action.act == "kill":
+        GameBoard.auto_kill(action.row, action.col)
+    elif action.act == "heal":
+        GameBoard.auto_heal(action.row, action.col)
+    elif action.act == "bite":
+        raise "?????? why zombie???"
+
+    print("Human (AI):")
+    print(GameBoard)
+
+    GameBoard.current_player *= -1    
+    ai_running = False
+
 while running:        
     PF.run(GameBoard, hospital, heal_button, kill_button)
-    if self_play:        
-        # Event a 
+    if self_play:                
         for event in pygame.event.get():
             if HealButton.collidepoint(pygame.mouse.get_pos()):
                 if event.type == pygame.MOUSEBUTTONUP:                          # If heal button is let go of, select heal and update heal button image to selected
@@ -184,18 +181,18 @@ while running:
                 result = None
                 directionToMove = PF.direction(take_action[0], take_action[1])
                 if directionToMove == "moveUp":
-                    result = GameBoard.moveUp(take_action[0])
+                    result = GameBoard.moveUp(take_action[0][0], take_action[0][1])
                 elif directionToMove == "moveDown":
-                    result = GameBoard.moveDown(take_action[0])                                 
+                    result = GameBoard.moveDown(take_action[0][0], take_action[0][1])              
                 elif directionToMove == "moveLeft":
-                    result = GameBoard.moveLeft(take_action[0])
+                    result = GameBoard.moveLeft(take_action[0][0], take_action[0][1])
                 elif directionToMove == "moveRight":
-                    result = GameBoard.moveRight(take_action[0])                
+                    result = GameBoard.moveRight(take_action[0][0], take_action[0][1])
                 if result != False:
                     playerMoved = True
                 take_action = []
             elif take_action[0] == "heal":
-                result = GameBoard.heal(take_action[1])
+                result = GameBoard.heal(take_action[1][0], take_action[1][1])
                 if result[0] != False:
                     playerMoved = True
                     heal_button = "button"
@@ -224,7 +221,7 @@ while running:
                 take_action = []
             elif take_action[0] == "kill":
                 kill_button = "button"
-                result = GameBoard.kill(take_action[1])
+                result = GameBoard.kill(take_action[1][0], take_action[1][1])
                 if result != False:
                     playerMoved = True
                     kill_button = "button"                                  # turns kill button back to normal                    
@@ -235,7 +232,7 @@ while running:
                         frame += 1
                     frame = 0
                 take_action = []
-            PF.run(GameBoard, hospital, heal_button, kill_button)
+
         pygame.display.update()        
             # Computer turn
         if playerMoved:      
@@ -254,43 +251,35 @@ while running:
             GameBoard = temp[0]
             GameBoard.update_effects()
     # AI Algorithm        
-    else:        
+    else:                
+        
         pygame.display.update() 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
                 break                
-
-        if not ai_running and not ai_ran:
+        
+        if not ai_running and GameBoard.current_player == 1:
             threading.Thread(target=monte_carlo).start()
-            ai_running = True
-            ai_ran = True
+            ai_running = True            
 
-        elif not ai_running and ai_ran:            
-            ai_ran = False
-            print("Human (AI):")
-            print(GameBoard)
-            if GameBoard.num_zombies == 0:
-                with open("mcts.pickle", "wb") as f:
-                    pickle.dump(mcts, f)
+        elif GameBoard.current_player == -1:                        
+            if GameBoard.num_zombies == 0:                
                 print("Humans Win")
                 GameBoard.player_turn = 1
                 GameBoard.clean_board()
-                GameBoard.populate()            
+                GameBoard.populate()
                 print("\n\n\n")
                 break
             
             pygame.time.wait(AI_PLAY_WAITTIME_MS)
-            GameBoard = GameBoard.zombie_move()[0]
+            GameBoard.zombie_random_move()
             GameBoard.update_effects()
             print("Zombie:")
             print(GameBoard)
 
-            pygame.display.update() 
-
-            if GameBoard.num_humans == 0:
-                with open("mcts.pickle", "wb") as f:
-                    pickle.dump(mcts, f)
+            pygame.display.update()
+            if GameBoard.num_humans == 0:                
                 print("Zombies Win")
                 GameBoard.player_turn = 1
                 GameBoard.clean_board()
@@ -298,5 +287,3 @@ while running:
                 print("\n\n\n")
                 break                                                                 
         
-
-
