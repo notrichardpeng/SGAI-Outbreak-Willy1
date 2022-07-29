@@ -149,8 +149,10 @@ def display_lose_screen():
             return
 def display_start_screen(starthover):
     screen.fill(BACKGROUND1)
+    my_font = pygame.font.Font("Assets/Minecraft.ttf", 100)
+    text_image = my_font.render("Outbreak", True, WHITE)
     screen.blit(
-         pygame.font.SysFont("comicsans", 40).render("OUTBREAK", True, WHITE), (500, 100),
+         text_image, (375, 100),
     )
     if starthover == "start":
         display_image(screen, "Assets/start_img_2.png", (300, 100), (455, 500))
