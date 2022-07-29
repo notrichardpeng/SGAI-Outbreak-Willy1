@@ -118,10 +118,10 @@ while running:
                 running = False
         # Display the current action
         PF.screen.blit(
-            pygame.font.SysFont("Comic Sans", 20).render("Your move is currently:", True, PF.WHITE),
+            pygame.font.SysFont("Calibri", 20).render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
-        PF.screen.blit(pygame.font.SysFont("Comic Sans", 20).render(f"{take_action}", True, PF.WHITE), (800, 450))
+        PF.screen.blit(pygame.font.SysFont("Calibri", 20).render(f"{take_action}", True, PF.WHITE), (800, 450))
 
         # Deselects or overrides action button
         if len(take_action) == 2:
@@ -203,6 +203,11 @@ while running:
                         frame += 1
                     frame = 0
                 take_action = []
+
+        if GameBoard.num_humans() == 0:
+            PF.display_lose_screen(GameBoard.num_zombies())
+        if GameBoard.num_zombies() == 0:
+            PF.display_win_screen(GameBoard.num_humans())
 
         # Computer turn
         if playerMoved:
