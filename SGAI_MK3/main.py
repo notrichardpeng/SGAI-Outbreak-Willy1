@@ -7,6 +7,7 @@ import threading
 import PygameFunctions as PF
 from Stats import Stats
 from mcts import mcts #pip install mcts
+import Tutorial as T
 #ctr-p
 #>select interpreter
 
@@ -43,6 +44,7 @@ SelfPlayButton = pygame.Rect(350, 250, 100, 100)
 HospitalOnButton = pygame.Rect(700, 250, 100, 100)
 ProceedButton = pygame.Rect(1050, 650, 100, 100)
 StatsButton = pygame.Rect(500, 500, 100, 100)
+TutorialButton = pygame.Rect(200, 600, 100, 100)
 
 global GameBoard, ai_running
 
@@ -59,10 +61,12 @@ while proceed == False:
                 hospital = not hospital
             elif ProceedButton.collidepoint(pygame.mouse.get_pos()):
                 proceed = True
-            #Stats Button
+            # Stats Button
             elif StatsButton.collidepoint(pygame.mouse.get_pos()):
                 st = Stats()
                 st.rewardsChart()
+            elif TutorialButton.collidepoint(pygame.mouse.get_pos()):
+                T.tutorial()
         elif event.type == pygame.MOUSEMOTION:
             if ProceedButton.collidepoint(pygame.mouse.get_pos()):
                 hover = "proceed"
