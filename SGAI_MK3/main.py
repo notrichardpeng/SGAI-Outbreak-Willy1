@@ -258,13 +258,14 @@ while running:
                 with open("mcts.pickle", "wb") as f:
                     pickle.dump(mcts, f)
                 print("Humans Win")
+                GameBoard.player_turn = 1
                 GameBoard.clean_board()
                 GameBoard.populate()            
                 print("\n\n\n")
                 break
             
             pygame.time.wait(AI_PLAY_WAITTIME_MS)
-            GameBoard = GameBoard.zombie_move()
+            GameBoard = GameBoard.zombie_move()[0]
             GameBoard.update_effects()
             print("Zombie:")
             print(GameBoard)
@@ -274,7 +275,8 @@ while running:
             if GameBoard.num_humans() == 0:
                 with open("mcts.pickle", "wb") as f:
                     pickle.dump(mcts, f)
-                print("Zombies Win")            
+                print("Zombies Win")
+                GameBoard.player_turn = 1
                 GameBoard.clean_board()
                 GameBoard.populate()              
                 print("\n\n\n")

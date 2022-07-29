@@ -1,4 +1,5 @@
 import random as rd
+import numpy as np
 from Person import Person
 from copy import deepcopy
 

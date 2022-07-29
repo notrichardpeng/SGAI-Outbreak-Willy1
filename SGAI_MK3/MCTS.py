@@ -17,7 +17,7 @@ class TreeNode():
         self.parent = parent                
         self.visits = 0                
         self.score = 0                
-        self.children = {}
+        self.children = []
 
 # MCTS class definition
 class MCTS():
@@ -30,30 +30,23 @@ class MCTS():
         # create root node        
         encoded = str(initial_state)        
         if encoded not in self.tree.keys():
-            self.tree[encoded] = TreeNode(initial_state, None)
-        self.root = self.tree[encoded]
+            self.tree[encoded] = TreeNode(initial_state, None)        
         
-        for _ in range(10):
-            node = self.select(self.root)                        
-            score = self.rollout(node.board)                        
+        for _ in range(100):
+            node = self.select(self.tree[encoded])
+            score = self.rollout(node.board)
             self.backpropagate(node, score)
                 
-        return self.get_best_move(self.root, 0)        
+        return self.get_best_move(self.tree[encoded], 0)        
     
-    # select most promising node
-    def select(self, node):
-        # make sure that we're dealing with non-terminal nodes
-        while not node.is_terminal:
-            # case where the node is fully expanded
+    def select(self, node):        
+        while not node.is_terminal:            
             if node.is_fully_expanded:
-                node = self.get_best_move(node, 2)
-            
-            # case where the node is not fully expanded 
+                node = self.get_best_move(node, 2)                        
             else:
                 # otherwise expand the node
                 return self.expand(node)
-       
-        # return node
+               
         return node
     
     # expand node
@@ -64,21 +57,22 @@ class MCTS():
         # loop over generated states (moves)
         for state in next_states:
             # make sure that current state (move) is not present in child nodes
-            encoded = str(state)
-            if encoded not in node.children:
+            new_encoded = str(state)
+            if new_encoded not in node.children:
                 # create a new node
-                if encoded not in self.tree.keys():
-                    self.tree[encoded] = TreeNode(state, node)                    
-                new_node = self.tree[encoded]
+                if new_encoded not in self.tree.keys():
+                    self.tree[new_encoded] = TreeNode(state, node)                                    
                 
-                node.children[encoded] = new_node
+                node.children.append(new_encoded)
                 
                 # case when node is fully expanded
                 if len(next_states) == len(node.children):
                     node.is_fully_expanded = True                                
 
                 # return newly created node
-                return new_node                
+                return self.tree[new_encoded]
+
+        print("?????")
     
     # simulate the game via making random moves until reach end of the game
     def rollout(self, board):
@@ -86,8 +80,7 @@ class MCTS():
         while board.num_humans() > 0 and board.num_zombies() > 0:
             board = random.choice(board.generate_states())            
         
-        if board.num_humans() == 0: return -1
-        if board.num_zombies() == 0: return 1
+        return board.num_humans() - board.num_zombies()        
                 
     # backpropagate the number of visits and score up to the root node
     def backpropagate(self, node, score):
@@ -108,9 +101,9 @@ class MCTS():
         best_moves = []
         
         # loop over child nodes
-        for child_node in node.children.values():                        
+        for child_code in node.children:                        
             
-            # get move score using UCT formula
+            child_node = self.tree[child_code]                        
             move_score = node.board.player_turn * child_node.score / child_node.visits + exploration_constant * math.sqrt(math.log(node.visits) / child_node.visits)
             
             if move_score > best_score:
