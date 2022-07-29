@@ -292,6 +292,55 @@ class Board:
                 c = rd.randint(0, self.columns-1)
             self.states[r][c] = Person(True)                
 
+    # Dumb Zombie
+    def zombie_random_move(self):        
+        move_zombies = []
+        possible_bite = []
+        vaccine_bite = []
+        
+        for r in range(self.rows):
+            for c in range(self.columns):
+                if self.states[r][c] is not None:
+                    if self.states[r][c].isZombie:
+                        if not self.states[r][c].isStunned:
+                            move_zombies.append((r, c))
+                    elif self.isAdjacentTo(r, c, True):
+                        if self.states[r][c].isVaccinated:
+                            vaccine_bite.append((r, c))
+                        else:
+                            possible_bite.append((r, c))                
+
+        action = "bite"
+        cnt = 100
+        has_moved = False
+
+        if len(move_zombies) == 0 and len(possible_bite) == 0 and len(vaccine_bite) == 0:
+            return
+
+        while not has_moved and cnt > 0:
+            r = rd.randint(0, 5)
+            if (r < 4 or (len(possible_bite) == 0 and len(vaccine_bite) == 0)) and len(move_zombies) > 0: 
+                action = rd.choice(MOVE_ACTIONS)                
+            else:
+                action = "bite"
+            
+            coord = rd.choice(move_zombies)            
+            if action == "bite":
+                bite_coord = rd.choice(possible_bite) if len(possible_bite) > 0 else rd.choice(vaccine_bite)
+                has_moved = self.bite(bite_coord[0], bite_coord[1])
+            elif action == "move_up":
+                has_moved = self.moveUp(coord[0], coord[1])                
+            elif action == "move_down":
+                has_moved = self.moveDown(coord[0], coord[1])                                
+            elif action == "move_left":
+                has_moved = self.moveLeft(coord[0], coord[1])                    
+            elif action == "move_right":
+                has_moved = self.moveRight(coord[0], coord[1])                
+
+            cnt -= 1
+
+        self.current_player *= -1
+
     # Zombie AI logic
     def zombie_move(self):
         # First check if any zombie can bite
