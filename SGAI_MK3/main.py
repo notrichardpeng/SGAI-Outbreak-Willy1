@@ -1,3 +1,4 @@
+import numpy as np
 import pygame
 from Board import Board
 import random as rd 
@@ -5,7 +6,9 @@ import pickle
 import threading
 import PygameFunctions as PF
 from Stats import Stats
-from mcts import mcts
+from mcts import mcts #pip install mcts
+#ctr-p
+#>select interpreter
 
 # Constants
 AI_PLAY_WAITTIME_MS = 300
@@ -20,7 +23,7 @@ var = 0
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
 #Start menu
-StartButton = pygame.Rect(455, 500, 300, 100)
+StartButton = pygame.Rect(455, 600, 300, 100)
 procstart = False
 starthover = ""
 while procstart == False:
@@ -154,10 +157,10 @@ while running:
                 running = False
         # Display the current action
         PF.screen.blit(
-            pygame.font.SysFont("Comic Sans", 20).render("Your move is currently:", True, PF.WHITE),
+            pygame.font.SysFont("Calibri", 20).render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
-        PF.screen.blit(pygame.font.SysFont("Comic Sans", 20).render(f"{take_action}", True, PF.WHITE), (800, 450))
+        PF.screen.blit(pygame.font.SysFont("Calibri", 20).render(f"{take_action}", True, PF.WHITE), (800, 450))
 
         # Deselects or overrides action button
         if len(take_action) == 2:
@@ -234,10 +237,14 @@ while running:
                     frame = 0
                 take_action = []
 
-        pygame.display.update()        
-            # Computer turn
-        if playerMoved:      
-            pygame.display.update()      
+        if GameBoard.num_humans == 0:
+            PF.display_lose_screen(GameBoard.num_zombies)
+        if GameBoard.num_zombies == 0:
+            PF.display_win_screen(GameBoard.num_humans)
+
+        # Computer turn
+        if playerMoved:
+            pygame.display.update()
             playerMoved = False
             take_action = []
                         
@@ -270,7 +277,7 @@ while running:
                 print("\n\n\n")
                 continue
             
-            pygame.time.wait(AI_PLAY_WAITTIME_MS)
+            #pygame.time.wait(AI_PLAY_WAITTIME_MS)
             GameBoard.zombie_random_move()
             GameBoard.update_effects()
             print("Zombie:")
