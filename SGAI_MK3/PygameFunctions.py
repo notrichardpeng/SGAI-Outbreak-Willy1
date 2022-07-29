@@ -119,21 +119,33 @@ def display_people(GameBoard):
                 )
                 display_image(screen, char, (80, 80), coords)
 
-def display_win_screen(num_humans):
+def display_win_screen(num_humans, score, times, bonus):
     screen.fill(BACKGROUND)
     screen.blit(
         pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
         (300, 400),
     )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"Game score: {score}", True, WHITE),
+        (300, 500),
+    )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"Time score: {times}", True, WHITE),
+        (300, 550),
+    )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"Bonus score: {bonus}", True, WHITE),
+        (300, 600),
+    )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"Total score: {bonus+score+times}", True, WHITE),
+        (300, 700),
+    )
     pygame.display.update()
 
     # catch quit event
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return
 
-def display_lose_screen(num_zombies):
+def display_lose_screen(num_zombies, score):
     screen.fill(BACKGROUND)
     screen.blit(
         pygame.font.SysFont("Calibri", 36).render(f"You lose! There were {num_zombies} zombies when the game ended", True, WHITE),
@@ -172,21 +184,13 @@ def display_start_screen(starthover):
 def display_options_screen(self_play, hospital, hover):
     screen.fill(BACKGROUND)
 
-    screen.blit(
-        pygame.font.SysFont("Calibri", 40).render("OPTIONS", True, WHITE), (500, 100),
-    )
-    screen.blit(
-        pygame.font.SysFont("Calibri", 32).render("Self Play?", True, WHITE), (325, 200),
-    )
-    screen.blit(
-        pygame.font.SysFont("Calibri", 32).render("Hospital On?", True, WHITE), (675, 200),
-    )
-    screen.blit(
-        pygame.font.SysFont("Calibri", 24).render("Proceed to game...", True, WHITE), (975, 600),
-    )
-    screen.blit(
-        pygame.font.SysFont("Calibri", 24).render("Show Stats", True, WHITE), (500, 450),
-    )
+    # Text on the Options Menu
+    screen.blit(pygame.font.SysFont("Calibri", 40).render("OPTIONS", True, WHITE), (500, 100),)
+    screen.blit(pygame.font.SysFont("Calibri", 32).render("Self Play?", True, WHITE), (325, 200),)
+    screen.blit(pygame.font.SysFont("Calibri", 32).render("Hospital On?", True, WHITE), (675, 200),)
+    screen.blit(pygame.font.SysFont("Calibri", 24).render("Proceed to game...", True, WHITE), (975, 600),)
+    screen.blit(pygame.font.SysFont("Calibri", 24).render("Show Stats", True, WHITE), (500, 450),)
+    screen.blit(pygame.font.SysFont("Calibri", 24).render("Tutorial:", True, WHITE), (200, 550),)
 
     if hover == "proceed":
         display_image(screen, "Assets/checked_box.png", (100, 100), (1050, 650))
@@ -209,6 +213,8 @@ def display_options_screen(self_play, hospital, hover):
     
     # Show Stats button
     display_image(screen, "Assets/DefaultButton.png", (100, 100), (500, 500))
+    # Tutorial button
+    display_image(screen, "Assets/DefaultButton.png", (100, 100), (200, 600))
     
     pygame.display.update()
 

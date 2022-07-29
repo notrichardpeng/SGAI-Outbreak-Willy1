@@ -7,6 +7,7 @@ import threading
 import PygameFunctions as PF
 from Stats import Stats
 from mcts import mcts #pip install mcts
+import Tutorial as T
 #ctr-p
 #>select interpreter
 
@@ -43,6 +44,7 @@ SelfPlayButton = pygame.Rect(350, 250, 100, 100)
 HospitalOnButton = pygame.Rect(700, 250, 100, 100)
 ProceedButton = pygame.Rect(1050, 650, 100, 100)
 StatsButton = pygame.Rect(500, 500, 100, 100)
+TutorialButton = pygame.Rect(200, 600, 100, 100)
 
 global GameBoard, ai_running
 
@@ -59,10 +61,12 @@ while proceed == False:
                 hospital = not hospital
             elif ProceedButton.collidepoint(pygame.mouse.get_pos()):
                 proceed = True
-            #Stats Button
+            # Stats Button
             elif StatsButton.collidepoint(pygame.mouse.get_pos()):
                 st = Stats()
                 st.rewardsChart()
+            elif TutorialButton.collidepoint(pygame.mouse.get_pos()):
+                T.tutorial()
         elif event.type == pygame.MOUSEMOTION:
             if ProceedButton.collidepoint(pygame.mouse.get_pos()):
                 hover = "proceed"
@@ -117,7 +121,8 @@ def monte_carlo():
 
     GameBoard.current_player *= -1    
     ai_running = False
-
+score = 0
+move = 0
 while running:        
     PF.run(GameBoard, hospital, heal_button, kill_button)
     if self_play:                
@@ -180,6 +185,7 @@ while running:
                 PF.select(take_action[0])
 
         # Action handling
+
         if len(take_action) == 2:
             if not isinstance(take_action[0], str):
                 result = None
@@ -208,6 +214,7 @@ while running:
                             clock.tick(12)
                             frame += 1
                         frame = 0
+                        score += 25
                     elif result[1] == "full":
                         while frame < 16:
                             PF.full_heal_animation(frame)
@@ -215,6 +222,7 @@ while running:
                             clock.tick(8)
                             frame += 1
                         frame = 0
+                        score += 25
                     elif result[1] == "vaccine": 
                         while frame < 6:
                             PF.vaccine_animation(frame)
@@ -222,6 +230,7 @@ while running:
                             clock.tick(8)
                             frame += 1
                         frame = 0
+                        score += 10
                 take_action = []
             elif take_action[0] == "kill":
                 kill_button = "button"
@@ -235,28 +244,39 @@ while running:
                         clock.tick(8)
                         frame += 1
                     frame = 0
+                    score += 50
                 take_action = []
-
+            move += 1
         if GameBoard.num_humans == 0:
             PF.display_lose_screen(GameBoard.num_zombies)
+            #print(score)
+            if event.type == pygame.QUIT:
+                running = False
         if GameBoard.num_zombies == 0:
-            PF.display_win_screen(GameBoard.num_humans)
+            times = 1000 - (move*50)
+            bonus = GameBoard.num_humans*100
+            PF.display_win_screen(GameBoard.num_humans, score, times, bonus)
+            #print(score)
+            if event.type == pygame.QUIT:
+                running = False
 
         # Computer turn
         if playerMoved:
             pygame.display.update()
             playerMoved = False
             take_action = []
-                        
-            play_bite_animation = GameBoard.zombie_move()
-            if play_bite_animation:
+            tempcalc = GameBoard.num_humans           
+            actions = GameBoard.zombie_move()
+            if GameBoard.num_humans == tempcalc-1:
                 while frame < 11:
                     PF.zombie_bite(frame)
                     pygame.display.update()                            
                     clock.tick(8)
                     frame += 1
-                frame = 0            
+                frame = 0     
+                score += -50        
             GameBoard.update_effects()
+            move += 1
     # AI Algorithm        
     else:                
         
