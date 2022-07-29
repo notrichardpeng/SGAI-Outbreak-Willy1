@@ -17,10 +17,3 @@ class Person:
         ret.wasCured = self.wasCured
         ret.isStunned = self.isStunned
         return ret
-
-    # Checks whether a piece is in the hospital
-    def isInHospital(self, coords):
-        if coords[0] < 3 and coords[1] < 3:
-            return True
-        else:
-            return False    

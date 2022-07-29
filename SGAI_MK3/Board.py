@@ -214,14 +214,14 @@ class Board:
         
         if self.states[row][col].isZombie:
             # If not adjacent to a human, then we cannot cure the zombie
-            if not self.isAdjacentTo(coords, False):                                
+            if not self.isAdjacentTo(row, col, False):                                
                 return (False, None)
             # Was the zombie already half-cured?
-            if self.states[row][col].halfCured == False and (self.states[row][col].isInHospital(coords) == False or self.hasHospital == False):
+            if self.states[row][col].halfCured == False and (not self.hasHospital or not self.is_in_hospital(row, col)):
                 self.states[row][col].halfCured = True
                 self.states[row][col].isStunned = True
                 return (True, "half" )               
-            elif (self.states[row][col].halfCured == True or (self.states[row][col].isInHospital(coords) == True and self.hasHospital == True)):
+            elif (self.states[row][col].halfCured == True or (self.hasHospital and self.is_in_hospital(row, col))):
                 self.states[row][col] = Person(False)                
                 self.states[row][col].wasCured = True
                 self.num_zombies -= 1
@@ -257,6 +257,9 @@ class Board:
                 ):                    
                     coords.append((r, c))            
         return coords
+
+    def is_in_hospital(self, row, col):
+        return row < 3 and col < 3
 
     def get_possible_zombies_to_move(self):
         coords = []        
@@ -358,19 +361,17 @@ class Board:
                 ):
                     if not p.isVaccinated: possible_bite.append((r, c))
                     else: vaccine_bite.append((r, c))
-
-        board = Board(board=self)
-
+        
         if len(possible_bite) > 0:
             coord = rd.choice(possible_bite)
-            board.bite(coord[0], coord[1])
+            self.bite(coord[0], coord[1])
             print("Zombie: Bite " + str(coord))
             list_return.append("bite")
         else:            
             # No zombies can bite, move the zombie that is nearest to a person.
             # Get all coordinates
-            human_coords = board.get_possible_human_targets()
-            zombie_coords = board.get_possible_zombies_to_move()
+            human_coords = self.get_possible_human_targets()
+            zombie_coords = self.get_possible_zombies_to_move()
             min_dist = 9999999
             selected_human, selected_zombie = (-1, -1), (-1, -1)
 
@@ -385,11 +386,11 @@ class Board:
             # If not moving is the best option, then move a random zombie not threatening a person
             if selected_zombie == (-1, -1): 
                 bored_zombies = [] # Zombies not adjacent to a person
-                for r in range(board.rows):
-                    for c in range(board.columns):                                
-                        state = board.states[r][c]
+                for r in range(self.rows):
+                    for c in range(self.columns):                                
+                        state = self.states[r][c]
                         if state is not None and state.isZombie and not state.isStunned:                            
-                            if not board.isAdjacentTo(r, c, False):
+                            if not self.isAdjacentTo(r, c, False):
                                 bored_zombies.append((r, c))
 
                 if len(bored_zombies) > 0:                    
@@ -400,13 +401,13 @@ class Board:
                         zombie = rd.choice(bored_zombies)
                         action = rd.choice(["move_up", "move_down", "move_left", "move_right"])
                         if action == "moveUp":
-                            has_moved = board.moveUp(zombie[0], zombie[1])
+                            has_moved = self.moveUp(zombie[0], zombie[1])
                         elif action == "moveDown":
-                            has_moved = board.moveDown(zombie[0], zombie[1])
+                            has_moved = self.moveDown(zombie[0], zombie[1])
                         elif action == "moveLeft":
-                            has_moved = board.moveLeft(zombie[0], zombie[1])
+                            has_moved = self.moveLeft(zombie[0], zombie[1])
                         elif action == "moveRight":
-                            has_moved = board.moveRight(zombie[0], zombie[1])
+                            has_moved = self.moveRight(zombie[0], zombie[1])
 
                         # If we tried so many times and there's still not a valid move, there probably just isn't any,
                         # perhaps because all the zombies are surrounded by vaccinated humans. In that case, we don't
@@ -423,12 +424,13 @@ class Board:
 
                 # Top Left corner is (0, 0)
                 if abs(diff_y) > abs(diff_x):
-                    if diff_y > 0: board.moveDown(selected_zombie[0], selected_zombie[1])
-                    else: board.moveUp(selected_zombie[0], selected_zombie[1])
+                    if diff_y > 0: self.moveDown(selected_zombie[0], selected_zombie[1])
+                    else: self.moveUp(selected_zombie[0], selected_zombie[1])
                 else:
-                    if diff_x > 0: board.moveRight(selected_zombie[0], selected_zombie[1])
-                    else: board.moveLeft(selected_zombie[0], selected_zombie[1])
-        list_return = [board] + list_return    
+                    if diff_x > 0: self.moveRight(selected_zombie[0], selected_zombie[1])
+                    else: self.moveLeft(selected_zombie[0], selected_zombie[1])
+        
+        self.current_player *= -1
         return list_return    
 
     def update_effects(self):        
