@@ -128,10 +128,6 @@ def display_win_screen(num_humans):
     pygame.display.update()
 
     # catch quit event
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return
 
 def display_lose_screen(num_zombies):
     screen.fill(BACKGROUND)
