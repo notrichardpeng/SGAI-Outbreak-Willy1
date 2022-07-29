@@ -1,6 +1,7 @@
 import pygame
 
 BACKGROUND = "#b0b0b0"
+BACKGROUND1 = "#63666A"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 CELL_COLOR = (176, 176, 176)
@@ -146,6 +147,16 @@ def display_lose_screen():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return
+def display_start_screen(starthover):
+    screen.fill(BACKGROUND1)
+    screen.blit(
+         pygame.font.SysFont("comicsans", 40).render("OUTBREAK", True, WHITE), (500, 100),
+    )
+    if starthover == "start":
+        display_image(screen, "Assets/start_img_2.png", (300, 100), (455, 500))
+    else:
+        display_image(screen, "Assets/start_img.png", (300, 100), (455, 500))
+    pygame.display.update()
 
 def display_options_screen(self_play, hospital, hover):
     screen.fill(BACKGROUND)

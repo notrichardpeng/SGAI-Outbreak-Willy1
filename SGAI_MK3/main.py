@@ -28,7 +28,22 @@ self_play = False
 hospital = False
 var = 0
 
-
+#Start menu
+StartButton = pygame.Rect(455, 500, 300, 100)
+procstart = False
+starthover = ""
+while procstart == False:
+    for event in pygame.event.get():
+        PF.display_start_screen(starthover)
+        starthover = ""
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if StartButton.collidepoint(pygame.mouse.get_pos()):
+                procstart = True
+        elif event.type == pygame.MOUSEMOTION:
+            if StartButton.collidepoint(pygame.mouse.get_pos()):
+                starthover = "start"
+        elif event.type == pygame.QUIT:
+            pygame.quit()
 # Option menu
 SelfPlayButton = pygame.Rect(350, 250, 100, 100)
 HospitalOnButton = pygame.Rect(700, 250, 100, 100)
