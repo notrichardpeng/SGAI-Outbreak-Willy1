@@ -143,7 +143,11 @@ while running:
                 if len(take_action) < 2:                                        # Checks if list is less than 2
                     x, y = pygame.mouse.get_pos()                               
                     action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile
+
+                    print("mouse x, mouse y: " + str(x) + " " + str(y))                    
+
                     if action != None:                        
+                        print("action row, col: " + str(action))
                         if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
                             if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
                                 take_action.append(action)
@@ -240,15 +244,14 @@ while running:
             playerMoved = False
             take_action = []
                         
-            temp = GameBoard.zombie_move()
-            if len(temp) > 1:
+            actions = GameBoard.zombie_move()
+            if len(actions) > 1:
                 while frame < 11:
                     PF.zombie_bite(frame)
                     pygame.display.update()                            
                     clock.tick(8)
                     frame += 1
-                frame = 0
-            GameBoard = temp[0]
+                frame = 0            
             GameBoard.update_effects()
     # AI Algorithm        
     else:                

@@ -44,7 +44,7 @@ def get_action(GameBoard, pixel_x, pixel_y):
         board_y = int((pixel_y - DISPLAY_BORDER) / DISPLAY_CELL_DIMENSIONS[1])
         # Return the grid position if it is a valid position on the board
         if (board_x >= 0 and board_x < GameBoard.columns and board_y >= 0 and board_y < GameBoard.rows):
-            return (board_x, board_y)
+            return (board_y, board_x)
     return None
 
 def run(GameBoard, hasHospital, heal_button, kill_button):
@@ -116,8 +116,8 @@ def display_people(GameBoard):
                 elif p.isZombie and p.halfCured:
                     char = "Assets/" + image_assets[3]
                 coords = (
-                    r * DISPLAY_CELL_DIMENSIONS[0] + DISPLAY_BORDER + 10,
                     c * DISPLAY_CELL_DIMENSIONS[1] + DISPLAY_BORDER + 10,
+                    r * DISPLAY_CELL_DIMENSIONS[0] + DISPLAY_BORDER + 10,
                 )
                 display_image(screen, char, (80, 80), coords)
 
@@ -208,8 +208,8 @@ def display_options_screen(self_play, hospital, hover):
     pygame.display.update()
 
 def select(coord):
-    left = coord[0] * 100 + 150
-    top = coord[1] * 100 + 150
+    left = coord[1] * 100 + 150
+    top = coord[0] * 100 + 150
     color = (232, 232, 232)
     # Drawing Rectangle
     pygame.draw.rect(screen, color, pygame.Rect(left, top, 100 + LINE_WIDTH, 100 + LINE_WIDTH),  LINE_WIDTH+3)
@@ -252,11 +252,11 @@ def zombie_bite(frame):
     display_image(screen, "Assets/zombie_bite/sprite_" + image + ".png", (250, 200), (500, 350))
 
 def direction(coord1, coord2):
-    if coord2[1] > coord1[1]:
-        return "moveDown"
-    elif coord2[1] < coord1[1]:
+    if coord2[0] > coord1[0]:
         return "moveUp"
-    elif coord2[0] > coord1[0]:
-        return "moveRight"
     elif coord2[0] < coord1[0]:
+        return "moveDown"
+    elif coord2[1] > coord1[1]:
+        return "moveRight"
+    elif coord2[1] < coord1[1]:
         return "moveLeft"
