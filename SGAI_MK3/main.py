@@ -289,4 +289,5 @@ while running:
                 GameBoard = Board(hospital=hospital)
                 print("\n\n\n")
                 continue
+    pygame.display.update()
         

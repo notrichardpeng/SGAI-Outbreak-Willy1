@@ -51,12 +51,10 @@ def run(GameBoard, hasHospital, heal_button, kill_button):
     """
     Draw the screen and return any events.
     """
-
-    if GameBoard is None: return
     screen.fill(BACKGROUND)
     build_grid(GameBoard, hasHospital) # Draw the grid
     display_buttons(heal_button, kill_button)
-    display_people(GameBoard)            
+    display_people(GameBoard)      
 
 def display_buttons(heal_button, kill_button):
     display_image(screen, "Assets/kill_" + kill_button + ".png", (), (800, 50))         # draws specified kill button asset
