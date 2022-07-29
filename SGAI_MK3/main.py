@@ -88,7 +88,7 @@ kill_button = "button"
 heal_button = "button"
 
 # Monte Carlo!
-searcher = mcts(timeLimit=1000)
+searcher = mcts(iterationLimit=300)
 
 def monte_carlo():
     global GameBoard, ai_running    
@@ -142,12 +142,9 @@ while running:
             if event.type == pygame.MOUSEBUTTONUP:
                 if len(take_action) < 2:                                        # Checks if list is less than 2
                     x, y = pygame.mouse.get_pos()                               
-                    action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile
+                    action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile                    
 
-                    print("mouse x, mouse y: " + str(x) + " " + str(y))                    
-
-                    if action != None:                        
-                        print("action row, col: " + str(action))
+                    if action != None:                                                
                         if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
                             if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
                                 take_action.append(action)
@@ -269,11 +266,9 @@ while running:
         elif GameBoard.current_player == -1:                        
             if GameBoard.num_zombies == 0:                
                 print("Humans Win")
-                GameBoard.player_turn = 1
-                GameBoard.clean_board()
-                GameBoard.populate()
+                GameBoard = Board(hospital=hospital)
                 print("\n\n\n")
-                break
+                continue
             
             pygame.time.wait(AI_PLAY_WAITTIME_MS)
             GameBoard.zombie_random_move()
@@ -284,9 +279,7 @@ while running:
             pygame.display.update()
             if GameBoard.num_humans == 0:                
                 print("Zombies Win")
-                GameBoard.player_turn = 1
-                GameBoard.clean_board()
-                GameBoard.populate()              
+                GameBoard = Board(hospital=hospital)
                 print("\n\n\n")
-                break                                                                 
+                continue
         
