@@ -4,7 +4,7 @@ class DataCollector:
     zombies_killed = 0
     zombies_cured = 0
     zombies_cured_in_hospital = 0
-    human_vaccinated = 0
+    humans_vaccinated = 0
     humans_remaining = 0
     humans_infected = 0
     turns_taken = 0
@@ -23,6 +23,7 @@ class DataCollector:
     def save_player_data():
         with open("previous_game_data.txt", "w") as f:
             lines = [
+                "Winner: " + ("Human" if DataCollector.humans_remaining > 0 else "Zombie") + "\n",
                 "Has hospital: " + str(DataCollector.hospital) + "\n",
                 "Zombies killed: " + str(DataCollector.zombies_killed) + "\n",
                 "Zombies cured: " + str(DataCollector.zombies_cured) + "\n",
@@ -35,5 +36,24 @@ class DataCollector:
             f.writelines(lines)
 
     @staticmethod
-    def save_ai_data():
-        pass
+    def clear_ai_data():
+        with open("ai_games_data.txt", "w") as f:
+            f.write("")
+
+    @staticmethod
+    def save_ai_data_of_one_game(game_number):
+        with open("ai_games_data.txt", "a") as f:
+            lines = [
+                "---\n",
+                "Game Number: " + str(game_number) + "\n",
+                "Winner: " + ("Human" if DataCollector.humans_remaining > 0 else "Zombie") + "\n",
+                "Has hospital: " + str(DataCollector.hospital) + "\n",
+                "Zombies killed: " + str(DataCollector.zombies_killed) + "\n",
+                "Zombies cured: " + str(DataCollector.zombies_cured) + "\n",
+                "Zombies cured in hospital: " + str(DataCollector.zombies_cured_in_hospital) + "\n",
+                "Humans vaccinated: " + str(DataCollector.humans_vaccinated) + "\n",
+                "Humans remaining: " + str(DataCollector.humans_remaining) + "\n",
+                "Humans infected: " + str(DataCollector.humans_infected) + "\n",
+                "Number of turns taken: " + str(DataCollector.turns_taken) + "\n"
+            ]
+            f.writelines(lines)

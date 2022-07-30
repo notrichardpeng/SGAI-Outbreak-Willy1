@@ -102,8 +102,9 @@ def monte_carlo():
     global GameBoard, ai_running    
     action = searcher.search(GameBoard)
     
+    print(action)
     if action.act == "move_up":
-        GameBoard.moveUp(action.row, action.col)
+        GameBoard.moveUp(action.row, action.col)        
     elif action.act == "move_down":
         GameBoard.moveDown(action.row, action.col)
     elif action.act == "move_left":
@@ -111,22 +112,22 @@ def monte_carlo():
     elif action.act == "move_right":
         GameBoard.moveRight(action.row, action.col)
     elif action.act == "kill":
-        GameBoard.auto_kill(action.row, action.col)
+        GameBoard.auto_kill(action.row, action.col, simulation=False)
     elif action.act == "heal":
-        GameBoard.auto_heal(action.row, action.col)
+        GameBoard.auto_heal(action.row, action.col, simulation=False)
     elif action.act == "bite":
-        raise "?????? why zombie???"
-
-    print("Human (AI):")
-    print(GameBoard)
+        raise "?????? why zombie???"    
 
     GameBoard.current_player *= -1    
     ai_running = False
 
 score = 0
 move = 0
+game_number = 1
 
 DataCollector.reset_data()
+if not self_play:
+    DataCollector.clear_ai_data()
 
 while running:        
     PF.run(GameBoard, hospital, heal_button, kill_button)
@@ -299,23 +300,25 @@ while running:
             ai_running = True            
 
         elif GameBoard.current_player == -1:                        
-            if GameBoard.num_zombies == 0:                
-                print("Humans Win")
-                GameBoard = Board(hospital=hospital)
-                print("\n\n\n")
+            if GameBoard.num_zombies == 0:                                
+                DataCollector.humans_remaining = GameBoard.num_humans
+                DataCollector.save_ai_data_of_one_game(game_number)
+                game_number += 1
+                DataCollector.reset_data()
+                GameBoard = Board(hospital=hospital)                
                 continue
             
             #pygame.time.wait(AI_PLAY_WAITTIME_MS)
             GameBoard.zombie_random_move()
-            GameBoard.update_effects()
-            print("Zombie:")
-            print(GameBoard)
+            GameBoard.update_effects()            
 
             pygame.display.update()
-            if GameBoard.num_humans == 0:                
-                print("Zombies Win")
-                GameBoard = Board(hospital=hospital)
-                print("\n\n\n")
+            if GameBoard.num_humans == 0:
+                DataCollector.humans_remaining = 0
+                DataCollector.save_ai_data_of_one_game(game_number)
+                game_number += 1
+                DataCollector.reset_data()
+                GameBoard = Board(hospital=hospital)                
                 continue
     pygame.display.update()
         

@@ -69,9 +69,10 @@ class Board:
         is_zombie = self.current_player != 1
         for i in range(4):
             for index, val in np.ndenumerate(self.states):
-                if val is not None and val.isZombie == is_zombie:                    
-                    if self.isValidCoordinate(index[0]+MOVE_COORDS[i][0], index[1]+MOVE_COORDS[i][1]):
-                        ret.append(Action(self.current_player, MOVE_ACTIONS[i], index[0], index[1]))        
+                if val is not None and val.isZombie == is_zombie:
+                    nrow, ncol = index[0]+MOVE_COORDS[i][0], index[1]+MOVE_COORDS[i][1]                    
+                    if self.isValidCoordinate(nrow, ncol) and self.states[nrow][ncol] is None:
+                        ret.append(Action(self.current_player, MOVE_ACTIONS[i], index[0], index[1]))
 
         if self.player_turn == 1:
             for row in range(self.rows):
@@ -159,7 +160,7 @@ class Board:
 
 # Functions for AI that are quicker
 
-    def auto_bite(self, row, col):                         
+    def auto_bite(self, row, col, simulation=True):                         
         chance = 100
         if self.states[row][col].isVaccinated:
             chance = 0
@@ -171,9 +172,11 @@ class Board:
         if r < chance:            
             self.states[row][col] = Person(True)
             self.num_humans -= 1
-            self.num_zombies += 1        
+            self.num_zombies += 1
+            if not simulation:
+                DataCollector.humans_infected += 1
 
-    def auto_heal(self, row, col):                                
+    def auto_heal(self, row, col, simulation=True):
         if self.states[row][col].isZombie:                                    
             if self.states[row][col].halfCured == False and (not self.hasHospital or not self.is_in_hospital(row, col)):
                 self.states[row][col].halfCured = True
@@ -182,13 +185,21 @@ class Board:
                 self.states[row][col] = Person(False)                
                 self.states[row][col].wasCured = True
                 self.num_zombies -= 1
-                self.num_humans += 1                          
+                self.num_humans += 1
+                if not simulation:
+                    DataCollector.zombies_cured += 1
+                    if self.hasHospital and self.is_in_hospital(row, col):
+                        DataCollector.zombies_cured_in_hospital += 1
         else:            
-            self.states[row][col].isVaccinated = True            
+            self.states[row][col].isVaccinated = True
+            if not simulation:
+                DataCollector.humans_vaccinated += 1
 
-    def auto_kill(self, row, col):                                
+    def auto_kill(self, row, col, simulation=True):
         self.states[row][col] = None
-        self.num_zombies -= 1            
+        self.num_zombies -= 1
+        if not simulation:
+            DataCollector.zombies_killed += 1
 
 #############
 
