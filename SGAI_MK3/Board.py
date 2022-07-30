@@ -67,14 +67,8 @@ class Board:
         ret = []
 
         is_zombie = self.current_player != 1
-        for i in range(4):
-            for index, val in np.ndenumerate(self.states):
-                if val is not None and val.isZombie == is_zombie:
-                    nrow, ncol = index[0]+MOVE_COORDS[i][0], index[1]+MOVE_COORDS[i][1]                    
-                    if self.isValidCoordinate(nrow, ncol) and self.states[nrow][ncol] is None:
-                        ret.append(Action(self.current_player, MOVE_ACTIONS[i], index[0], index[1]))
 
-        if self.player_turn == 1:
+        if not is_zombie:
             for row in range(self.rows):
                 for col in range(self.columns):
                     if self.states[row][col] is not None and self.states[row][col].isZombie:
@@ -90,17 +84,29 @@ class Board:
             for row in range(self.rows):
                 for col in range(self.columns):
                     if self.states[row][col] is not None and not self.states[row][col].isZombie:
-                        if self.isAdjacentTo(row, col, True):
+                        if not self.states[row][col].isVaccinated and self.isAdjacentTo(row, col, True):
                             ret.append(Action(self.current_player, "bite", row, col))
+            #if len(ret) > 0: return ret  #Assumes Zombies are smart
+
+        for i in range(4):
+            for index, val in np.ndenumerate(self.states):
+                if val is not None and val.isZombie == is_zombie and not val.isStunned:
+                    nrow, ncol = index[0]+MOVE_COORDS[i][0], index[1]+MOVE_COORDS[i][1]                    
+                    if self.isValidCoordinate(nrow, ncol) and self.states[nrow][ncol] is None:
+                        ret.append(Action(self.current_player, MOVE_ACTIONS[i], index[0], index[1]))
+
+        if len(ret) == 0:
+            return [Action(self.current_player, "skip", -1, -1)] # Only zombie remaining is stunned, must skip turn
 
         return ret
 
     def takeAction(self, action):
-        new_board = deepcopy(self)
+        new_board = deepcopy(self)        
+        
         if new_board.current_player == -1:
             new_board.update_effects(simulation=True)
         new_board.current_player *= -1
-        
+
         if action.act == "move_up":
             new_board.moveUp(action.row, action.col)
         elif action.act == "move_down":
@@ -114,7 +120,7 @@ class Board:
         elif action.act == "heal":
             new_board.auto_heal(action.row, action.col)
         elif action.act == "bite":
-            new_board.auto_bite(action.row, action.col)
+            new_board.auto_bite(action.row, action.col)        
 
         return new_board
 
@@ -136,7 +142,7 @@ class Board:
                     if p.isVaccinated: ret += "v"
                     else: ret += "p"
             ret += "\n"
-        return ret                              
+        return ret    
 
     def move(self, row, col, nrow, ncol):                
         if not self.isValidCoordinate(nrow, ncol):
@@ -184,6 +190,7 @@ class Board:
             elif (self.states[row][col].halfCured == True or (self.hasHospital and self.is_in_hospital(row, col))):
                 self.states[row][col] = Person(False)                
                 self.states[row][col].wasCured = True
+                self.states[row][col].halfCured = False
                 self.num_zombies -= 1
                 self.num_humans += 1
                 if not simulation:
@@ -238,6 +245,7 @@ class Board:
             elif (self.states[row][col].halfCured == True or (self.hasHospital and self.is_in_hospital(row, col))):
                 self.states[row][col] = Person(False)                
                 self.states[row][col].wasCured = True
+                self.states[row][col].halfCured = False
                 self.num_zombies -= 1
                 self.num_humans += 1                
                 DataCollector.zombies_cured += 1
@@ -386,6 +394,7 @@ class Board:
             coord = rd.choice(possible_bite)
             self.bite(coord[0], coord[1])
             print("Zombie: Bite " + str(coord))
+            self.current_player *= -1
             return True
         else:            
             # No zombies can bite, move the zombie that is nearest to a person.
