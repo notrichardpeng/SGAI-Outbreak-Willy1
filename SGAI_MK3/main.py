@@ -266,7 +266,8 @@ while running:
             PF.display_win_screen(GameBoard.num_humans, score, times, bonus)
             #print(score)
             if event.type == pygame.QUIT:
-                running = False            
+                running = False
+                break            
 
         # Computer turn
         if playerMoved:
