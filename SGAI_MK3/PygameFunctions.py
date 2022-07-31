@@ -360,9 +360,9 @@ def display_options_screen(self_play, hospital, hover):
             display_image(screen, "Assets/unchecked_box.png", (100, 100), (350, 250))
     
     # Show Stats button
-    display_image(screen, "Assets/DefaultButton.png", (100, 100), (500, 500))
+    display_image(screen, "Assets/button_round.png", (100, 100), (500, 500))
     # Tutorial button
-    display_image(screen, "Assets/DefaultButton.png", (100, 100), (200, 600))
+    display_image(screen, "Assets/button_round.png", (100, 100), (200, 600))
     
     pygame.display.update()
 
