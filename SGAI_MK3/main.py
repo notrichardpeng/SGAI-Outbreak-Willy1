@@ -2,7 +2,7 @@ import numpy as np
 import pygame
 import random as rd 
 import threading
-from mcts import mcts #pip install mcts
+from mod_mcts import mcts
 
 import PygameFunctions as PF
 import Tutorial as T
@@ -97,13 +97,15 @@ kill_button = "button"
 heal_button = "button"
 
 # Monte Carlo!
-searcher = mcts(timeLimit=3000)
+searcher = mcts(timeLimit=1000, explorationConstant=2)
 
 def monte_carlo():
     global GameBoard, ai_running    
-    action = searcher.search(GameBoard)
-    
-    print(action)
+    ret = searcher.search(initialState=GameBoard, needDetails=True)
+    action = ret["action"]
+    reward = ret["expectedReward"]
+    print(str(action) + ": " + str(reward))
+
     if action.act == "move_up":
         GameBoard.moveUp(action.row, action.col)        
     elif action.act == "move_down":
@@ -313,7 +315,7 @@ while running:
                 GameBoard = Board(hospital=hospital)                
                 continue
             
-            #pygame.time.wait(AI_PLAY_WAITTIME_MS)
+            #pygame.time.wait(AI_PLAY_WAITTIME_MS)            
             GameBoard.zombie_random_move()
             GameBoard.update_effects()            
 
