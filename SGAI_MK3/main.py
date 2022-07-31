@@ -136,7 +136,12 @@ move = 0
 game_number = 1
 button_press = pygame.mixer.Sound("Assets/button_press.wav")
 button_up = pygame.mixer.Sound("Assets/button_up.wav")
-
+throw = pygame.mixer.Sound("Assets/throw.wav")
+potion_break = pygame.mixer.Sound("Assets/potion_break.wav")
+unfect = pygame.mixer.Sound("Assets/unfect.wav")
+vaccine = pygame.mixer.Sound("Assets/vaccine.wav")
+zombie_bite = pygame.mixer.Sound("Assets/zombie_bite.wav")
+watergun = pygame.mixer.Sound("Assets/watergun.wav")
 DataCollector.reset_data()
 if not self_play:
     DataCollector.clear_ai_data()
@@ -232,6 +237,10 @@ while running:
                     if result[1] == "half": 
                         # Half heal animation
                         while frame < 12:
+                            if frame == 0:
+                                throw.play()
+                            if frame == 5:
+                                potion_break.play()
                             PF.half_heal_animation(frame)
                             pygame.display.update()                            
                             clock.tick(12)
@@ -240,6 +249,10 @@ while running:
                         score += 25
                     elif result[1] == "full":
                         while frame < 16:
+                            if frame == 0:
+                                throw.play()
+                            if frame == 3:
+                                unfect.play()
                             PF.full_heal_animation(frame)
                             pygame.display.update()                            
                             clock.tick(8)
@@ -248,6 +261,10 @@ while running:
                         score += 25
                     elif result[1] == "vaccine": 
                         while frame < 6:
+                            if frame == 0:
+                                throw.play()
+                            if frame == 3:
+                                vaccine.play()
                             PF.vaccine_animation(frame)
                             pygame.display.update()                            
                             clock.tick(8)
@@ -262,6 +279,8 @@ while running:
                     playerMoved = True
                     kill_button = "button"                                  # turns kill button back to normal
                     while frame < 9:
+                        if frame == 5:
+                            watergun.play()
                         PF.kill_animation(frame)
                         pygame.display.update()                        
                         clock.tick(8)
@@ -299,6 +318,8 @@ while running:
             actions = GameBoard.zombie_move()
             if GameBoard.num_humans == tempcalc-1:
                 while frame < 11:
+                    if frame == 4:
+                        zombie_bite.play()
                     PF.zombie_bite(frame)
                     pygame.display.update()                            
                     clock.tick(8)
