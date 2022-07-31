@@ -4,12 +4,14 @@ BACKGROUND = "#b0b0b0"
 BACKGROUND1 = "#63666A"
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-CELL_COLOR = (176, 176, 176)
+GRAY = (120, 114, 118)
+CELL_COLOR = (153, 156, 158)
+BAR = (136, 138, 140)
 HOSPITAL_COLOR = (191, 209, 255)
 LINE_WIDTH = 5
-DISPLAY_BORDER = 150
+DISPLAY_BORDER = 100
 DISPLAY_CELL_DIMENSIONS = (100,100)
-
+GRID = pygame.Surface((1200, 800), pygame.SRCALPHA)
 image_assets = [
     "person_normal.png",
     "person_vax.png",
@@ -51,14 +53,20 @@ def run(GameBoard, hasHospital, heal_button, kill_button):
     """
     Draw the screen and return any events.
     """
-    screen.fill(BACKGROUND)
+    screen.fill(BACKGROUND1)
+    pygame.draw.rect(screen, BAR, (750, 100, 350, 600))
     build_grid(GameBoard, hasHospital) # Draw the grid
     display_buttons(heal_button, kill_button)
     display_people(GameBoard)      
 
 def display_buttons(heal_button, kill_button):
-    display_image(screen, "Assets/kill_" + kill_button + ".png", (), (800, 50))         # draws specified kill button asset
-    display_image(screen, "Assets/heal_" + heal_button + ".png", (), (800, 200))        # draws specified heal button asset
+    display_image(screen, "Assets/kill_" + kill_button + ".png", (), (785, 180))         # draws specified kill button asset
+    display_image(screen, "Assets/heal_" + heal_button + ".png", (), (850, 400))        # draws specified heal button asset
+    my_font = pygame.font.Font("Assets/Minecraft.ttf", 30)
+    kill_text = my_font.render("KILL", True, (220, 223, 224))
+    heal_text = my_font.render("HEAL/VAX", True, (220, 223, 224))
+    screen.blit(kill_text, (840, 280))
+    screen.blit(heal_text, (765, 550))
 
 def get_events():
     return pygame.event.get()
@@ -83,21 +91,24 @@ def build_grid(GameBoard, hasHospital):
     pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER - LINE_WIDTH, DISPLAY_BORDER + grid_height, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])  # bottom
     pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER - LINE_WIDTH, DISPLAY_BORDER - LINE_WIDTH, grid_width + (2 * LINE_WIDTH), LINE_WIDTH])   # top
     pygame.draw.rect(screen, CELL_COLOR, [DISPLAY_BORDER, DISPLAY_BORDER, grid_width, grid_height]) # Fill the inside wioth the cell color
-    
     if hasHospital == True:
-        pygame.draw.rect(screen, HOSPITAL_COLOR, [150, 150, 300, 300])
+        pygame.draw.rect(screen, HOSPITAL_COLOR, [100, 100, 300, 300])
+        v = pygame.image.load("Assets/hospital_tile.png").convert_alpha()
+        GRID.blit(v, (100, 175))
+        
 
+    GRID.set_alpha(128)
     # Draw the vertical lines
     i = DISPLAY_BORDER + DISPLAY_CELL_DIMENSIONS[0]
     while i < DISPLAY_BORDER + grid_width:
-        pygame.draw.rect(screen, BLACK, [i, DISPLAY_BORDER, LINE_WIDTH, grid_height])
+        pygame.draw.rect(GRID, GRAY, [i, DISPLAY_BORDER, LINE_WIDTH, grid_height])
         i += DISPLAY_CELL_DIMENSIONS[0]
     # Draw the horizontal lines
     i = DISPLAY_BORDER + DISPLAY_CELL_DIMENSIONS[1]
     while i < DISPLAY_BORDER + grid_height:
-        pygame.draw.rect(screen, BLACK, [DISPLAY_BORDER, i, grid_width, LINE_WIDTH])
+        pygame.draw.rect(GRID, GRAY, [DISPLAY_BORDER, i, grid_width, LINE_WIDTH])
         i += DISPLAY_CELL_DIMENSIONS[1]
-
+    screen.blit(GRID, (0,0))
 def display_people(GameBoard):
     """
     Draw the people (government, vaccinated, and zombies) on the grid.
@@ -325,8 +336,8 @@ def display_options_screen(self_play, hospital, hover):
     pygame.display.update()
 
 def select(coord):
-    left = coord[1] * 100 + 150
-    top = coord[0] * 100 + 150
+    left = coord[1] * 100 + 100
+    top = coord[0] * 100 + 100
     color = (232, 232, 232)
     # Drawing Rectangle
     pygame.draw.rect(screen, color, pygame.Rect(left, top, 100 + LINE_WIDTH, 100 + LINE_WIDTH),  LINE_WIDTH+3)

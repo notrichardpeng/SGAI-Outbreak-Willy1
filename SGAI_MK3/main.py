@@ -88,16 +88,16 @@ frame = 0
 
 # Buttons
 kill_img = pygame.image.load("Assets/kill_button.png").convert_alpha()
-KillButton = kill_img.get_rect(topleft=(800, 50))
+KillButton = kill_img.get_rect(topleft=(785, 150))
 
 heal_img = pygame.image.load("Assets/heal_button.png").convert_alpha()
-HealButton = heal_img.get_rect(topleft=(800, 200))
+HealButton = heal_img.get_rect(topleft=(840, 400))
 
 kill_button = "button"
 heal_button = "button"
 
 # Monte Carlo!
-searcher = mcts(timeLimit=1000, explorationConstant=2)
+searcher = mcts(timeLimit=15000, explorationConstant=2.0)
 
 def monte_carlo():
     global GameBoard, ai_running    
@@ -170,12 +170,12 @@ while running:
             if event.type == pygame.QUIT:
                 running = False
         # Display the current action
-        PF.screen.blit(
+        """PF.screen.blit(
             pygame.font.SysFont("Calibri", 20).render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
         PF.screen.blit(pygame.font.SysFont("Calibri", 20).render(f"{take_action}", True, PF.WHITE), (800, 450))
-
+"""
         # Deselects or overrides action button
         if len(take_action) == 2:
             if take_action[0] == take_action[1]:
