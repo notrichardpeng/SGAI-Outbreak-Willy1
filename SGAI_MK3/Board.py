@@ -78,8 +78,12 @@ class Board:
             for row in range(self.rows):
                 for col in range(self.columns):
                     if self.states[row][col] is not None and not self.states[row][col].isVaccinated:
-                        if self.isAdjacentTo(row, col, False):                      
+                        if self.states[row][col].isZombie:
+                            if self.isAdjacentTo(row, col, False):                      
+                                ret.append(Action(self.current_player, "heal", row, col))
+                        else:
                             ret.append(Action(self.current_player, "heal", row, col))
+                            
         else:
             for row in range(self.rows):
                 for col in range(self.columns):
