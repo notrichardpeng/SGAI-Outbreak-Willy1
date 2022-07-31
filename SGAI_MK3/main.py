@@ -88,10 +88,10 @@ frame = 0
 
 # Buttons
 kill_img = pygame.image.load("Assets/kill_button.png").convert_alpha()
-KillButton = kill_img.get_rect(topleft=(785, 150))
+KillButton = kill_img.get_rect(topleft=(785, 180))
 
 heal_img = pygame.image.load("Assets/heal_button.png").convert_alpha()
-HealButton = heal_img.get_rect(topleft=(840, 400))
+HealButton = heal_img.get_rect(topleft=(850, 400))
 
 kill_button = "button"
 heal_button = "button"
@@ -127,7 +127,8 @@ def monte_carlo():
 score = 0
 move = 0
 game_number = 1
-
+button_press = pygame.mixer.Sound("Assets/button_press.wav")
+button_up = pygame.mixer.Sound("Assets/button_up.wav")
 DataCollector.reset_data()
 if not self_play:
     DataCollector.clear_ai_data()
@@ -138,9 +139,11 @@ while running:
         for event in pygame.event.get():
             if HealButton.collidepoint(pygame.mouse.get_pos()):
                 if event.type == pygame.MOUSEBUTTONUP:                          # If heal button is let go of, select heal and update heal button image to selected
+                    button_up.play()
                     take_action.append("heal")
                     heal_button = "select"
                 elif event.type == pygame.MOUSEBUTTONDOWN:                      # If heal button is pressed, update heal button image to pressed
+                    button_press.play()
                     heal_button = "press"
                 elif heal_button != "select":                                   # If mouse is over heal button, update heal button to hovering
                     heal_button = "hover"                       
@@ -148,9 +151,11 @@ while running:
                 heal_button = "button"
             if KillButton.collidepoint(pygame.mouse.get_pos()):
                 if event.type == pygame.MOUSEBUTTONUP:                          # If kill button is let go of, select kill and update kill button image to selected
+                    button_up.play()
                     take_action.append("kill")
                     kill_button = "select"
                 elif event.type == pygame.MOUSEBUTTONDOWN:                      # If kill button is pressed, update kill button image to pressed
+                    button_press.play()
                     kill_button = "press"
                 elif kill_button != "select":
                     kill_button = "hover"                                       # If mouse is over kill button, update kill button to hovering
