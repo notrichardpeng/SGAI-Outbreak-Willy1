@@ -282,6 +282,7 @@ while running:
 
         # Computer turn
         if playerMoved:
+            PF.run(GameBoard, hospital, heal_button, kill_button)
             pygame.display.update()
             playerMoved = False
             take_action = []
