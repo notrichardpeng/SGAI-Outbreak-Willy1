@@ -20,8 +20,8 @@ class DataCollector:
         DataCollector.turns_taken = 0
 
     @staticmethod
-    def save_player_data():
-        with open("previous_game_data.txt", "w") as f:
+    def save_player_data(filename="previous_game_data.txt"):
+        with open(filename, "w") as f:
             lines = [
                 "Winner: " + ("Human" if DataCollector.humans_remaining > 0 else "Zombie") + "\n",
                 "Has hospital: " + str(DataCollector.hospital) + "\n",
@@ -41,8 +41,8 @@ class DataCollector:
             f.write("")
 
     @staticmethod
-    def save_ai_data_of_one_game(game_number):
-        with open("ai_games_data.txt", "a") as f:
+    def save_ai_data_of_one_game(game_number, filename="ai_games_data.txt"):
+        with open(filename, "a") as f:
             lines = [
                 "---\n",
                 "Game Number: " + str(game_number) + "\n",
@@ -57,3 +57,19 @@ class DataCollector:
                 "Number of turns taken: " + str(DataCollector.turns_taken) + "\n"
             ]
             f.writelines(lines)
+    
+    @staticmethod
+    def save_stats_data(self_play):
+        if  DataCollector.hospital:
+            if self_play:
+                DataCollector.save_player_data("SelfPlayData_Hospital.txt")
+            else:
+                DataCollector.save_ai_data_of_one_game(1, "AiData_Hospital.txt")
+        else:
+            if self_play:
+                DataCollector.save_player_data("SelfPlayData_NoHospital.txt")
+            else:
+                DataCollector.save_ai_data_of_one_game(1, "AiData_NoHospital.txt")
+
+
+
