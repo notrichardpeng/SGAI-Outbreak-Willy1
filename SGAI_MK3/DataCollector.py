@@ -59,17 +59,17 @@ class DataCollector:
             f.writelines(lines)
     
     @staticmethod
-    def save_stats_data(self_play):
+    def save_stats_data(self_play, game_number):
         if  DataCollector.hospital:
             if self_play:
                 DataCollector.save_player_data("SelfPlayData_Hospital.txt")
             else:
-                DataCollector.save_ai_data_of_one_game(1, "AiData_Hospital.txt")
+                DataCollector.save_ai_data_of_one_game(game_number, "AiData_Hospital.txt")
         else:
             if self_play:
                 DataCollector.save_player_data("SelfPlayData_NoHospital.txt")
             else:
-                DataCollector.save_ai_data_of_one_game(1, "AiData_NoHospital.txt")
+                DataCollector.save_ai_data_of_one_game(game_number, "AiData_NoHospital.txt")
 
 
 

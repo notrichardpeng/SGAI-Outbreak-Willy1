@@ -76,21 +76,21 @@ class Stats:
         return timesZombiesCured, timesZombiesKilled
 
 
-    def rewardsChart(self):
+    def ethicsChart(self):
         plt.clf()
 
         x = ["Yes Hospital", "No Hospital"]
         y_cured = [0,0]
         y_killed = [0,0]
 
-        # load hospital data
+        # load self play hospital data
         self.loadData("SelfPlayData_Hospital.txt")
         values = self.calculatePercents()
         y_cured[0] = values[0]
         y_killed[0] = values[1]
         DataCollector.reset_data()
 
-        # load no hospital data
+        # load self play no hospital data
         self.loadData("SelfPlayData_NoHospital.txt")
         values = self.calculatePercents()
         y_cured[1] = values[0]

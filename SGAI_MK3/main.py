@@ -65,7 +65,7 @@ while proceed == False:
             # Stats Button
             elif StatsButton.collidepoint(pygame.mouse.get_pos()):
                 st = Stats()
-                st.rewardsChart()
+                st.ethicsChart()
             elif TutorialButton.collidepoint(pygame.mouse.get_pos()):
                 T.tutorial()
         elif event.type == pygame.MOUSEMOTION:
@@ -259,7 +259,7 @@ while running:
         if GameBoard.num_humans == 0:
             PF.display_lose_screen(GameBoard.num_zombies)
             DataCollector.save_player_data()
-            DataCollector.save_stats_data(True)
+            DataCollector.save_stats_data(True, 1)
             #print(score)
             if event.type == pygame.QUIT:
                 running = False
@@ -268,7 +268,7 @@ while running:
             bonus = GameBoard.num_humans*100
             DataCollector.humans_remaining = GameBoard.num_humans
             DataCollector.save_player_data()
-            DataCollector.save_stats_data(True)
+            DataCollector.save_stats_data(True, 1)
             PF.display_win_screen(GameBoard.num_humans, score, times, bonus)
             #print(score)
             if event.type == pygame.QUIT:
@@ -309,7 +309,7 @@ while running:
             if GameBoard.num_zombies == 0:                                
                 DataCollector.humans_remaining = GameBoard.num_humans
                 DataCollector.save_ai_data_of_one_game(game_number)
-                DataCollector.save_stats_data(False)
+                DataCollector.save_stats_data(False, game_number)
                 game_number += 1
                 DataCollector.reset_data()
                 GameBoard = Board(hospital=hospital)                
@@ -323,7 +323,7 @@ while running:
             if GameBoard.num_humans == 0:
                 DataCollector.humans_remaining = 0
                 DataCollector.save_ai_data_of_one_game(game_number)
-                DataCollector.save_stats_data(False)
+                DataCollector.save_stats_data(False, game_number)
                 game_number += 1
                 DataCollector.reset_data()
                 GameBoard = Board(hospital=hospital)                
