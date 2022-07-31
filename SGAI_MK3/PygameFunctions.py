@@ -1,5 +1,10 @@
 import pygame
-
+'''
+from asciimatics.effects import Cycle, Stars
+from asciimatics.renderers import FigletText
+from asciimatics.scene import Scene
+from asciimatics.screen import Screen
+'''
 BACKGROUND = "#b0b0b0"
 BACKGROUND1 = "#63666A"
 BLACK = (0, 0, 0)
@@ -302,6 +307,7 @@ def display_lose_screen(num_zombies, score):
             return
 def display_start_screen(starthover):
     screen.fill(BACKGROUND1)
+    #screen.wrapper(ascii)
     my_font = pygame.font.Font("Assets/Minecraft.ttf", 100)
     text_image = my_font.render("Outbreak", True, WHITE)
     screen.blit(
@@ -320,7 +326,7 @@ def display_start_screen(starthover):
     if starthover == "start":
         display_image(screen, "Assets/start_img_2.png", (300, 100), (455, 600))
     else:
-        display_image(screen, "Assets/start_img.png", (300, 100), (455, 600))
+        display_image(screen, "Assets/start_img-modified.png", (300, 100), (455, 600))
     pygame.display.update()
 
 def display_options_screen(self_play, hospital, hover):
