@@ -24,6 +24,7 @@ hospital = False
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
+click = pygame.mixer.Sound("Assets/click.wav")
 #Start menu
 StartButton = pygame.Rect(455, 600, 300, 100)
 procstart = False
@@ -34,6 +35,7 @@ while procstart == False:
         starthover = ""
         if event.type == pygame.MOUSEBUTTONDOWN:
             if StartButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 procstart = True
         elif event.type == pygame.MOUSEMOTION:
             if StartButton.collidepoint(pygame.mouse.get_pos()):
@@ -57,16 +59,21 @@ while proceed == False:
         hover = ""
         if event.type == pygame.MOUSEBUTTONDOWN:
             if SelfPlayButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 self_play = not self_play
             elif HospitalOnButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 hospital = not hospital
             elif ProceedButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 proceed = True
             # Stats Button
             elif StatsButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 st = Stats()
                 st.ethicsChart()
             elif TutorialButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 T.tutorial()
         elif event.type == pygame.MOUSEMOTION:
             if ProceedButton.collidepoint(pygame.mouse.get_pos()):
@@ -129,6 +136,7 @@ move = 0
 game_number = 1
 button_press = pygame.mixer.Sound("Assets/button_press.wav")
 button_up = pygame.mixer.Sound("Assets/button_up.wav")
+
 DataCollector.reset_data()
 if not self_play:
     DataCollector.clear_ai_data()
@@ -165,12 +173,13 @@ while running:
                 if len(take_action) < 2:                                        # Checks if list is less than 2
                     x, y = pygame.mouse.get_pos()                               
                     action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile                    
-
                     if action != None:                                                
                         if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
                             if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
+                                click.play()
                                 take_action.append(action)
-                        else:                                                   # Otherwise, add selected tile as destination                            
+                        else:                                                   # Otherwise, add selected tile as destination  
+                            click.play()                          
                             take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
