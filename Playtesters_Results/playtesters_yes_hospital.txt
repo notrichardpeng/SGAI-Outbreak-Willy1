@@ -1,0 +1,29 @@
+Winner: Zombie
+Has hospital: True
+Zombies killed: 9
+Zombies cured: 2
+Zombies cured in hospital: 0
+Humans vaccinated: 2
+Humans remaining: 0
+Humans infected: 9
+Number of turns taken: 27
+---
+Winner: Human
+Has hospital: True
+Zombies killed: 3
+Zombies cured: 7
+Zombies cured in hospital: 3
+Humans vaccinated: 0
+Humans remaining: 10
+Humans infected: 4
+Number of turns taken: 15
+---
+Winner: Human
+Has hospital: True
+Zombies killed: 9
+Zombies cured: 5
+Zombies cured in hospital: 4
+Humans vaccinated: 4
+Humans remaining: 4
+Humans infected: 8
+Number of turns taken: 27
