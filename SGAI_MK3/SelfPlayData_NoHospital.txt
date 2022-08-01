@@ -1,9 +1,0 @@
-Winner: Human
-Has hospital: False
-Zombies killed: 12
-Zombies cured: 4
-Zombies cured in hospital: 0
-Humans vaccinated: 0
-Humans remaining: 5
-Humans infected: 10
-Number of turns taken: 22

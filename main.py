@@ -143,11 +143,15 @@ vaccine = pygame.mixer.Sound("Assets/vaccine.wav")
 zombie_bite = pygame.mixer.Sound("Assets/zombie_bite.wav")
 watergun = pygame.mixer.Sound("Assets/watergun.wav")
 DataCollector.reset_data()
-if not self_play:
-    DataCollector.clear_ai_data()
+#if not self_play:
+    #DataCollector.clear_ai_data()
+
+WINDOWLESS = False
+if WINDOWLESS:
+    pygame.quit()
 
 while running:        
-    PF.run(GameBoard, hospital, heal_button, kill_button)
+    if not WINDOWLESS: PF.run(GameBoard, hospital, heal_button, kill_button)
     if self_play:                
         for event in pygame.event.get():
             if HealButton.collidepoint(pygame.mouse.get_pos()):
@@ -331,11 +335,12 @@ while running:
     # AI Algorithm        
     else:                
         
-        pygame.display.update() 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                break                
+        if not WINDOWLESS:
+            pygame.display.update() 
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    break                
         
         if not ai_running and GameBoard.current_player == 1:
             threading.Thread(target=monte_carlo).start()
@@ -355,7 +360,7 @@ while running:
             GameBoard.zombie_random_move()
             GameBoard.update_effects()            
 
-            pygame.display.update()
+            if not WINDOWLESS: pygame.display.update()
             if GameBoard.num_humans == 0:
                 DataCollector.humans_remaining = 0
                 DataCollector.save_ai_data_of_one_game(game_number)
@@ -364,5 +369,5 @@ while running:
                 DataCollector.reset_data()
                 GameBoard = Board(hospital=hospital)                
                 continue
-    pygame.display.update()
+    if not WINDOWLESS: pygame.display.update()
         
