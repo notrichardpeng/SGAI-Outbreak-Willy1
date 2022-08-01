@@ -157,7 +157,7 @@ def display_win_screen(num_humans, score, times, bonus):
 
     pygame.time.wait(2)
     n=0
-    for i in range(score):
+    for i in range(score//5):
         screen.fill(BACKGROUND2)
         pygame.draw.rect(screen, BLACK, (250, 400, 700, 350))
         pygame.draw.rect(screen, BLACK, (450, 350, 300, 50))
@@ -178,11 +178,11 @@ def display_win_screen(num_humans, score, times, bonus):
             my_font.render(f"MISSION SCORE: {n}", True, WHITE),
             (300, 500),
         )
-        n += 1
+        n += 5
         pygame.display.update()
     n=0
     if times <= 0:
-        for i in range(-times):
+        for i in range(-times//5):
             screen.fill(BACKGROUND2)
             pygame.draw.rect(screen, BLACK, (250, 400, 700, 350))
             pygame.draw.rect(screen, BLACK, (450, 350, 300, 50))
@@ -207,10 +207,10 @@ def display_win_screen(num_humans, score, times, bonus):
                 my_font.render(f"TIME BONUS: {n}", True, WHITE),
                 (300, 550),
             )
-            n += -1
+            n += -5
             pygame.display.update()
     else:
-        for i in range(times):
+        for i in range(times//5):
             screen.fill(BACKGROUND2)
             pygame.draw.rect(screen, BLACK, (250, 400, 700, 350))
             pygame.draw.rect(screen, BLACK, (450, 350, 300, 50))
@@ -235,10 +235,10 @@ def display_win_screen(num_humans, score, times, bonus):
                 my_font.render(f"TIME BONUS: {n}", True, WHITE),
                 (300, 550),
             )
-            n += 1
+            n += 5
             pygame.display.update()
     n=0
-    for i in range(bonus):
+    for i in range(bonus//5):
         screen.fill(BACKGROUND2)
         pygame.draw.rect(screen, BLACK, (250, 400, 700, 350))
         pygame.draw.rect(screen, BLACK, (450, 350, 300, 50))
@@ -267,7 +267,7 @@ def display_win_screen(num_humans, score, times, bonus):
         my_font.render(f"SURVIVOR BONUS: {n}", True, WHITE),
         (300, 600),
         )
-        n += 1
+        n += 5
         pygame.display.update()
     #BROWN = "#964B00"
     screen.fill(BACKGROUND2)
