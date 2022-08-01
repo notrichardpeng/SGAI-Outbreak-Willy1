@@ -146,7 +146,7 @@ DataCollector.reset_data()
 #if not self_play:
     #DataCollector.clear_ai_data()
 
-WINDOWLESS = True
+WINDOWLESS = False
 if WINDOWLESS:
     pygame.quit()
 
