@@ -1,5 +1,6 @@
 *.pyc
 test.py
+tmp.txt
 previous_game_data.txt
 ai_games_data.txt
 AiData_Hospital.txt
