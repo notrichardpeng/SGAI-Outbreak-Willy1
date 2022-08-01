@@ -21,4 +21,8 @@ Then, please follow these steps:
 5. Finish this game
 6. Open `SelfPlayData_Hospital.txt` and `SelfPlayData_NoHospital.txt`, copy and paste both into the willy1 game test Discord channel
 
+MAKE NOTE THAT THE ENTIRE TEXT FILE GETS REWRITTEN EACH GAME.
+
+To re-play the game, close the game tab and re-run `python main.py`
+
 Thanks for playing and we hope you have fun! Any constructive feedback is welcome.

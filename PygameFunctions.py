@@ -1,4 +1,5 @@
 import pygame
+from DataCollector import DataCollector
 '''
 from asciimatics.effects import Cycle, Stars
 from asciimatics.renderers import FigletText
@@ -26,6 +27,8 @@ image_assets = [
 ]
 
 # Initialize pygame
+pygame_icon = pygame.image.load('Assets/zombie_head_icon.png')
+pygame.display.set_icon(pygame_icon)
 screen = pygame.display.set_mode((1200, 800))
 pygame.display.set_caption("Outbreak!")
 pygame.font.init()
@@ -147,6 +150,10 @@ def display_win_screen(num_humans, score, times, bonus):
         (300, 200),
     )
     screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be zombies, that could have been human.", True, WHITE),
+        (75, 250),
+    )
+    screen.blit(
         my_font.render(f"RESULT", True, GOLD),
         (540, 360),
     )
@@ -166,6 +173,10 @@ def display_win_screen(num_humans, score, times, bonus):
             (300, 200),
         )
         screen.blit(
+            pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be zombies, that could have been human.", True, WHITE),
+            (75, 250),
+        )
+        screen.blit(
         my_font.render(f"RESULT", True, GOLD),
         (540, 360),
         ) 
@@ -180,63 +191,39 @@ def display_win_screen(num_humans, score, times, bonus):
         )
         n += 5
         pygame.display.update()
-    n=0
-    if times <= 0:
-        for i in range(-times//5):
-            screen.fill(BACKGROUND2)
-            pygame.draw.rect(screen, BLACK, (250, 400, 700, 350))
-            pygame.draw.rect(screen, BLACK, (450, 350, 300, 50))
-            screen.blit(
-                pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
-                (300, 200),
-            )
-            screen.blit(
-            my_font.render(f"RESULT", True, GOLD),
-            (540, 360),
-            ) 
-            screen.blit(
-                my_font.render(f"Calculating Score...", True, GOLD),
-                (300, 450),
-            )
-            screen.blit(
-                my_font.render(f"MISSION SCORE: {score}", True, GOLD),
-                (300, 500),
-            )
-            pygame.time.wait(2)
-            screen.blit(
-                my_font.render(f"TIME BONUS: {n}", True, WHITE),
-                (300, 550),
-            )
-            n += -5
-            pygame.display.update()
-    else:
-        for i in range(times//5):
-            screen.fill(BACKGROUND2)
-            pygame.draw.rect(screen, BLACK, (250, 400, 700, 350))
-            pygame.draw.rect(screen, BLACK, (450, 350, 300, 50))
-            screen.blit(
-                pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
-                (300, 200),
-            )
-            screen.blit(
-            my_font.render(f"RESULT", True, GOLD),
-            (540, 360),
-            ) 
-            screen.blit(
-                my_font.render(f"Calculating Score...", True, GOLD),
-                (300, 450),
-            )
-            screen.blit(
-                my_font.render(f"MISSION SCORE: {score}", True, GOLD),
-                (300, 500),
-            )
-            pygame.time.wait(2)
-            screen.blit(
-                my_font.render(f"TIME BONUS: {n}", True, WHITE),
-                (300, 550),
-            )
-            n += 5
-            pygame.display.update()
+    n=0    
+    for i in range(abs(times)//5):
+        screen.fill(BACKGROUND2)
+        pygame.draw.rect(screen, BLACK, (250, 400, 700, 350))
+        pygame.draw.rect(screen, BLACK, (450, 350, 300, 50))
+        screen.blit(
+            pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
+            (300, 200),
+        )
+        screen.blit(
+            pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be zombies, that could have been human.", True, WHITE),
+            (75, 250),
+        )
+        screen.blit(
+        my_font.render(f"RESULT", True, GOLD),
+        (540, 360),
+        ) 
+        screen.blit(
+            my_font.render(f"Calculating Score...", True, GOLD),
+            (300, 450),
+        )
+        screen.blit(
+            my_font.render(f"MISSION SCORE: {score}", True, GOLD),
+            (300, 500),
+        )
+        pygame.time.wait(2)
+        screen.blit(
+            my_font.render(f"TIME BONUS: {n}", True, WHITE),
+            (300, 550),
+        )
+        n += -5
+        pygame.display.update()
+    
     n=0
     for i in range(bonus//5):
         screen.fill(BACKGROUND2)
@@ -245,6 +232,10 @@ def display_win_screen(num_humans, score, times, bonus):
         screen.blit(
             pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
             (300, 200),
+        )
+        screen.blit(
+            pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be zombies, that could have been human.", True, WHITE),
+            (75, 250),
         )
         screen.blit(
         my_font.render(f"RESULT", True, GOLD),
@@ -276,6 +267,10 @@ def display_win_screen(num_humans, score, times, bonus):
     screen.blit(
         pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
         (300, 200),
+    )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be infected, who could have been human.", True, WHITE),
+        (75, 250),
     )
     screen.blit(
     my_font.render(f"RESULT", True, GOLD),
