@@ -1,5 +1,5 @@
 import pygame
-import DataCollector
+from DataCollector import DataCollector
 '''
 from asciimatics.effects import Cycle, Stars
 from asciimatics.renderers import FigletText
@@ -148,6 +148,10 @@ def display_win_screen(num_humans, score, times, bonus):
         (300, 200),
     )
     screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be zombies, that could have been human.", True, WHITE),
+        (75, 250),
+    )
+    screen.blit(
         my_font.render(f"RESULT", True, GOLD),
         (540, 360),
     )
@@ -165,6 +169,10 @@ def display_win_screen(num_humans, score, times, bonus):
         screen.blit(
             pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
             (300, 200),
+        )
+        screen.blit(
+            pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be zombies, that could have been human.", True, WHITE),
+            (75, 250),
         )
         screen.blit(
         my_font.render(f"RESULT", True, GOLD),
@@ -189,6 +197,10 @@ def display_win_screen(num_humans, score, times, bonus):
         screen.blit(
             pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
             (300, 200),
+        )
+        screen.blit(
+            pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be zombies, that could have been human.", True, WHITE),
+            (75, 250),
         )
         screen.blit(
         my_font.render(f"RESULT", True, GOLD),
@@ -220,6 +232,10 @@ def display_win_screen(num_humans, score, times, bonus):
             (300, 200),
         )
         screen.blit(
+            pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be zombies, that could have been human.", True, WHITE),
+            (75, 250),
+        )
+        screen.blit(
         my_font.render(f"RESULT", True, GOLD),
         (540, 360),
         ) 
@@ -249,6 +265,10 @@ def display_win_screen(num_humans, score, times, bonus):
     screen.blit(
         pygame.font.SysFont("Calibri", 32).render(f"You win! You ended with {num_humans} people. Fine work soldier.", True, WHITE),
         (300, 200),
+    )
+    screen.blit(
+        pygame.font.SysFont("Calibri", 32).render(f"You killed {DataCollector.zombies_killed} zombies who didn't want to be infected, who could have been human.", True, WHITE),
+        (75, 250),
     )
     screen.blit(
     my_font.render(f"RESULT", True, GOLD),
