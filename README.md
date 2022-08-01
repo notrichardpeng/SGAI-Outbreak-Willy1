@@ -6,7 +6,7 @@ Please clone the repository: `git clone https://github.com/notrichardpeng/SGAI-O
 
 Run the game: `cd SGAI-Outbreak-Willy1` and `python main.py`
 
-Then, please follow the following steps:
+Then, please follow these steps:
 
 1. Click the tutorial button and watch how to play
 2. Check self-play option, but NOT the hospital option
