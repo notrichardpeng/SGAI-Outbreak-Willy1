@@ -14,7 +14,7 @@ Run the game: `python main.py`
 
 Then, please follow these steps:
 
-1. Click the tutorial button and watch how to play
+1. Click the tutorial button and watch how to play (Optional)
 2. Check self-play option, but NOT the hospital option
 3. Play and finish the game
 4. Restart the game, but this time check the hospital option as well
