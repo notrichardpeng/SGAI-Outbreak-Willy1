@@ -303,7 +303,7 @@ def display_win_screen(num_humans, score, times, bonus):
 
     # catch quit event
 
-def display_lose_screen(num_zombies, score):
+def display_lose_screen(num_zombies):
     screen.fill(BACKGROUND)
     screen.blit(
         pygame.font.SysFont("Minecraft.ttf", 36).render(f"You lose! There were {num_zombies} zombies when the game ended", True, WHITE),
