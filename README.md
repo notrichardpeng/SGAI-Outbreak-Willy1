@@ -3,7 +3,9 @@ This is the repository that Beaverworks' SGAI 2022 will be using to understand s
 
 ## Playtesters - look here!
 Please clone the repository: `git clone https://github.com/notrichardpeng/SGAI-Outbreak-Willy1.git`
+
 Run the game: `cd SGAI-Outbreak-Willy1` and `python main.py`
+
 Then, please follow the following steps:
 
 1. Click the tutorial button and watch how to play
