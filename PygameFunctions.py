@@ -26,6 +26,8 @@ image_assets = [
 ]
 
 # Initialize pygame
+pygame_icon = pygame.image.load('Assets/zombie_head_icon.png')
+pygame.display.set_icon(pygame_icon)
 screen = pygame.display.set_mode((1200, 800))
 pygame.display.set_caption("Outbreak!")
 pygame.font.init()
