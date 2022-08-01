@@ -60,18 +60,16 @@ class Stats:
             print("Data File Issue: File not found or file format invalid")
 
     def calculatePercents(self):
-        #DataCollector.hospital
-        #DataCollector.zombies_killed
-        #DataCollector.zombies_cured
 
         total_zombie_interaction = DataCollector.zombies_killed + DataCollector.zombies_cured
-        timesZombiesCured = (DataCollector.zombies_cured / total_zombie_interaction) * 100
-        timesZombiesKilled = (DataCollector.zombies_killed / total_zombie_interaction) * 100
+        timesZombiesCured = 0
+        timesZombiesKilled = 0
+        if total_zombie_interaction != 0:
+            timesZombiesCured = (DataCollector.zombies_cured / total_zombie_interaction) * 100
+            timesZombiesKilled = (DataCollector.zombies_killed / total_zombie_interaction) * 100
+        else:
+            print("No Data to Plot")
 
-        #print("Cured: ")
-        #print(timesZombiesCured)
-        #print("Killed: ")
-        #print(timesZombiesKilled)
         return timesZombiesCured, timesZombiesKilled
 
 
