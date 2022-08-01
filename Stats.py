@@ -69,7 +69,7 @@ class Stats:
         try:
             file1 = open(filename, "r") 
 
-            while (line := file1.readline()):
+            while (line == file1.readline()):
                 while line == "\n" or line == "---\n":
                     line = file1.readline()
                     #print(line)
