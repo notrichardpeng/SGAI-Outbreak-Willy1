@@ -2,9 +2,15 @@
 This is the repository that Beaverworks' SGAI 2022 will be using to understand serious games and reinforcement learning.
 
 ## Playtesters - look here!
-Please clone the repository: `git clone https://github.com/notrichardpeng/SGAI-Outbreak-Willy1.git`
+Please clone the repository and go to the directory: 
 
-Run the game: `cd SGAI-Outbreak-Willy1` and `python main.py`
+`git clone https://github.com/notrichardpeng/SGAI-Outbreak-Willy1.git`
+
+`cd SGAI-Outbreak-Willy1`
+
+Install requirements if needed: `pip install -r requirements.txt`
+
+Run the game: `python main.py`
 
 Then, please follow these steps:
 
