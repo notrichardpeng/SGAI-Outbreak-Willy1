@@ -19,6 +19,6 @@ Then, please follow these steps:
 3. Play and finish the game
 4. Restart the game, but this time check the hospital option as well
 5. Finish this game
-6. Open `SelfPlayData_Hospital.txt` and `SelfPlayData_NoHospital`, copy and paste both into the willy1 game test Discord channel
+6. Open `SelfPlayData_Hospital.txt` and `SelfPlayData_NoHospital.txt`, copy and paste both into the willy1 game test Discord channel
 
 Thanks for playing and we hope you have fun! Any constructive feedback is welcome.
