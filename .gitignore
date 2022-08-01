@@ -1,1 +1,7 @@
-*.pyc
+test.py
+previous_game_data.txt
+ai_games_data.txt
+AiData_Hospital.txt
+AiData_NoHospital.txt
+SelfPlayData_Hospital.txt
+SelfPlayData_NoHospital.txt

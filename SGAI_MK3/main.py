@@ -24,6 +24,7 @@ hospital = False
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.mixer.init()
+click = pygame.mixer.Sound("Assets/click.wav")
 #Start menu
 StartButton = pygame.Rect(455, 600, 300, 100)
 procstart = False
@@ -34,6 +35,7 @@ while procstart == False:
         starthover = ""
         if event.type == pygame.MOUSEBUTTONDOWN:
             if StartButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 procstart = True
         elif event.type == pygame.MOUSEMOTION:
             if StartButton.collidepoint(pygame.mouse.get_pos()):
@@ -57,16 +59,21 @@ while proceed == False:
         hover = ""
         if event.type == pygame.MOUSEBUTTONDOWN:
             if SelfPlayButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 self_play = not self_play
             elif HospitalOnButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 hospital = not hospital
             elif ProceedButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 proceed = True
             # Stats Button
             elif StatsButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 st = Stats()
-                st.rewardsChart()
+                st.ethicsChart()
             elif TutorialButton.collidepoint(pygame.mouse.get_pos()):
+                click.play()
                 T.tutorial()
         elif event.type == pygame.MOUSEMOTION:
             if ProceedButton.collidepoint(pygame.mouse.get_pos()):
@@ -80,6 +87,7 @@ while proceed == False:
 
 GameBoard = Board(hospital=hospital)
 ai_running = False
+DataCollector.hospital = hospital
 
 # Self play variables
 clock = pygame.time.Clock()
@@ -87,10 +95,10 @@ frame = 0
 
 # Buttons
 kill_img = pygame.image.load("Assets/kill_button.png").convert_alpha()
-KillButton = kill_img.get_rect(topleft=(800, 50))
+KillButton = kill_img.get_rect(topleft=(785, 180))
 
 heal_img = pygame.image.load("Assets/heal_button.png").convert_alpha()
-HealButton = heal_img.get_rect(topleft=(800, 200))
+HealButton = heal_img.get_rect(topleft=(850, 400))
 
 kill_button = "button"
 heal_button = "button"
@@ -126,7 +134,14 @@ def monte_carlo():
 score = 0
 move = 0
 game_number = 1
-
+button_press = pygame.mixer.Sound("Assets/button_press.wav")
+button_up = pygame.mixer.Sound("Assets/button_up.wav")
+throw = pygame.mixer.Sound("Assets/throw.wav")
+potion_break = pygame.mixer.Sound("Assets/potion_break.wav")
+unfect = pygame.mixer.Sound("Assets/unfect.wav")
+vaccine = pygame.mixer.Sound("Assets/vaccine.wav")
+zombie_bite = pygame.mixer.Sound("Assets/zombie_bite.wav")
+watergun = pygame.mixer.Sound("Assets/watergun.wav")
 DataCollector.reset_data()
 #if not self_play:
     #DataCollector.clear_ai_data()
@@ -141,9 +156,11 @@ while running:
         for event in pygame.event.get():
             if HealButton.collidepoint(pygame.mouse.get_pos()):
                 if event.type == pygame.MOUSEBUTTONUP:                          # If heal button is let go of, select heal and update heal button image to selected
+                    button_up.play()
                     take_action.append("heal")
                     heal_button = "select"
                 elif event.type == pygame.MOUSEBUTTONDOWN:                      # If heal button is pressed, update heal button image to pressed
+                    button_press.play()
                     heal_button = "press"
                 elif heal_button != "select":                                   # If mouse is over heal button, update heal button to hovering
                     heal_button = "hover"                       
@@ -151,9 +168,11 @@ while running:
                 heal_button = "button"
             if KillButton.collidepoint(pygame.mouse.get_pos()):
                 if event.type == pygame.MOUSEBUTTONUP:                          # If kill button is let go of, select kill and update kill button image to selected
+                    button_up.play()
                     take_action.append("kill")
                     kill_button = "select"
                 elif event.type == pygame.MOUSEBUTTONDOWN:                      # If kill button is pressed, update kill button image to pressed
+                    button_press.play()
                     kill_button = "press"
                 elif kill_button != "select":
                     kill_button = "hover"                                       # If mouse is over kill button, update kill button to hovering
@@ -163,22 +182,23 @@ while running:
                 if len(take_action) < 2:                                        # Checks if list is less than 2
                     x, y = pygame.mouse.get_pos()                               
                     action = PF.get_action(GameBoard, x, y)                     # If it is, find position of tile                    
-
                     if action != None:                                                
                         if take_action == []:                                   # If take_action is empty, check if selected tile is empty. If so, add selected tile as target
                             if ((GameBoard.states[action[0]][action[1]] is not None) and (GameBoard.states[action[0]][action[1]].isZombie == False)):
+                                click.play()
                                 take_action.append(action)
-                        else:                                                   # Otherwise, add selected tile as destination                            
+                        else:                                                   # Otherwise, add selected tile as destination  
+                            click.play()                          
                             take_action.append(action)
             if event.type == pygame.QUIT:
                 running = False
         # Display the current action
-        PF.screen.blit(
+        """PF.screen.blit(
             pygame.font.SysFont("Calibri", 20).render("Your move is currently:", True, PF.WHITE),
             (800, 400),
         )
         PF.screen.blit(pygame.font.SysFont("Calibri", 20).render(f"{take_action}", True, PF.WHITE), (800, 450))
-
+"""
         # Deselects or overrides action button
         if len(take_action) == 2:
             if take_action[0] == take_action[1]:
@@ -221,6 +241,10 @@ while running:
                     if result[1] == "half": 
                         # Half heal animation
                         while frame < 12:
+                            if frame == 0:
+                                throw.play()
+                            if frame == 5:
+                                potion_break.play()
                             PF.half_heal_animation(frame)
                             pygame.display.update()                            
                             clock.tick(12)
@@ -229,6 +253,10 @@ while running:
                         score += 25
                     elif result[1] == "full":
                         while frame < 16:
+                            if frame == 0:
+                                throw.play()
+                            if frame == 3:
+                                unfect.play()
                             PF.full_heal_animation(frame)
                             pygame.display.update()                            
                             clock.tick(8)
@@ -237,6 +265,10 @@ while running:
                         score += 25
                     elif result[1] == "vaccine": 
                         while frame < 6:
+                            if frame == 0:
+                                throw.play()
+                            if frame == 3:
+                                vaccine.play()
                             PF.vaccine_animation(frame)
                             pygame.display.update()                            
                             clock.tick(8)
@@ -251,6 +283,8 @@ while running:
                     playerMoved = True
                     kill_button = "button"                                  # turns kill button back to normal
                     while frame < 9:
+                        if frame == 5:
+                            watergun.play()
                         PF.kill_animation(frame)
                         pygame.display.update()                        
                         clock.tick(8)
@@ -262,6 +296,7 @@ while running:
         if GameBoard.num_humans == 0:
             PF.display_lose_screen(GameBoard.num_zombies)
             DataCollector.save_player_data()
+            DataCollector.save_stats_data(True, 1)
             #print(score)
             if event.type == pygame.QUIT:
                 running = False
@@ -270,6 +305,7 @@ while running:
             bonus = GameBoard.num_humans*100
             DataCollector.humans_remaining = GameBoard.num_humans
             DataCollector.save_player_data()
+            DataCollector.save_stats_data(True, 1)
             PF.display_win_screen(GameBoard.num_humans, score, times, bonus)
             #print(score)
             if event.type == pygame.QUIT:
@@ -278,6 +314,7 @@ while running:
 
         # Computer turn
         if playerMoved:
+            PF.run(GameBoard, hospital, heal_button, kill_button)
             pygame.display.update()
             playerMoved = False
             take_action = []
@@ -285,6 +322,8 @@ while running:
             actions = GameBoard.zombie_move()
             if GameBoard.num_humans == tempcalc-1:
                 while frame < 11:
+                    if frame == 4:
+                        zombie_bite.play()
                     PF.zombie_bite(frame)
                     pygame.display.update()                            
                     clock.tick(8)
@@ -311,6 +350,7 @@ while running:
             if GameBoard.num_zombies == 0:                                
                 DataCollector.humans_remaining = GameBoard.num_humans
                 DataCollector.save_ai_data_of_one_game(game_number)
+                DataCollector.save_stats_data(False, game_number)
                 game_number += 1
                 DataCollector.reset_data()
                 GameBoard = Board(hospital=hospital)                
@@ -324,6 +364,7 @@ while running:
             if GameBoard.num_humans == 0:
                 DataCollector.humans_remaining = 0
                 DataCollector.save_ai_data_of_one_game(game_number)
+                DataCollector.save_stats_data(False, game_number)
                 game_number += 1
                 DataCollector.reset_data()
                 GameBoard = Board(hospital=hospital)                
