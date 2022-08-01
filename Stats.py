@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from DataCollector import DataCollector
-import pickle
 
 class Stats:
     def __init__(self):
