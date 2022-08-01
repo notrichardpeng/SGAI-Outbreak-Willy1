@@ -72,6 +72,7 @@ while proceed == False:
                 click.play()
                 st = Stats()
                 st.ethicsChart()
+                st.AI_ethicsChart()
             elif TutorialButton.collidepoint(pygame.mouse.get_pos()):
                 click.play()
                 T.tutorial()
