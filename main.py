@@ -331,7 +331,6 @@ while running:
                 frame = 0     
                 score += -50        
             GameBoard.update_effects()
-            move += 1
     # AI Algorithm        
     else:                
         
