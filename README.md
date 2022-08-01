@@ -9,6 +9,6 @@ Please clone the repository and run `main.py` in whatever terminal/IDE you use. 
 3. Play and finish the game
 4. Open `previous_game_data.txt`, copy and paste everything into the willy1 game test Discord channel
 5. Restart the game, but this time check the hospital option as well
-6. Repeat steps (2) and (3)
+6. Repeat steps (3) and (4)
 
 Thanks for playing and we hope you have fun! Any constructive feedback is welcome.
