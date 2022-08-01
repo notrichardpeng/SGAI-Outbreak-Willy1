@@ -1,0 +1,363 @@
+---
+Game Number: 1
+Winner: Human
+Has hospital: False
+Zombies killed: 8
+Zombies cured: 10
+Zombies cured in hospital: 0
+Humans vaccinated: 41
+Humans remaining: 5
+Humans infected: 13
+Number of turns taken: 226
+---
+Game Number: 2
+Winner: Zombie
+Has hospital: False
+Zombies killed: 3
+Zombies cured: 5
+Zombies cured in hospital: 0
+Humans vaccinated: 17
+Humans remaining: 0
+Humans infected: 13
+Number of turns taken: 74
+---
+Game Number: 1
+Winner: Human
+Has hospital: False
+Zombies killed: 8
+Zombies cured: 13
+Zombies cured in hospital: 0
+Humans vaccinated: 35
+Humans remaining: 5
+Humans infected: 16
+Number of turns taken: 231
+---
+Game Number: 3
+Winner: Human
+Has hospital: False
+Zombies killed: 13
+Zombies cured: 7
+Zombies cured in hospital: 0
+Humans vaccinated: 25
+Humans remaining: 4
+Humans infected: 14
+Number of turns taken: 176
+---
+Game Number: 2
+Winner: Human
+Has hospital: False
+Zombies killed: 12
+Zombies cured: 12
+Zombies cured in hospital: 0
+Humans vaccinated: 28
+Humans remaining: 5
+Humans infected: 18
+Number of turns taken: 141
+---
+Game Number: 1
+Winner: Zombie
+Has hospital: False
+Zombies killed: 2
+Zombies cured: 7
+Zombies cured in hospital: 0
+Humans vaccinated: 12
+Humans remaining: 0
+Humans infected: 16
+Number of turns taken: 79
+---
+Game Number: 1
+Winner: Zombie
+Has hospital: False
+Zombies killed: 6
+Zombies cured: 11
+Zombies cured in hospital: 0
+Humans vaccinated: 19
+Humans remaining: 0
+Humans infected: 19
+Number of turns taken: 141
+---
+Game Number: 4
+Winner: Human
+Has hospital: False
+Zombies killed: 8
+Zombies cured: 10
+Zombies cured in hospital: 0
+Humans vaccinated: 40
+Humans remaining: 5
+Humans infected: 13
+Number of turns taken: 222
+---
+Game Number: 3
+Winner: Human
+Has hospital: False
+Zombies killed: 12
+Zombies cured: 16
+Zombies cured in hospital: 0
+Humans vaccinated: 44
+Humans remaining: 4
+Humans infected: 23
+Number of turns taken: 220
+---
+Game Number: 1
+Winner: Human
+Has hospital: False
+Zombies killed: 9
+Zombies cured: 13
+Zombies cured in hospital: 0
+Humans vaccinated: 50
+Humans remaining: 6
+Humans infected: 16
+Number of turns taken: 210
+---
+Game Number: 2
+Winner: Human
+Has hospital: False
+Zombies killed: 10
+Zombies cured: 14
+Zombies cured in hospital: 0
+Humans vaccinated: 38
+Humans remaining: 4
+Humans infected: 19
+Number of turns taken: 197
+---
+Game Number: 2
+Winner: Human
+Has hospital: False
+Zombies killed: 9
+Zombies cured: 8
+Zombies cured in hospital: 0
+Humans vaccinated: 22
+Humans remaining: 6
+Humans infected: 11
+Number of turns taken: 139
+---
+Game Number: 5
+Winner: Human
+Has hospital: False
+Zombies killed: 11
+Zombies cured: 8
+Zombies cured in hospital: 0
+Humans vaccinated: 40
+Humans remaining: 5
+Humans infected: 13
+Number of turns taken: 195
+---
+Game Number: 4
+Winner: Human
+Has hospital: False
+Zombies killed: 10
+Zombies cured: 13
+Zombies cured in hospital: 0
+Humans vaccinated: 25
+Humans remaining: 5
+Humans infected: 18
+Number of turns taken: 184
+---
+Game Number: 3
+Winner: Human
+Has hospital: False
+Zombies killed: 11
+Zombies cured: 11
+Zombies cured in hospital: 0
+Humans vaccinated: 28
+Humans remaining: 5
+Humans infected: 16
+Number of turns taken: 147
+---
+Game Number: 3
+Winner: Human
+Has hospital: False
+Zombies killed: 9
+Zombies cured: 8
+Zombies cured in hospital: 0
+Humans vaccinated: 44
+Humans remaining: 5
+Humans infected: 11
+Number of turns taken: 207
+---
+Game Number: 4
+Winner: Zombie
+Has hospital: False
+Zombies killed: 8
+Zombies cured: 9
+Zombies cured in hospital: 0
+Humans vaccinated: 21
+Humans remaining: 0
+Humans infected: 20
+Number of turns taken: 148
+---
+Game Number: 6
+Winner: Human
+Has hospital: False
+Zombies killed: 10
+Zombies cured: 19
+Zombies cured in hospital: 0
+Humans vaccinated: 43
+Humans remaining: 5
+Humans infected: 23
+Number of turns taken: 262
+---
+Game Number: 2
+Winner: Human
+Has hospital: False
+Zombies killed: 11
+Zombies cured: 22
+Zombies cured in hospital: 0
+Humans vaccinated: 64
+Humans remaining: 4
+Humans infected: 27
+Number of turns taken: 407
+---
+Game Number: 5
+Winner: Human
+Has hospital: False
+Zombies killed: 10
+Zombies cured: 20
+Zombies cured in hospital: 0
+Humans vaccinated: 54
+Humans remaining: 5
+Humans infected: 25
+Number of turns taken: 267
+---
+Game Number: 4
+Winner: Zombie
+Has hospital: False
+Zombies killed: 10
+Zombies cured: 9
+Zombies cured in hospital: 0
+Humans vaccinated: 38
+Humans remaining: 0
+Humans infected: 19
+Number of turns taken: 192
+---
+Game Number: 7
+Winner: Human
+Has hospital: False
+Zombies killed: 8
+Zombies cured: 13
+Zombies cured in hospital: 0
+Humans vaccinated: 28
+Humans remaining: 6
+Humans infected: 16
+Number of turns taken: 166
+---
+Game Number: 3
+Winner: Human
+Has hospital: False
+Zombies killed: 11
+Zombies cured: 15
+Zombies cured in hospital: 0
+Humans vaccinated: 33
+Humans remaining: 5
+Humans infected: 20
+Number of turns taken: 160
+---
+Game Number: 5
+Winner: Human
+Has hospital: False
+Zombies killed: 13
+Zombies cured: 22
+Zombies cured in hospital: 0
+Humans vaccinated: 58
+Humans remaining: 4
+Humans infected: 29
+Number of turns taken: 298
+---
+Game Number: 6
+Winner: Human
+Has hospital: False
+Zombies killed: 9
+Zombies cured: 23
+Zombies cured in hospital: 0
+Humans vaccinated: 43
+Humans remaining: 5
+Humans infected: 26
+Number of turns taken: 277
+---
+Game Number: 5
+Winner: Human
+Has hospital: False
+Zombies killed: 12
+Zombies cured: 15
+Zombies cured in hospital: 0
+Humans vaccinated: 56
+Humans remaining: 4
+Humans infected: 21
+Number of turns taken: 274
+---
+Game Number: 8
+Winner: Human
+Has hospital: False
+Zombies killed: 9
+Zombies cured: 15
+Zombies cured in hospital: 0
+Humans vaccinated: 34
+Humans remaining: 5
+Humans infected: 19
+Number of turns taken: 222
+---
+Game Number: 4
+Winner: Human
+Has hospital: False
+Zombies killed: 9
+Zombies cured: 14
+Zombies cured in hospital: 0
+Humans vaccinated: 36
+Humans remaining: 5
+Humans infected: 17
+Number of turns taken: 228
+---
+Game Number: 6
+Winner: Zombie
+Has hospital: False
+Zombies killed: 8
+Zombies cured: 9
+Zombies cured in hospital: 0
+Humans vaccinated: 28
+Humans remaining: 0
+Humans infected: 19
+Number of turns taken: 150
+---
+Game Number: 9
+Winner: Zombie
+Has hospital: False
+Zombies killed: 3
+Zombies cured: 3
+Zombies cured in hospital: 0
+Humans vaccinated: 9
+Humans remaining: 0
+Humans infected: 13
+Number of turns taken: 49
+---
+Game Number: 7
+Winner: Human
+Has hospital: False
+Zombies killed: 11
+Zombies cured: 11
+Zombies cured in hospital: 0
+Humans vaccinated: 30
+Humans remaining: 5
+Humans infected: 17
+Number of turns taken: 178
+---
+Game Number: 5
+Winner: Human
+Has hospital: False
+Zombies killed: 9
+Zombies cured: 15
+Zombies cured in hospital: 0
+Humans vaccinated: 37
+Humans remaining: 6
+Humans infected: 19
+Number of turns taken: 173
+---
+Game Number: 6
+Winner: Human
+Has hospital: False
+Zombies killed: 7
+Zombies cured: 15
+Zombies cured in hospital: 0
+Humans vaccinated: 37
+Humans remaining: 6
+Humans infected: 16
+Number of turns taken: 224
