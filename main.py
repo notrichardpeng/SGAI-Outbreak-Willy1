@@ -105,7 +105,7 @@ kill_button = "button"
 heal_button = "button"
 
 # Monte Carlo!
-searcher = mcts(timeLimit=3000, explorationConstant=2.0)
+searcher = mcts(timeLimit=500, explorationConstant=2.0)
 
 def monte_carlo():
     global GameBoard, ai_running    
@@ -147,7 +147,7 @@ DataCollector.reset_data()
 #if not self_play:
     #DataCollector.clear_ai_data()
 
-WINDOWLESS = True
+WINDOWLESS = False
 if WINDOWLESS:
     pygame.quit()
 
