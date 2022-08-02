@@ -68,3 +68,13 @@ Humans vaccinated: 4
 Humans remaining: 10
 Humans infected: 9
 Number of turns taken: 37
+---
+Winner: Human
+Has hospital: True
+Zombies killed: 7
+Zombies cured: 24
+Zombies cured in hospital: 13
+Humans vaccinated: 0
+Humans remaining: 7
+Humans infected: 26
+Number of turns taken: 70
